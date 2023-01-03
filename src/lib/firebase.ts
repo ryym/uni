@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { Auth, connectAuthEmulator, getAuth } from "firebase/auth";
+import { Auth, getAuth } from "firebase/auth";
 import { Database, connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { log } from "./logger";
 
@@ -26,9 +26,7 @@ export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
     log.debug("starting Firebase emulator...");
     const { default: config } = await import("../../firebase.json");
     const em = config.emulators;
-    const host = "localhost";
-    connectAuthEmulator(auth, `http://${host}:${em.auth.port}`);
-    connectDatabaseEmulator(db, host, em.database.port);
+    connectDatabaseEmulator(db, "localhost", em.database.port);
   }
 
   return Object.freeze({ auth, db });
