@@ -4,6 +4,7 @@ import { log } from "~/lib/logger";
 
 export type SubscribeProtoEventsParams = {
   readonly roomId: string;
+  readonly lastSeq?: number | null;
   readonly onEvent: (seq: number, event: unknown) => void;
 };
 
@@ -12,7 +13,8 @@ export const subscribeProtoEvents = (
   params: SubscribeProtoEventsParams,
 ): Unsubscribe => {
   const eventsRef = ref(db, `protoevents/${params.roomId}`);
-  const q = query(eventsRef, orderByKey(), startAfter("000"));
+  const lastKey = seqToKey(params.lastSeq || 0);
+  const q = query(eventsRef, orderByKey(), startAfter(lastKey));
   return onChildAdded(q, (snapshot) => {
     log.debug("protoevent", snapshot.key, snapshot.val());
     const seq = Number(snapshot.key);
@@ -33,7 +35,10 @@ export const dispatchProtoEvent = async (
   db: Database,
   params: DispatchProtoEventParams,
 ): Promise<void> => {
-  const seqKey = params.seq.toString().padStart(3, "0");
-  const eventRef = ref(db, `protoevents/${params.roomId}/${seqKey}`);
+  const eventRef = ref(db, `protoevents/${params.roomId}/${seqToKey(params.seq)}`);
   await set(eventRef, params.event);
+};
+
+const seqToKey = (seq: number): string => {
+  return seq.toString().padStart(3, "0");
 };

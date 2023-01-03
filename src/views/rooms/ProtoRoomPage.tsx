@@ -5,7 +5,8 @@ import { useProtoGameState } from "./_store/protogameState";
 
 export function ProtoRoomPage(): ReactElement {
   const user = useAtomValue(userAtom);
-  const [gameState, dispatch] = useProtoGameState();
+  const isUser2 = user.uid[0] === "H";
+  const [gameState, dispatch] = useProtoGameState(user.uid, !isUser2);
 
   return (
     <div>
@@ -30,7 +31,7 @@ export function ProtoRoomPage(): ReactElement {
           dispatch({
             type: "Draw",
             playerUid: user.uid,
-            numOfCards: user.uid[0] === "H" ? 2 : 1,
+            numOfCards: isUser2 ? 2 : 1,
           });
         }}
       >
