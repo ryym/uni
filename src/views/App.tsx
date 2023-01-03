@@ -1,5 +1,7 @@
+import { Provider } from "jotai";
 import { ReactElement, StrictMode } from "react";
 import { FirebaseClient } from "~/lib/firebase";
+import { firebaseAtomInitializers } from "./_store/firebase";
 
 export type AppProps = {
   readonly firebase: FirebaseClient;
@@ -8,7 +10,9 @@ export type AppProps = {
 export function App(props: AppProps): ReactElement {
   return (
     <StrictMode>
-      <h1>Hello, world</h1>
+      <Provider initialValues={firebaseAtomInitializers(props.firebase)}>
+        <h1>Hello, world</h1>
+      </Provider>
     </StrictMode>
   );
 }
