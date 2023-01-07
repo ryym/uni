@@ -23,7 +23,7 @@ export const useProtoGameState = (uid: string, isOwner: boolean): UseProtoGameSt
   const [gameState, setGameState] = useState<ProtoGameState | null>(null);
 
   const dispatch = (action: ProtoGameAction) => {
-    dispatchProtoEvent(firebase.db, {
+    dispatchProtoEvent(firebase.rtdb, {
       roomId: "dev",
       seq: (seqRef.current || 0) + 1,
       event: action,
@@ -34,14 +34,14 @@ export const useProtoGameState = (uid: string, isOwner: boolean): UseProtoGameSt
     if (stateRestored) {
       return;
     }
-    readProtoGameStateCache(firebase.db, { roomId: "dev" }).then((cache) => {
+    readProtoGameStateCache(firebase.rtdb, { roomId: "dev" }).then((cache) => {
       if (cache != null) {
         seqRef.current = cache.eventSeq;
         setGameState(cache.state);
       }
       setStateRestored(true);
     });
-  }, [stateRestored, firebase.db]);
+  }, [stateRestored, firebase.rtdb]);
 
   useEffect(() => {
     if (!stateRestored) {
@@ -50,10 +50,10 @@ export const useProtoGameState = (uid: string, isOwner: boolean): UseProtoGameSt
 
     const cacheGameState = debounce((eventSeq: number, state: ProtoGameState) => {
       log.debug("cache game state", eventSeq, state);
-      storeProtoGameStateCache(firebase.db, { roomId: "dev", eventSeq, state });
+      storeProtoGameStateCache(firebase.rtdb, { roomId: "dev", eventSeq, state });
     });
 
-    return subscribeProtoEvents(firebase.db, {
+    return subscribeProtoEvents(firebase.rtdb, {
       roomId: "dev",
       lastSeq: seqRef.current,
       onEvent: (seq, event) => {
@@ -72,7 +72,7 @@ export const useProtoGameState = (uid: string, isOwner: boolean): UseProtoGameSt
         }
       },
     });
-  }, [stateRestored, firebase.db, uid, isOwner]);
+  }, [stateRestored, firebase.rtdb, uid, isOwner]);
 
   return [gameState, dispatch] as const;
 };

@@ -6,8 +6,8 @@ import { log } from "./logger";
 
 export type FirebaseClient = {
   readonly auth: Auth;
-  readonly db: Database;
-  readonly firestore: Firestore;
+  readonly rtdb: Database;
+  readonly db: Firestore;
 };
 
 export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
@@ -22,19 +22,19 @@ export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
     measurementId: getEnv("VITE_FIREBASE_MEASUREMENT_ID"),
   });
   const auth = getAuth(app);
-  const db = getDatabase(app);
-  const firestore = getFirestore(app);
+  const rtdb = getDatabase(app);
+  const db = getFirestore(app);
 
   if (__FIREBASE_EMULATOR__) {
     log.debug("starting Firebase emulator...");
     const { default: config } = await import("../../firebase.json");
     const em = config.emulators;
     const host = "localhost";
-    connectDatabaseEmulator(db, host, em.database.port);
-    connectFirestoreEmulator(firestore, host, em.firestore.port);
+    connectDatabaseEmulator(rtdb, host, em.database.port);
+    connectFirestoreEmulator(db, host, em.firestore.port);
   }
 
-  return Object.freeze({ auth, db, firestore });
+  return Object.freeze({ auth, rtdb, db });
 };
 
 const getEnv = (name: string): string => {
