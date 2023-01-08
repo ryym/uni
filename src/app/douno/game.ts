@@ -49,6 +49,37 @@ export const updateGameState = (
   state: GameState,
   action: GameAction,
 ): UpdateGameResult => {
+  const buildPatchResult = buildPatch(config, state, action);
+  if (!buildPatchResult.ok) {
+    return { ok: false, errors: [buildPatchResult.message] };
+  }
+
+  const nextState = applyPatch(config, state, buildPatchResult.patch);
+  return { ok: true, state: nextState };
+};
+
+type BuildPatchResult =
+  | {
+      readonly ok: true;
+      readonly patch: GameStatePatch;
+    }
+  | {
+      readonly ok: false;
+      readonly message: string;
+    };
+
+type GameStatePatch = {
+  readonly deckTopIdx: number;
+  readonly discardPile: GameState["discardPile"];
+  readonly playerHand: readonly number[];
+  readonly playerMove: PlayerMove;
+};
+
+type PlayerMove = {
+  readonly step: number;
+};
+
+const buildPatch = (config: GameConfig, state: GameState, action: GameAction): BuildPatchResult => {
   switch (action.type) {
     case "Start": {
       throw new Error('[douno] "Start" action is fired during game');
@@ -57,9 +88,11 @@ export const updateGameState = (
     case "Pass": {
       return {
         ok: true,
-        state: {
-          ...state,
-          currentPlayerUid: determineNextPlayer(config.playerUids, state.currentPlayerUid),
+        patch: {
+          deckTopIdx: state.deckTopIdx,
+          discardPile: state.discardPile,
+          playerHand: state.hands[state.currentPlayerUid],
+          playerMove: { step: 1 },
         },
       };
     }
@@ -67,13 +100,11 @@ export const updateGameState = (
     case "Draw": {
       return {
         ok: true,
-        state: {
-          ...state,
+        patch: {
           deckTopIdx: state.deckTopIdx + 1,
-          hands: {
-            ...state.hands,
-            [state.currentPlayerUid]: [...state.hands[state.currentPlayerUid], state.deckTopIdx],
-          },
+          discardPile: state.discardPile,
+          playerHand: [...state.hands[state.currentPlayerUid], state.deckTopIdx],
+          playerMove: { step: 0 },
         },
       };
     }
@@ -81,23 +112,33 @@ export const updateGameState = (
     case "Play": {
       return {
         ok: true,
-        state: {
-          ...state,
-          currentPlayerUid: determineNextPlayer(config.playerUids, state.currentPlayerUid),
-          hands: {
-            ...state.hands,
-            [state.currentPlayerUid]: state.hands[state.currentPlayerUid].filter(
-              (i) => i !== action.cardIdx,
-            ),
-          },
+        patch: {
+          deckTopIdx: state.deckTopIdx,
           discardPile: {
             topCards: [action.cardIdx, ...state.discardPile.topCards].slice(0, 5),
             color: findCardColor(config.deck[action.cardIdx]),
           },
+          playerHand: state.hands[state.currentPlayerUid].filter((i) => i !== action.cardIdx),
+          playerMove: { step: 1 },
         },
       };
     }
   }
+};
+
+const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch): GameState => {
+  return {
+    currentPlayerUid:
+      patch.playerMove.step === 1
+        ? determineNextPlayer(config.playerUids, state.currentPlayerUid)
+        : state.currentPlayerUid,
+    deckTopIdx: patch.deckTopIdx,
+    discardPile: patch.discardPile,
+    hands: {
+      ...state.hands,
+      [state.currentPlayerUid]: patch.playerHand,
+    },
+  };
 };
 
 const determineNextPlayer = (playerUids: readonly string[], currentPlayer: string): string => {
