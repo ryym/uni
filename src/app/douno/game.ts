@@ -24,6 +24,9 @@ export type GameAction =
       readonly type: "Start";
     }
   | {
+      readonly type: "Pass";
+    }
+  | {
       readonly type: "Draw";
     }
   | {
@@ -49,6 +52,16 @@ export const updateGameState = (
   switch (action.type) {
     case "Start": {
       throw new Error('[douno] "Start" action is fired during game');
+    }
+
+    case "Pass": {
+      return {
+        ok: true,
+        state: {
+          ...state,
+          currentPlayerUid: determineNextPlayer(config.playerUids, state.currentPlayerUid),
+        },
+      };
     }
 
     case "Draw": {

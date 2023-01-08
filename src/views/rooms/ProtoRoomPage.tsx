@@ -146,6 +146,9 @@ function GameStateView(props: {
         >
           Play 1
         </button>
+        <button disabled={!canPlay} onClick={() => props.update({ type: "Pass" })}>
+          Pass
+        </button>
       </div>
     </div>
   );
