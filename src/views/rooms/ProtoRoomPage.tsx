@@ -9,6 +9,7 @@ import {
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { GameAction, GameConfig, GameState, updateGameState } from "~/app/douno/game";
+import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
@@ -131,12 +132,19 @@ const syncGameState = (
     }
     case "valid": {
       const result = updateGameStateIfPossible(config, current.gameState, remote.lastAction);
-      if (result.ok) {
-        // TODO: Compare state and remote.state to verify remote.state is valid.
-        return { type: "valid", gameState: result.state };
-      } else {
+      if (!result.ok) {
         return { type: "invalid", errors: result.errors };
       }
+      if (!deepStrictEqual(result.state, remote.state)) {
+        log.debug("local and remote state mismatch", result.state, remote.state);
+        return {
+          type: "invalid",
+          errors: [
+            "予期しないゲーム状態になりました。リロードしても直らない場合はゲームを中断してください。",
+          ],
+        };
+      }
+      return { type: "valid", gameState: result.state };
     }
   }
 };
