@@ -110,6 +110,7 @@ function GameStateView(props: {
 }): ReactElement {
   const user = useAtomValue(userAtom);
   const canPlay = user.uid === props.gameState.currentPlayerUid;
+  const myHand = props.gameState.hands[user.uid];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
@@ -138,6 +139,12 @@ function GameStateView(props: {
       <div>
         <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
           Draw 1
+        </button>
+        <button
+          disabled={!canPlay}
+          onClick={() => props.update({ type: "Play", cardIdx: myHand[0] })}
+        >
+          Play 1
         </button>
       </div>
     </div>

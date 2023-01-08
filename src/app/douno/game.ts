@@ -1,4 +1,6 @@
-export type Color = "Red" | "Blue" | "Green" | "Yellow";
+const COLORS = ["Red", "Blue", "Green", "Yellow"] as const;
+
+export type Color = typeof COLORS[number];
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -23,6 +25,10 @@ export type GameAction =
     }
   | {
       readonly type: "Draw";
+    }
+  | {
+      readonly type: "Play";
+      readonly cardIdx: number;
     };
 
 export type UpdateGameResult =
@@ -59,6 +65,26 @@ export const updateGameState = (
         },
       };
     }
+
+    case "Play": {
+      return {
+        ok: true,
+        state: {
+          ...state,
+          currentPlayerUid: determineNextPlayer(config.playerUids, state.currentPlayerUid),
+          hands: {
+            ...state.hands,
+            [state.currentPlayerUid]: state.hands[state.currentPlayerUid].filter(
+              (i) => i !== action.cardIdx,
+            ),
+          },
+          discardPile: {
+            topCards: [action.cardIdx, ...state.discardPile.topCards].slice(0, 5),
+            color: findCardColor(config.deck[action.cardIdx]),
+          },
+        },
+      };
+    }
   }
 };
 
@@ -69,4 +95,13 @@ const determineNextPlayer = (playerUids: readonly string[], currentPlayer: strin
   }
   const nextIdx = (idx + 1) % playerUids.length;
   return playerUids[nextIdx];
+};
+
+const findCardColor = (cardName: string): Color => {
+  for (const color of COLORS) {
+    if (cardName.startsWith(color)) {
+      return color;
+    }
+  }
+  throw new Error("[douno] failed to detect card color");
 };
