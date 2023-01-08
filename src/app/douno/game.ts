@@ -56,7 +56,6 @@ export const updateGameState = (
         ok: true,
         state: {
           ...state,
-          currentPlayerUid: determineNextPlayer(config.playerUids, state.currentPlayerUid),
           deckTopIdx: state.deckTopIdx + 1,
           hands: {
             ...state.hands,
