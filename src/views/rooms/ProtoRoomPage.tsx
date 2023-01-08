@@ -81,39 +81,58 @@ export function ProtoRoomPage(): ReactElement {
   if (synced.type === "unset") {
     return <div>no game</div>;
   }
+  if (synced.type === "invalid") {
+    return (
+      <div>
+        <div>unexpected game state</div>
+        <div>{JSON.stringify(synced.errors)}</div>
+      </div>
+    );
+  }
   return (
     <div>
       <h1>proto room page</h1>
-      <h2>game state:</h2>
-      {synced.type === "invalid" ? (
-        <div>
-          <div>unexpected game state</div>
-          <div>{JSON.stringify(synced.errors)}</div>
-        </div>
-      ) : (
-        <GameStateView gameState={synced.gameState} update={publishNextGameState} />
+      {gameConfigRef.current == null ? null : (
+        <GameStateView
+          gameConfig={gameConfigRef.current}
+          gameState={synced.gameState}
+          update={publishNextGameState}
+        />
       )}
     </div>
   );
 }
 
 function GameStateView(props: {
+  readonly gameConfig: GameConfig;
   readonly gameState: GameState;
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
   const canPlay = user.uid === props.gameState.currentPlayerUid;
   return (
-    <div>
-      <div>game in progress</div>
-      <div>my turn?: {canPlay ? "yes" : "no"}</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <div>
-        <pre>{JSON.stringify(props.gameState, null, 2)}</pre>
+        <div>my turn?: {canPlay ? "yes" : "no"}</div>
+        <div>deck top: {props.gameState.deckTopIdx}</div>
       </div>
-      <hr />
-      <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
-        Draw 1
-      </button>
+      <div>
+        {props.gameConfig.playerUids.map((uid) => (
+          <div key={uid}>
+            <div>hand of {uid}</div>
+            <ul>
+              {props.gameState.hands[uid]?.map((cardIdx) => (
+                <li key={cardIdx}>{props.gameConfig.deck[cardIdx]}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div>
+        <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
+          Draw 1
+        </button>
+      </div>
     </div>
   );
 }
