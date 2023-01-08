@@ -1,3 +1,5 @@
+export type Color = "Red" | "Blue" | "Green" | "Yellow";
+
 export type GameConfig = {
   readonly deck: readonly string[];
   readonly playerUids: readonly string[];
@@ -8,6 +10,10 @@ export type GameState = {
   readonly deckTopIdx: number;
   readonly hands: {
     readonly [uid: string]: readonly number[];
+  };
+  readonly discardPile: {
+    readonly topCards: readonly number[];
+    readonly color: Color;
   };
 };
 

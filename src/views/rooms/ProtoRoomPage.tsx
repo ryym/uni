@@ -111,10 +111,17 @@ function GameStateView(props: {
   const user = useAtomValue(userAtom);
   const canPlay = user.uid === props.gameState.currentPlayerUid;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
         <div>deck top: {props.gameState.deckTopIdx}</div>
+      </div>
+      <div>
+        <div>discard pile (color: {props.gameState.discardPile.color})</div>
+        <div>
+          top cards:{" "}
+          {props.gameState.discardPile.topCards.map((i) => props.gameConfig.deck[i]).join(", ")}
+        </div>
       </div>
       <div>
         {props.gameConfig.playerUids.map((uid) => (

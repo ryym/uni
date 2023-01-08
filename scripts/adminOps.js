@@ -51,16 +51,20 @@ const tmpInitGameState = async (firestore) => {
 
   const batch = firestore.batch();
   batch.set(firestore.doc("games/poc"), {
-    deck: ["Red-0", "Green-0", "Blue-0", "Yellow-0"],
+    deck: ["Red-0", "Green-0", "Blue-0", "Yellow-0", "Red-1", "Green-1", "Blue-1", "Yellow-1"],
     playerUids: [uid1, uid2],
   });
   batch.set(firestore.doc("games/poc/states/current"), {
     state: {
       currentPlayerUid: uid1,
-      deckTopIdx: 2,
+      deckTopIdx: 3,
       hands: {
         [uid1]: [0],
         [uid2]: [1],
+      },
+      discardPile: {
+        topCards: [2],
+        color: "Blue",
       },
     },
     lastAction: {
