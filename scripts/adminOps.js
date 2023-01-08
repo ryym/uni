@@ -11,6 +11,7 @@ const main = async () => {
 
   const app = initFirebaseAdminForEmulator();
   const db = app.database();
+  const firestore = app.firestore();
   try {
     const command = process.argv[2];
     switch (command) {
@@ -20,6 +21,10 @@ const main = async () => {
       }
       case "clear-db": {
         await clearDb(db);
+        return;
+      }
+      case "init-game": {
+        await tmpInitGameState(firestore);
         return;
       }
       default:
@@ -35,6 +40,35 @@ const clearDb = async (db) => {
   await seedBaseData(db);
   const snapshot = await db.ref("/").once("value");
   console.log("DB cleared", snapshot.val());
+};
+
+/**
+ * @param {FirebaseFirestore.Firestore} firestore
+ */
+const tmpInitGameState = async (firestore) => {
+  const uid1 = "OY7hfWeGKJZfzkFf4QShzeCmVnn2";
+  const uid2 = "HxImD58lt4OMIgkQ7mOsMx3DPmn1";
+
+  const batch = firestore.batch();
+  batch.set(firestore.doc("games/poc"), {
+    deck: ["Red-0", "Green-0", "Blue-0", "Yellow-0"],
+    playerUids: [uid1, uid2],
+  });
+  batch.set(firestore.doc("games/poc/states/current"), {
+    state: {
+      currentPlayerUid: uid1,
+      deckTopIdx: 2,
+      hands: {
+        [uid1]: [0],
+        [uid2]: [1],
+      },
+    },
+    lastAction: {
+      type: "Start",
+    },
+  });
+  const results = await batch.commit();
+  console.log("game state initialized", results);
 };
 
 main().catch((err) => {
