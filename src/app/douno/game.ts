@@ -137,12 +137,15 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
 };
 
 const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch): GameState => {
+  const remainingPlayerUids = config.playerUids.filter((uid) => state.playerMap[uid].wonAt == null);
+  const nextPlayerUid = determineNextPlayer(
+    remainingPlayerUids,
+    state.currentPlayerUid,
+    patch.playerMove,
+  );
   return {
     turn: state.turn + 1,
-    currentPlayerUid:
-      patch.playerMove.step === 1
-        ? determineNextPlayer(config.playerUids, state.currentPlayerUid)
-        : state.currentPlayerUid,
+    currentPlayerUid: nextPlayerUid,
     deckTopIdx: patch.deckTopIdx,
     discardPile: patch.discardPile,
     playerMap: {
@@ -156,12 +159,19 @@ const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch)
   };
 };
 
-const determineNextPlayer = (playerUids: readonly string[], currentPlayer: string): string => {
+const determineNextPlayer = (
+  playerUids: readonly string[],
+  currentPlayer: string,
+  move: PlayerMove,
+): string => {
+  if (move.step === 0) {
+    return currentPlayer;
+  }
   const idx = playerUids.indexOf(currentPlayer);
   if (idx === -1) {
-    return playerUids[0];
+    throw new Error("[douno] current player not listed in remaining players");
   }
-  const nextIdx = (idx + 1) % playerUids.length;
+  const nextIdx = (idx + move.step) % playerUids.length;
   return playerUids[nextIdx];
 };
 
