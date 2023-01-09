@@ -117,6 +117,7 @@ function GameStateView(props: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
+        <div>turn: {props.gameState.turn}</div>
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
         <div>deck top: {props.gameState.deckTopIdx}</div>
       </div>

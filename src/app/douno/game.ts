@@ -8,6 +8,7 @@ export type GameConfig = {
 };
 
 export type GameState = {
+  readonly turn: number;
   readonly currentPlayerUid: string;
   readonly deckTopIdx: number;
   readonly playerMap: {
@@ -136,6 +137,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
 
 const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch): GameState => {
   return {
+    turn: state.turn + 1,
     currentPlayerUid:
       patch.playerMove.step === 1
         ? determineNextPlayer(config.playerUids, state.currentPlayerUid)

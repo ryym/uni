@@ -56,6 +56,7 @@ const tmpInitGameState = async (firestore) => {
   });
   batch.set(firestore.doc("games/poc/states/current"), {
     state: {
+      turn: 1,
       currentPlayerUid: uid1,
       deckTopIdx: 3,
       playerMap: {

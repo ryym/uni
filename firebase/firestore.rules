@@ -14,7 +14,11 @@ service cloud.firestore {
 
       match /states/current {
         allow read: if request.auth != null && (resource == null || request.auth.uid in resource.data.state.playerMap);
-        allow update: if request.auth != null && request.auth.uid == resource.data.state.currentPlayerUid;
+        allow update: if (
+            request.auth != null
+            && request.auth.uid == resource.data.state.currentPlayerUid
+            && request.resource.data.state.turn == resource.data.state.turn + 1
+        );
       }
     }
   }
