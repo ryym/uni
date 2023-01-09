@@ -58,9 +58,13 @@ const tmpInitGameState = async (firestore) => {
     state: {
       currentPlayerUid: uid1,
       deckTopIdx: 3,
-      hands: {
-        [uid1]: [0],
-        [uid2]: [1],
+      playerMap: {
+        [uid1]: {
+          hand: [0],
+        },
+        [uid2]: {
+          hand: [1],
+        },
       },
       discardPile: {
         topCards: [2],

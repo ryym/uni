@@ -72,7 +72,10 @@ export function ProtoRoomPage(): ReactElement {
     const result = updateGameStateIfPossible(gameConfigRef.current, synced.gameState, action);
     log.debug("updated game state locally", result);
     if (result.ok) {
-      updateDoc(gameSnapDocRef(db), { state: result.state, lastAction: action });
+      const updateData: GameSnapshot = { state: result.state, lastAction: action };
+      // XXX: https://github.com/googleapis/nodejs-firestore/issues/1745
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      updateDoc(gameSnapDocRef(db), updateData as any);
     } else {
       setSynced({ type: "invalid", errors: result.errors });
     }
@@ -110,7 +113,7 @@ function GameStateView(props: {
 }): ReactElement {
   const user = useAtomValue(userAtom);
   const canPlay = user.uid === props.gameState.currentPlayerUid;
-  const myHand = props.gameState.hands[user.uid];
+  const myState = props.gameState.playerMap[user.uid];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
@@ -129,7 +132,7 @@ function GameStateView(props: {
           <div key={uid}>
             <div>hand of {uid}</div>
             <ul>
-              {props.gameState.hands[uid]?.map((cardIdx) => (
+              {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
                 <li key={cardIdx}>{props.gameConfig.deck[cardIdx]}</li>
               ))}
             </ul>
@@ -142,7 +145,7 @@ function GameStateView(props: {
         </button>
         <button
           disabled={!canPlay}
-          onClick={() => props.update({ type: "Play", cardIdx: myHand[0] })}
+          onClick={() => props.update({ type: "Play", cardIdx: myState.hand[0] })}
         >
           Play 1
         </button>

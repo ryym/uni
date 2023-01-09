@@ -10,13 +10,19 @@ export type GameConfig = {
 export type GameState = {
   readonly currentPlayerUid: string;
   readonly deckTopIdx: number;
-  readonly hands: {
-    readonly [uid: string]: readonly number[];
+  readonly playerMap: {
+    readonly [uid: string]: PlayerState;
   };
-  readonly discardPile: {
-    readonly topCards: readonly number[];
-    readonly color: Color;
-  };
+  readonly discardPile: DiscardPile;
+};
+
+export type PlayerState = {
+  readonly hand: readonly number[];
+};
+
+export type DiscardPile = {
+  readonly topCards: readonly number[];
+  readonly color: Color;
 };
 
 export type GameAction =
@@ -91,7 +97,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
         patch: {
           deckTopIdx: state.deckTopIdx,
           discardPile: state.discardPile,
-          playerHand: state.hands[state.currentPlayerUid],
+          playerHand: state.playerMap[state.currentPlayerUid].hand,
           playerMove: { step: 1 },
         },
       };
@@ -103,7 +109,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
         patch: {
           deckTopIdx: state.deckTopIdx + 1,
           discardPile: state.discardPile,
-          playerHand: [...state.hands[state.currentPlayerUid], state.deckTopIdx],
+          playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
           playerMove: { step: 0 },
         },
       };
@@ -118,7 +124,9 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
             topCards: [action.cardIdx, ...state.discardPile.topCards].slice(0, 5),
             color: findCardColor(config.deck[action.cardIdx]),
           },
-          playerHand: state.hands[state.currentPlayerUid].filter((i) => i !== action.cardIdx),
+          playerHand: state.playerMap[state.currentPlayerUid].hand.filter(
+            (i) => i !== action.cardIdx,
+          ),
           playerMove: { step: 1 },
         },
       };
@@ -134,9 +142,12 @@ const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch)
         : state.currentPlayerUid,
     deckTopIdx: patch.deckTopIdx,
     discardPile: patch.discardPile,
-    hands: {
-      ...state.hands,
-      [state.currentPlayerUid]: patch.playerHand,
+    playerMap: {
+      ...state.playerMap,
+      [state.currentPlayerUid]: {
+        ...state.playerMap[state.currentPlayerUid],
+        hand: patch.playerHand,
+      },
     },
   };
 };
