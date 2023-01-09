@@ -4,6 +4,7 @@
 // This assumes that the emulator is already launched.
 
 const dotenv = require("dotenv");
+const fs = require("fs/promises");
 const { initFirebaseAdminForEmulator, seedBaseData } = require("./lib/firebase");
 
 const main = async () => {
@@ -46,37 +47,38 @@ const clearDb = async (db) => {
  * @param {FirebaseFirestore.Firestore} firestore
  */
 const tmpInitGameState = async (firestore) => {
-  const uid1 = "OY7hfWeGKJZfzkFf4QShzeCmVnn2";
-  const uid2 = "HxImD58lt4OMIgkQ7mOsMx3DPmn1";
-  const uid3 = "RU1N3xxK7YTHoybGitUkm907sDU2";
+  const cards = JSON.parse(await fs.readFile("./cards.json"));
+
+  const playerUids = [
+    "OY7hfWeGKJZfzkFf4QShzeCmVnn2",
+    "HxImD58lt4OMIgkQ7mOsMx3DPmn1",
+    "RU1N3xxK7YTHoybGitUkm907sDU2",
+  ];
+  const handNum = 3;
+  const playerMap = {};
+  playerUids.forEach((uid, i) => {
+    playerMap[uid] = {
+      hand: [...Array(handNum)].map((_, j) => handNum * i + j),
+      wonAt: null,
+    };
+  });
+  const discardPileTop = cards[playerUids.length * handNum];
+  const deckTopIdx = playerUids.length * handNum + 1;
 
   const batch = firestore.batch();
   batch.set(firestore.doc("games/poc"), {
-    deck: ["Red-0", "Green-0", "Blue-0", "Yellow-0", "Red-1", "Green-1", "Blue-1", "Yellow-1"],
-    playerUids: [uid1, uid2, uid3],
+    deck: cards.map((c) => c.id),
+    playerUids,
   });
   batch.set(firestore.doc("games/poc/states/current"), {
     state: {
       turn: 1,
-      currentPlayerUid: uid1,
-      deckTopIdx: 4,
-      playerMap: {
-        [uid1]: {
-          hand: [0],
-          wonAt: null,
-        },
-        [uid2]: {
-          hand: [1],
-          wonAt: null,
-        },
-        [uid3]: {
-          hand: [2],
-          wonAt: null,
-        },
-      },
+      currentPlayerUid: playerUids[0],
+      deckTopIdx,
+      playerMap,
       discardPile: {
-        topCards: ["Yellow-0"],
-        color: "Yellow",
+        topCards: [discardPileTop.id],
+        color: discardPileTop.color,
       },
     },
     lastAction: {
