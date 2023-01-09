@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
+import { cardById } from "~/app/douno/cards";
 import { GameAction, GameConfig, GameState, updateGameState } from "~/app/douno/game";
 import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
@@ -138,11 +139,19 @@ function GameStateView(props: {
         <div>turn: {props.gameState.turn}</div>
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
         <div>won?: {myState.wonAt != null ? "yes" : "no"}</div>
-        <div>deck top: {props.gameState.deckTopIdx}</div>
+        <div>
+          deck top: {props.gameState.deckTopIdx}{" "}
+          {JSON.stringify(cardById(props.gameConfig.deck[props.gameState.deckTopIdx]))}
+        </div>
       </div>
       <div>
         <div>discard pile (color: {props.gameState.discardPile.color})</div>
-        <div>top cards: {props.gameState.discardPile.topCards.map((id) => id).join(", ")}</div>
+        <div>top cards:</div>
+        <ul>
+          {props.gameState.discardPile.topCards.map((id) => (
+            <li key={id}>{JSON.stringify(cardById(id))}</li>
+          ))}
+        </ul>
       </div>
       <div>
         {props.gameConfig.playerUids.map((uid) => (
@@ -150,7 +159,7 @@ function GameStateView(props: {
             <div>hand of {uid}</div>
             <ul>
               {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
-                <li key={cardIdx}>{props.gameConfig.deck[cardIdx]}</li>
+                <li key={cardIdx}>{JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}</li>
               ))}
             </ul>
           </div>

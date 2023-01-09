@@ -1,6 +1,4 @@
-const COLORS = ["Red", "Blue", "Green", "Yellow"] as const;
-
-export type Color = typeof COLORS[number];
+import { Color, cardById } from "./cards";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -124,7 +122,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
           deckTopIdx: state.deckTopIdx,
           discardPile: {
             topCards: [config.deck[action.cardIdx], ...state.discardPile.topCards].slice(0, 5),
-            color: findCardColor(config.deck[action.cardIdx]),
+            color: cardById(config.deck[action.cardIdx]).color,
           },
           playerHand: state.playerMap[state.currentPlayerUid].hand.filter(
             (i) => i !== action.cardIdx,
@@ -173,13 +171,4 @@ const determineNextPlayer = (
   }
   const nextIdx = (idx + move.step) % playerUids.length;
   return playerUids[nextIdx];
-};
-
-const findCardColor = (cardName: string): Color => {
-  for (const color of COLORS) {
-    if (cardName.startsWith(color)) {
-      return color;
-    }
-  }
-  throw new Error("[douno] failed to detect card color");
 };
