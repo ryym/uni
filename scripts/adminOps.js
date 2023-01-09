@@ -75,7 +75,7 @@ const tmpInitGameState = async (firestore) => {
         },
       },
       discardPile: {
-        topCards: [3],
+        topCards: ["Yellow-0"],
         color: "Yellow",
       },
     },

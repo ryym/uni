@@ -23,7 +23,7 @@ export type PlayerState = {
 };
 
 export type DiscardPile = {
-  readonly topCards: readonly number[];
+  readonly topCards: readonly string[];
   readonly color: Color;
 };
 
@@ -123,7 +123,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
         patch: {
           deckTopIdx: state.deckTopIdx,
           discardPile: {
-            topCards: [action.cardIdx, ...state.discardPile.topCards].slice(0, 5),
+            topCards: [config.deck[action.cardIdx], ...state.discardPile.topCards].slice(0, 5),
             color: findCardColor(config.deck[action.cardIdx]),
           },
           playerHand: state.playerMap[state.currentPlayerUid].hand.filter(

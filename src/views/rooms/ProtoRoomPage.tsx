@@ -142,10 +142,7 @@ function GameStateView(props: {
       </div>
       <div>
         <div>discard pile (color: {props.gameState.discardPile.color})</div>
-        <div>
-          top cards:{" "}
-          {props.gameState.discardPile.topCards.map((i) => props.gameConfig.deck[i]).join(", ")}
-        </div>
+        <div>top cards: {props.gameState.discardPile.topCards.map((id) => id).join(", ")}</div>
       </div>
       <div>
         {props.gameConfig.playerUids.map((uid) => (
