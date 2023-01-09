@@ -48,17 +48,18 @@ const clearDb = async (db) => {
 const tmpInitGameState = async (firestore) => {
   const uid1 = "OY7hfWeGKJZfzkFf4QShzeCmVnn2";
   const uid2 = "HxImD58lt4OMIgkQ7mOsMx3DPmn1";
+  const uid3 = "RU1N3xxK7YTHoybGitUkm907sDU2";
 
   const batch = firestore.batch();
   batch.set(firestore.doc("games/poc"), {
     deck: ["Red-0", "Green-0", "Blue-0", "Yellow-0", "Red-1", "Green-1", "Blue-1", "Yellow-1"],
-    playerUids: [uid1, uid2],
+    playerUids: [uid1, uid2, uid3],
   });
   batch.set(firestore.doc("games/poc/states/current"), {
     state: {
       turn: 1,
       currentPlayerUid: uid1,
-      deckTopIdx: 3,
+      deckTopIdx: 4,
       playerMap: {
         [uid1]: {
           hand: [0],
@@ -68,10 +69,14 @@ const tmpInitGameState = async (firestore) => {
           hand: [1],
           wonAt: null,
         },
+        [uid3]: {
+          hand: [2],
+          wonAt: null,
+        },
       },
       discardPile: {
-        topCards: [2],
-        color: "Blue",
+        topCards: [3],
+        color: "Yellow",
       },
     },
     lastAction: {
