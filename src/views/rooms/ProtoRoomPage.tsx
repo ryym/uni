@@ -106,16 +106,34 @@ export function ProtoRoomPage(): ReactElement {
   );
 }
 
+type Player = {
+  readonly uid: string;
+  readonly wonAt: number | null;
+};
+
 function GameStateView(props: {
   readonly gameConfig: GameConfig;
   readonly gameState: GameState;
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
+  const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
+    uid,
+    wonAt: props.gameState.playerMap[uid].wonAt,
+  }));
+  const gameFinished = players.filter((s) => s.wonAt == null).length <= 1;
   const myState = props.gameState.playerMap[user.uid];
-  const canPlay = user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
+  const canPlay =
+    !gameFinished && user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {gameFinished && (
+        <div>
+          <hr />
+          <GameResultView gameState={props.gameState} players={players} />
+          <hr />
+        </div>
+      )}
       <div>
         <div>turn: {props.gameState.turn}</div>
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
@@ -155,6 +173,28 @@ function GameStateView(props: {
           Pass
         </button>
       </div>
+    </div>
+  );
+}
+
+function GameResultView(props: {
+  readonly gameState: GameState;
+  readonly players: readonly Player[];
+}): ReactElement {
+  const noWin = props.gameState.turn + 1;
+  const players = [...props.players].sort((p1, p2) => {
+    return (p1.wonAt ?? noWin) - (p2.wonAt ?? noWin);
+  });
+  return (
+    <div>
+      <h2>Result</h2>
+      <ol>
+        {players.map((p) => (
+          <li key={p.uid}>
+            {p.uid}: {p.wonAt != null ? `wonAt ${p.wonAt}` : "-"}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
