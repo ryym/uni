@@ -62,9 +62,11 @@ const tmpInitGameState = async (firestore) => {
       playerMap: {
         [uid1]: {
           hand: [0],
+          wonAt: null,
         },
         [uid2]: {
           hand: [1],
+          wonAt: null,
         },
       },
       discardPile: {

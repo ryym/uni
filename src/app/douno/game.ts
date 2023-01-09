@@ -19,6 +19,7 @@ export type GameState = {
 
 export type PlayerState = {
   readonly hand: readonly number[];
+  readonly wonAt: number | null;
 };
 
 export type DiscardPile = {
@@ -149,6 +150,7 @@ const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch)
       [state.currentPlayerUid]: {
         ...state.playerMap[state.currentPlayerUid],
         hand: patch.playerHand,
+        wonAt: patch.playerHand.length === 0 ? state.turn : null,
       },
     },
   };

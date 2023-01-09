@@ -112,13 +112,14 @@ function GameStateView(props: {
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
-  const canPlay = user.uid === props.gameState.currentPlayerUid;
   const myState = props.gameState.playerMap[user.uid];
+  const canPlay = user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <div>turn: {props.gameState.turn}</div>
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
+        <div>won?: {myState.wonAt != null ? "yes" : "no"}</div>
         <div>deck top: {props.gameState.deckTopIdx}</div>
       </div>
       <div>
