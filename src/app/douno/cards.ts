@@ -9,13 +9,19 @@ export type Color = typeof COLORS[number];
 
 export type NumberValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-export type Card = NumberCard;
+export type Card = NumberCard | Draw2Card;
 
 export type NumberCard = {
   readonly id: string;
   readonly type: "Number";
   readonly color: Color;
   readonly value: NumberValue;
+};
+
+export type Draw2Card = {
+  readonly id: string;
+  readonly type: "Draw2";
+  readonly color: Color;
 };
 
 const cardMap = CARDS.reduce((m, card) => {

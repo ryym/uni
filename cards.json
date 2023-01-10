@@ -1,5 +1,45 @@
 [
   {
+    "id": "draw2-0-0",
+    "type": "Draw2",
+    "color": "Red"
+  },
+  {
+    "id": "draw2-0-1",
+    "type": "Draw2",
+    "color": "Red"
+  },
+  {
+    "id": "draw2-1-0",
+    "type": "Draw2",
+    "color": "Blue"
+  },
+  {
+    "id": "draw2-1-1",
+    "type": "Draw2",
+    "color": "Blue"
+  },
+  {
+    "id": "draw2-2-0",
+    "type": "Draw2",
+    "color": "Green"
+  },
+  {
+    "id": "draw2-2-1",
+    "type": "Draw2",
+    "color": "Green"
+  },
+  {
+    "id": "draw2-3-0",
+    "type": "Draw2",
+    "color": "Yellow"
+  },
+  {
+    "id": "draw2-3-1",
+    "type": "Draw2",
+    "color": "Yellow"
+  },
+  {
     "id": "num-0-0-0",
     "type": "Number",
     "color": "Red",
