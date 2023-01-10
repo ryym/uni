@@ -124,8 +124,11 @@ function GameStateView(props: {
     uid,
     wonAt: props.gameState.playerMap[uid].wonAt,
   }));
-  const gameFinished = players.filter((s) => s.wonAt == null).length <= 1;
   const myState = props.gameState.playerMap[user.uid];
+  const gameFinished =
+    props.gameConfig.playerUids.length === 1
+      ? myState.wonAt != null
+      : players.filter((s) => s.wonAt == null).length <= 1;
   const canPlay =
     !gameFinished && user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
 
