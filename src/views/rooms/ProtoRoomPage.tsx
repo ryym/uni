@@ -118,6 +118,8 @@ function GameStateView(props: {
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
+  const [cardSelection, setCardSelection] = useState<readonly number[]>([]);
+
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
     wonAt: props.gameState.playerMap[uid].wonAt,
@@ -126,6 +128,7 @@ function GameStateView(props: {
   const myState = props.gameState.playerMap[user.uid];
   const canPlay =
     !gameFinished && user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {gameFinished && (
@@ -145,6 +148,23 @@ function GameStateView(props: {
         </div>
       </div>
       <div>
+        <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
+          Draw 1
+        </button>
+        <button
+          disabled={!canPlay}
+          onClick={() => {
+            setCardSelection([]);
+            props.update({ type: "Play", cardIndice: cardSelection });
+          }}
+        >
+          Play
+        </button>
+        <button disabled={!canPlay} onClick={() => props.update({ type: "Pass" })}>
+          Pass
+        </button>
+      </div>
+      <div>
         <div>discard pile (color: {props.gameState.discardPile.color})</div>
         <div>top cards:</div>
         <ul>
@@ -156,28 +176,33 @@ function GameStateView(props: {
       <div>
         {props.gameConfig.playerUids.map((uid) => (
           <div key={uid}>
-            <div>hand of {uid}</div>
-            <ul>
-              {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
-                <li key={cardIdx}>{JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}</li>
-              ))}
-            </ul>
+            <div style={{ fontWeight: uid === user.uid ? "bold" : "inherit" }}>hand of {uid}</div>
+            {uid === user.uid && canPlay ? (
+              <ul>
+                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
+                  <li key={cardIdx}>
+                    <input
+                      type="checkbox"
+                      checked={cardSelection.includes(cardIdx)}
+                      onChange={(e) =>
+                        setCardSelection((is) =>
+                          e.target.checked ? [...is, cardIdx] : is.filter((i) => i !== cardIdx),
+                        )
+                      }
+                    />
+                    {JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul>
+                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
+                  <li key={cardIdx}>{JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}</li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
-      </div>
-      <div>
-        <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
-          Draw 1
-        </button>
-        <button
-          disabled={!canPlay}
-          onClick={() => props.update({ type: "Play", cardIndice: [myState.hand[0]] })}
-        >
-          Play 1
-        </button>
-        <button disabled={!canPlay} onClick={() => props.update({ type: "Pass" })}>
-          Pass
-        </button>
       </div>
     </div>
   );
