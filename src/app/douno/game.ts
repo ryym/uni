@@ -37,7 +37,7 @@ export type GameAction =
     }
   | {
       readonly type: "Play";
-      readonly cardIdx: number;
+      readonly cardIndice: readonly number[];
     };
 
 export type UpdateGameResult =
@@ -116,16 +116,17 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
     }
 
     case "Play": {
+      const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
       return {
         ok: true,
         patch: {
           deckTopIdx: state.deckTopIdx,
           discardPile: {
-            topCards: [config.deck[action.cardIdx], ...state.discardPile.topCards].slice(0, 5),
-            color: cardById(config.deck[action.cardIdx]).color,
+            topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
+            color: cardById(playedCardIds[0]).color,
           },
           playerHand: state.playerMap[state.currentPlayerUid].hand.filter(
-            (i) => i !== action.cardIdx,
+            (i) => !action.cardIndice.includes(i),
           ),
           playerMove: { step: 1 },
         },

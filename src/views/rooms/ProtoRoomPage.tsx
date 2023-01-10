@@ -171,7 +171,7 @@ function GameStateView(props: {
         </button>
         <button
           disabled={!canPlay}
-          onClick={() => props.update({ type: "Play", cardIdx: myState.hand[0] })}
+          onClick={() => props.update({ type: "Play", cardIndice: [myState.hand[0]] })}
         >
           Play 1
         </button>
