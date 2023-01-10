@@ -73,12 +73,12 @@ export function ProtoRoomPage(): ReactElement {
     const result = updateGameStateIfPossible(gameConfigRef.current, synced.gameState, action);
     log.debug("updated game state locally", result);
     if (result.ok) {
-      const updateData: GameSnapshot = { state: result.state, lastAction: action };
+      const updateData: GameSnapshot = { state: result.value, lastAction: action };
       // XXX: https://github.com/googleapis/nodejs-firestore/issues/1745
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       updateDoc(gameSnapDocRef(db), updateData as any);
     } else {
-      setSynced({ type: "invalid", errors: result.errors });
+      setSynced({ type: "invalid", errors: [result.error] });
     }
   };
 
@@ -245,10 +245,10 @@ const syncGameState = (
     case "valid": {
       const result = updateGameStateIfPossible(config, current.gameState, remote.lastAction);
       if (!result.ok) {
-        return { type: "invalid", errors: result.errors };
+        return { type: "invalid", errors: [result.error] };
       }
-      if (!deepStrictEqual(result.state, remote.state)) {
-        log.debug("local and remote state mismatch", result.state, remote.state);
+      if (!deepStrictEqual(result.value, remote.state)) {
+        log.debug("local and remote state mismatch", result.value, remote.state);
         return {
           type: "invalid",
           errors: [
@@ -256,7 +256,7 @@ const syncGameState = (
           ],
         };
       }
-      return { type: "valid", gameState: result.state };
+      return { type: "valid", gameState: result.value };
     }
   }
 };

@@ -1,3 +1,4 @@
+import { Result } from "~/lib/types";
 import { Color, cardById } from "./cards";
 
 export type GameConfig = {
@@ -40,39 +41,19 @@ export type GameAction =
       readonly cardIndice: readonly number[];
     };
 
-export type UpdateGameResult =
-  | {
-      readonly ok: true;
-      readonly state: GameState;
-    }
-  | {
-      readonly ok: false;
-      readonly errors: string[];
-    };
-
 export const updateGameState = (
   config: GameConfig,
   state: GameState,
   action: GameAction,
-): UpdateGameResult => {
-  const buildPatchResult = buildPatch(config, state, action);
-  if (!buildPatchResult.ok) {
-    return { ok: false, errors: [buildPatchResult.message] };
+): Result<GameState> => {
+  const patchResult = buildPatch(config, state, action);
+  if (!patchResult.ok) {
+    return { ok: false, error: patchResult.error };
   }
 
-  const nextState = applyPatch(config, state, buildPatchResult.patch);
-  return { ok: true, state: nextState };
+  const nextState = applyPatch(config, state, patchResult.value);
+  return { ok: true, value: nextState };
 };
-
-type BuildPatchResult =
-  | {
-      readonly ok: true;
-      readonly patch: GameStatePatch;
-    }
-  | {
-      readonly ok: false;
-      readonly message: string;
-    };
 
 type GameStatePatch = {
   readonly deckTopIdx: number;
@@ -85,7 +66,11 @@ type PlayerMove = {
   readonly step: number;
 };
 
-const buildPatch = (config: GameConfig, state: GameState, action: GameAction): BuildPatchResult => {
+const buildPatch = (
+  config: GameConfig,
+  state: GameState,
+  action: GameAction,
+): Result<GameStatePatch> => {
   switch (action.type) {
     case "Start": {
       throw new Error('[douno] "Start" action is fired during game');
@@ -94,7 +79,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
     case "Pass": {
       return {
         ok: true,
-        patch: {
+        value: {
           deckTopIdx: state.deckTopIdx,
           discardPile: state.discardPile,
           playerHand: state.playerMap[state.currentPlayerUid].hand,
@@ -106,7 +91,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
     case "Draw": {
       return {
         ok: true,
-        patch: {
+        value: {
           deckTopIdx: state.deckTopIdx + 1,
           discardPile: state.discardPile,
           playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
@@ -119,7 +104,7 @@ const buildPatch = (config: GameConfig, state: GameState, action: GameAction): B
       const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
       return {
         ok: true,
-        patch: {
+        value: {
           deckTopIdx: state.deckTopIdx,
           discardPile: {
             topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
