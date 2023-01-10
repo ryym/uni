@@ -149,7 +149,7 @@ function GameStateView(props: {
       </div>
       <div>
         <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
-          Draw 1
+          Draw
         </button>
         <button
           disabled={!canPlay}

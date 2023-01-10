@@ -1,5 +1,6 @@
+import { range } from "~/lib/array";
 import { Result } from "~/lib/types";
-import { Color, cardById } from "./cards";
+import { Color, Draw2Card, NumberCard, cardById } from "./cards";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -24,6 +25,7 @@ export type PlayerState = {
 export type DiscardPile = {
   readonly topCards: readonly string[];
   readonly color: Color;
+  readonly attackTotal: null | number;
 };
 
 export type GameAction =
@@ -89,33 +91,73 @@ const buildPatch = (
     }
 
     case "Draw": {
-      return {
-        ok: true,
-        value: {
-          deckTopIdx: state.deckTopIdx + 1,
-          discardPile: state.discardPile,
-          playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
-          playerMove: { step: 0 },
-        },
-      };
+      if (state.discardPile.attackTotal == null) {
+        return {
+          ok: true,
+          value: {
+            deckTopIdx: state.deckTopIdx + 1,
+            discardPile: state.discardPile,
+            playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
+            playerMove: { step: 0 },
+          },
+        };
+      } else {
+        const nextDeckTopIdx = state.deckTopIdx + state.discardPile.attackTotal;
+        const drawn = range(state.deckTopIdx, nextDeckTopIdx);
+        return {
+          ok: true,
+          value: {
+            deckTopIdx: nextDeckTopIdx,
+            discardPile: { ...state.discardPile, attackTotal: null },
+            playerHand: [...state.playerMap[state.currentPlayerUid].hand, ...drawn],
+            playerMove: { step: 1 },
+          },
+        };
+      }
     }
 
     case "Play": {
       const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
-      return {
-        ok: true,
-        value: {
-          deckTopIdx: state.deckTopIdx,
-          discardPile: {
-            topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
-            color: cardById(playedCardIds[0]).color,
-          },
-          playerHand: state.playerMap[state.currentPlayerUid].hand.filter(
-            (i) => !action.cardIndice.includes(i),
-          ),
-          playerMove: { step: 1 },
-        },
+      const playResult = parsePlay(playedCardIds);
+      if (!playResult.ok) {
+        return { ok: false, error: `failed to parse play: ${playResult.error}` };
+      }
+
+      const discardPile: typeof state["discardPile"] = {
+        ...state.discardPile,
+        topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
+        color: cardById(playedCardIds[0]).color,
       };
+      const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((i) => {
+        return !action.cardIndice.includes(i);
+      });
+
+      const play = playResult.value;
+      switch (play.type) {
+        case "NumberCards": {
+          return {
+            ok: true,
+            value: {
+              deckTopIdx: state.deckTopIdx,
+              discardPile,
+              playerHand,
+              playerMove: { step: 1 },
+            },
+          };
+        }
+        case "Draw2Cards": {
+          const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 2;
+          return {
+            ok: true,
+            value: {
+              deckTopIdx: state.deckTopIdx,
+              discardPile: { ...discardPile, attackTotal },
+              playerHand,
+              playerMove: { step: 1 },
+            },
+          };
+        }
+      }
     }
   }
 };
@@ -157,4 +199,46 @@ const determineNextPlayer = (
   }
   const nextIdx = (idx + move.step) % playerUids.length;
   return playerUids[nextIdx];
+};
+
+type Play =
+  | {
+      readonly type: "NumberCards";
+      readonly cards: readonly NumberCard[];
+    }
+  | {
+      readonly type: "Draw2Cards";
+      readonly cards: readonly Draw2Card[];
+    };
+
+const parsePlay = (cardIds: readonly string[]): Result<Play> => {
+  if (cardIds.length === 0) {
+    throw new Error("[douno] played cards empty");
+  }
+
+  const cards = cardIds.map((id) => cardById(id));
+  if (cards.some((c) => c.type !== cards[0].type)) {
+    throw new Error("[douno] multiple type cards played");
+  }
+
+  switch (cards[0].type) {
+    case "Number": {
+      const numCards = cards as NumberCard[];
+      if (numCards.some((c) => c.value !== numCards[0].value)) {
+        throw new Error("[douno] multiple number values played");
+      }
+      return {
+        ok: true,
+        value: { type: "NumberCards", cards: numCards },
+      };
+    }
+
+    case "Draw2": {
+      const draw2Cards = cards as Draw2Card[];
+      return {
+        ok: true,
+        value: { type: "Draw2Cards", cards: draw2Cards },
+      };
+    }
+  }
 };
