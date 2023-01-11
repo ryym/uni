@@ -7,6 +7,11 @@ export type GameConfig = {
   readonly playerUids: readonly string[];
 };
 
+export type GameSnapshot = {
+  readonly state: GameState;
+  readonly lastAction: GameAction;
+};
+
 export type GameState = {
   readonly turn: number;
   readonly currentPlayerUid: string;
@@ -45,15 +50,15 @@ export type GameAction =
 
 export const updateGameState = (
   config: GameConfig,
-  state: GameState,
+  snapshot: GameSnapshot,
   action: GameAction,
 ): Result<GameState> => {
-  const patchResult = buildPatch(config, state, action);
+  const patchResult = buildPatch(config, snapshot, action);
   if (!patchResult.ok) {
     return { ok: false, error: patchResult.error };
   }
 
-  const nextState = applyPatch(config, state, patchResult.value);
+  const nextState = applyPatch(config, snapshot.state, patchResult.value);
   return { ok: true, value: nextState };
 };
 
@@ -70,7 +75,7 @@ type PlayerMove = {
 
 const buildPatch = (
   config: GameConfig,
-  state: GameState,
+  { state }: GameSnapshot,
   action: GameAction,
 ): Result<GameStatePatch> => {
   switch (action.type) {
