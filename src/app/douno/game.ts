@@ -95,6 +95,9 @@ const buildPatch = (
     }
 
     case "Draw": {
+      if (hasDrawnLastTime(state, state.currentPlayerUid)) {
+        throw new Error("[douno] cannot draw twice");
+      }
       if (state.discardPile.attackTotal == null) {
         return {
           ok: true,
@@ -164,6 +167,10 @@ const buildPatch = (
       }
     }
   }
+};
+
+export const hasDrawnLastTime = (state: GameState, uid: string): boolean => {
+  return state.lastUpdate?.playerUid === uid && state.lastUpdate.action.type === "Draw";
 };
 
 const applyPatch = (

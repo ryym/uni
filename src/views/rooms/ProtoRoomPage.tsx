@@ -9,7 +9,13 @@ import {
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { cardById } from "~/app/douno/cards";
-import { GameAction, GameConfig, GameState, updateGameState } from "~/app/douno/game";
+import {
+  GameAction,
+  GameConfig,
+  GameState,
+  hasDrawnLastTime,
+  updateGameState,
+} from "~/app/douno/game";
 import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
@@ -129,8 +135,9 @@ function GameStateView(props: {
     props.gameConfig.playerUids.length === 1
       ? myState.wonAt != null
       : players.filter((s) => s.wonAt == null).length <= 1;
-  const canPlay =
-    !gameFinished && user.uid === props.gameState.currentPlayerUid && myState.wonAt == null;
+  const isMyTurn = user.uid === props.gameState.currentPlayerUid;
+  const canPlay = !gameFinished && isMyTurn && myState.wonAt == null;
+  const canDraw = isMyTurn && !hasDrawnLastTime(props.gameState, user.uid);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -151,7 +158,7 @@ function GameStateView(props: {
         </div>
       </div>
       <div>
-        <button disabled={!canPlay} onClick={() => props.update({ type: "Draw" })}>
+        <button disabled={!canPlay || !canDraw} onClick={() => props.update({ type: "Draw" })}>
           Draw
         </button>
         <button
