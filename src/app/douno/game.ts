@@ -7,11 +7,6 @@ export type GameConfig = {
   readonly playerUids: readonly string[];
 };
 
-export type GameSnapshot = {
-  readonly state: GameState;
-  readonly lastAction: GameAction;
-};
-
 export type GameState = {
   readonly turn: number;
   readonly currentPlayerUid: string;
@@ -20,6 +15,10 @@ export type GameState = {
     readonly [uid: string]: PlayerState;
   };
   readonly discardPile: DiscardPile;
+  readonly lastUpdate: null | {
+    readonly playerUid: string;
+    readonly action: GameAction;
+  };
 };
 
 export type PlayerState = {
@@ -50,15 +49,15 @@ export type GameAction =
 
 export const updateGameState = (
   config: GameConfig,
-  snapshot: GameSnapshot,
+  state: GameState,
   action: GameAction,
 ): Result<GameState> => {
-  const patchResult = buildPatch(config, snapshot, action);
+  const patchResult = buildPatch(config, state, action);
   if (!patchResult.ok) {
     return { ok: false, error: patchResult.error };
   }
 
-  const nextState = applyPatch(config, snapshot.state, patchResult.value);
+  const nextState = applyPatch(config, state, action, patchResult.value);
   return { ok: true, value: nextState };
 };
 
@@ -75,7 +74,7 @@ type PlayerMove = {
 
 const buildPatch = (
   config: GameConfig,
-  { state }: GameSnapshot,
+  state: GameState,
   action: GameAction,
 ): Result<GameStatePatch> => {
   switch (action.type) {
@@ -167,7 +166,12 @@ const buildPatch = (
   }
 };
 
-const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch): GameState => {
+const applyPatch = (
+  config: GameConfig,
+  state: GameState,
+  action: GameAction,
+  patch: GameStatePatch,
+): GameState => {
   const remainingPlayerUids = config.playerUids.filter((uid) => state.playerMap[uid].wonAt == null);
   const nextPlayerUid = determineNextPlayer(
     remainingPlayerUids,
@@ -186,6 +190,10 @@ const applyPatch = (config: GameConfig, state: GameState, patch: GameStatePatch)
         hand: patch.playerHand,
         wonAt: patch.playerHand.length === 0 ? state.turn : null,
       },
+    },
+    lastUpdate: {
+      playerUid: state.currentPlayerUid,
+      action,
     },
   };
 };
