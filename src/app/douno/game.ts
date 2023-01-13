@@ -1,6 +1,6 @@
 import { range } from "~/lib/array";
 import { Result } from "~/lib/types";
-import { Color, Draw2Card, NumberCard, cardById } from "./cards";
+import { Card, Color, Draw2Card, NumberCard, cardById } from "./cards";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -83,6 +83,9 @@ const buildPatch = (
     }
 
     case "Pass": {
+      if (state.discardPile.attackTotal != null) {
+        throw new Error("[douno] cannot pass during attack: must play or draw");
+      }
       return {
         ok: true,
         value: {
@@ -140,8 +143,17 @@ const buildPatch = (
       });
 
       const play = playResult.value;
+      const pileCardMismatchErr = (card: Card) => {
+        const pileTop = cardById(state.discardPile.topCards[0]);
+        return new Error(
+          `[douno] cannot play ${JSON.stringify(card)} on ${JSON.stringify(pileTop)}`,
+        );
+      };
       switch (play.type) {
         case "NumberCards": {
+          if (!canPlayOn(state.discardPile, play.cards[0])) {
+            throw pileCardMismatchErr(play.cards[0]);
+          }
           return {
             ok: true,
             value: {
@@ -153,6 +165,9 @@ const buildPatch = (
           };
         }
         case "Draw2Cards": {
+          if (!canPlayOn(state.discardPile, play.cards[0])) {
+            throw pileCardMismatchErr(play.cards[0]);
+          }
           const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 2;
           return {
             ok: true,
@@ -165,6 +180,21 @@ const buildPatch = (
           };
         }
       }
+    }
+  }
+};
+
+const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
+  const pileTop = cardById(pile.topCards[0]);
+  switch (card.type) {
+    case "Number": {
+      return (
+        pile.attackTotal == null &&
+        (card.color === pile.color || (pileTop.type === "Number" && pileTop.value === card.value))
+      );
+    }
+    case "Draw2": {
+      return card.color === pile.color || card.type === pileTop.type;
     }
   }
 };
