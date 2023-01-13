@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { cardById } from "~/app/douno/cards";
+import { Card, cardById } from "~/app/douno/cards";
 import {
   GameAction,
   GameConfig,
@@ -100,7 +100,7 @@ export function ProtoRoomPage(): ReactElement {
     );
   }
   return (
-    <div>
+    <div style={{ backgroundColor: "#eee" }}>
       <h1>proto room page</h1>
       {gameConfigRef.current == null ? null : (
         <GameStateView
@@ -153,8 +153,8 @@ function GameStateView(props: {
         <div>my turn?: {canPlay ? "yes" : "no"}</div>
         <div>won?: {myState.wonAt != null ? "yes" : "no"}</div>
         <div>
-          deck top: {props.gameState.deckTopIdx}{" "}
-          {JSON.stringify(cardById(props.gameConfig.deck[props.gameState.deckTopIdx]))}
+          <div>deck top: {props.gameState.deckTopIdx}</div>
+          <CardView card={cardById(props.gameConfig.deck[props.gameState.deckTopIdx])} />
         </div>
       </div>
       <div>
@@ -179,14 +179,23 @@ function GameStateView(props: {
         <div>top cards:</div>
         <ul>
           {props.gameState.discardPile.topCards.map((id) => (
-            <li key={id}>{JSON.stringify(cardById(id))}</li>
+            <li key={id}>
+              <CardView card={cardById(id)} />
+            </li>
           ))}
         </ul>
       </div>
       <div>
         {props.gameConfig.playerUids.map((uid) => (
           <div key={uid}>
-            <div style={{ fontWeight: uid === user.uid ? "bold" : "inherit" }}>hand of {uid}</div>
+            <div
+              style={{
+                fontWeight: uid === props.gameState.currentPlayerUid ? "bold" : "inherit",
+              }}
+            >
+              hand of {uid}
+              {uid === user.uid ? " (YOU)" : ""}
+            </div>
             {uid === user.uid && canPlay ? (
               <ul>
                 {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
@@ -200,14 +209,16 @@ function GameStateView(props: {
                         )
                       }
                     />
-                    {JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}
+                    <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
                   </li>
                 ))}
               </ul>
             ) : (
               <ul>
                 {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
-                  <li key={cardIdx}>{JSON.stringify(cardById(props.gameConfig.deck[cardIdx]))}</li>
+                  <li key={cardIdx}>
+                    <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
+                  </li>
                 ))}
               </ul>
             )}
@@ -216,6 +227,17 @@ function GameStateView(props: {
       </div>
     </div>
   );
+}
+
+function CardView(props: { card: Card }): ReactElement {
+  switch (props.card.type) {
+    case "Number": {
+      return <span style={{ color: props.card.color }}>Number {props.card.value}</span>;
+    }
+    case "Draw2": {
+      return <span style={{ color: props.card.color }}>Draw2</span>;
+    }
+  }
 }
 
 function GameResultView(props: {
