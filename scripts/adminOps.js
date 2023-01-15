@@ -49,6 +49,20 @@ const clearDb = async (db) => {
 const tmpInitGameState = async (firestore) => {
   const cards = JSON.parse(await fs.readFile("./cards.json"));
 
+  const shuffleCards = (cards) => {
+    // Fisher-Yates shuffle (https://stackoverflow.com/a/2450976)
+    let i = cards.length;
+    while (i > 0) {
+      const r = randomInt(i);
+      i -= 1;
+      [cards[i], cards[r]] = [cards[r], cards[i]];
+    }
+  };
+  const randomInt = (maxExclusive) => {
+    return Math.floor(Math.random() * maxExclusive);
+  };
+  shuffleCards(cards);
+
   const playerUids = [
     "OY7hfWeGKJZfzkFf4QShzeCmVnn2",
     "HxImD58lt4OMIgkQ7mOsMx3DPmn1",
