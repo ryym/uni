@@ -13,6 +13,8 @@ import {
   GameAction,
   GameConfig,
   GameState,
+  canPlayOn,
+  canPlayWith,
   hasDrawnLastTime,
   updateGameState,
 } from "~/app/douno/game";
@@ -139,6 +141,37 @@ function GameStateView(props: {
   const canPlay = !gameFinished && isMyTurn && myState.wonAt == null;
   const canDraw = isMyTurn && !hasDrawnLastTime(props.gameState, user.uid);
 
+  const canSelectCard = (card: Card): boolean => {
+    if (cardSelection.length === 0) {
+      return canPlayOn(props.gameState.discardPile, card);
+    }
+    return canPlayWith(cardById(props.gameConfig.deck[cardSelection[0]]), card);
+  };
+
+  const selectCard = (idx: number) => {
+    if (cardSelection.indexOf(idx) === -1) {
+      setCardSelection([...cardSelection, idx]);
+    }
+  };
+
+  const unselectCard = (idx: number) => {
+    // Just unselect the card if it is not the first one.
+    if (cardSelection.length <= 1 || cardSelection.indexOf(idx) !== 0) {
+      setCardSelection(cardSelection.filter((i) => i !== idx));
+      return;
+    }
+    // Otherwise, validate whole selection using the second card.
+    const second = cardById(props.gameConfig.deck[cardSelection[1]]);
+    if (!canPlayOn(props.gameState.discardPile, second)) {
+      setCardSelection([]);
+      return;
+    }
+    const nextSelection = cardSelection.slice(1).filter((i) => {
+      return i === cardSelection[1] || canPlayWith(second, cardById(props.gameConfig.deck[i]));
+    });
+    setCardSelection(nextSelection);
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {gameFinished && (
@@ -158,7 +191,13 @@ function GameStateView(props: {
         </div>
       </div>
       <div>
-        <button disabled={!canPlay || !canDraw} onClick={() => props.update({ type: "Draw" })}>
+        <button
+          disabled={!canPlay || !canDraw}
+          onClick={() => {
+            setCardSelection([]);
+            props.update({ type: "Draw" });
+          }}
+        >
           Draw
         </button>
         <button
@@ -170,7 +209,13 @@ function GameStateView(props: {
         >
           Play
         </button>
-        <button disabled={!canPlay} onClick={() => props.update({ type: "Pass" })}>
+        <button
+          disabled={!canPlay}
+          onClick={() => {
+            setCardSelection([]);
+            props.update({ type: "Pass" });
+          }}
+        >
           Pass
         </button>
       </div>
@@ -198,20 +243,23 @@ function GameStateView(props: {
             </div>
             {uid === user.uid && canPlay ? (
               <ul>
-                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
-                  <li key={cardIdx}>
-                    <input
-                      type="checkbox"
-                      checked={cardSelection.includes(cardIdx)}
-                      onChange={(e) =>
-                        setCardSelection((is) =>
-                          e.target.checked ? [...is, cardIdx] : is.filter((i) => i !== cardIdx),
-                        )
-                      }
-                    />
-                    <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
-                  </li>
-                ))}
+                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => {
+                  const checked = cardSelection.includes(cardIdx);
+                  const card = cardById(props.gameConfig.deck[cardIdx]);
+                  return (
+                    <li key={cardIdx}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={!checked && !canSelectCard(card)}
+                        onChange={(e) =>
+                          e.target.checked ? selectCard(cardIdx) : unselectCard(cardIdx)
+                        }
+                      />
+                      <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <ul>

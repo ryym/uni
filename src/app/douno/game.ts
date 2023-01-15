@@ -184,7 +184,7 @@ const buildPatch = (
   }
 };
 
-const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
+export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
   const pileTop = cardById(pile.topCards[0]);
   switch (card.type) {
     case "Number": {
@@ -195,6 +195,20 @@ const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
     }
     case "Draw2": {
       return card.color === pile.color || card.type === pileTop.type;
+    }
+  }
+};
+
+export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
+  if (firstCard.type !== nextCard.type) {
+    return false;
+  }
+  switch (firstCard.type) {
+    case "Number": {
+      return firstCard.value === (nextCard as NumberCard).value;
+    }
+    case "Draw2": {
+      return firstCard.color === nextCard.color;
     }
   }
 };
