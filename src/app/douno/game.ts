@@ -1,6 +1,6 @@
 import { range } from "~/lib/array";
 import { Result } from "~/lib/types";
-import { Card, Color, Draw2Card, NumberCard, cardById } from "./cards";
+import { Card, Color, Draw2Card, NumberCard, WildCard, cardById, parseColor } from "./cards";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -45,6 +45,7 @@ export type GameAction =
   | {
       readonly type: "Play";
       readonly cardIndice: readonly number[];
+      readonly color: string | null;
     };
 
 export const updateGameState = (
@@ -128,32 +129,36 @@ const buildPatch = (
 
     case "Play": {
       const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
-      const playResult = parsePlay(playedCardIds);
+
+      const playResult = parsePlay(playedCardIds, action.color);
       if (!playResult.ok) {
         return { ok: false, error: `failed to parse play: ${playResult.error}` };
       }
+      const play = playResult.value;
 
       const discardPile: typeof state["discardPile"] = {
         ...state.discardPile,
         topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
-        color: cardById(playedCardIds[0]).color,
+        color: "color" in play ? play.color : play.cards[0].color,
       };
+
       const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((i) => {
         return !action.cardIndice.includes(i);
       });
 
-      const play = playResult.value;
       const pileCardMismatchErr = (card: Card) => {
         const pileTop = cardById(state.discardPile.topCards[0]);
         return new Error(
           `[douno] cannot play ${JSON.stringify(card)} on ${JSON.stringify(pileTop)}`,
         );
       };
+
+      if (!canPlayOn(state.discardPile, play.cards[0])) {
+        throw pileCardMismatchErr(play.cards[0]);
+      }
       switch (play.type) {
-        case "NumberCards": {
-          if (!canPlayOn(state.discardPile, play.cards[0])) {
-            throw pileCardMismatchErr(play.cards[0]);
-          }
+        case "NumberCards":
+        case "WildCards": {
           return {
             ok: true,
             value: {
@@ -165,9 +170,6 @@ const buildPatch = (
           };
         }
         case "Draw2Cards": {
-          if (!canPlayOn(state.discardPile, play.cards[0])) {
-            throw pileCardMismatchErr(play.cards[0]);
-          }
           const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 2;
           return {
             ok: true,
@@ -196,6 +198,9 @@ export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
     case "Draw2": {
       return card.color === pile.color || card.type === pileTop.type;
     }
+    case "Wild": {
+      return pile.attackTotal == null;
+    }
   }
 };
 
@@ -208,7 +213,10 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
       return firstCard.value === (nextCard as NumberCard).value;
     }
     case "Draw2": {
-      return firstCard.color === nextCard.color;
+      return firstCard.color === (nextCard as Draw2Card).color;
+    }
+    case "Wild": {
+      return true;
     }
   }
 };
@@ -273,9 +281,14 @@ type Play =
   | {
       readonly type: "Draw2Cards";
       readonly cards: readonly Draw2Card[];
+    }
+  | {
+      readonly type: "WildCards";
+      readonly cards: readonly WildCard[];
+      readonly color: Color;
     };
 
-const parsePlay = (cardIds: readonly string[]): Result<Play> => {
+const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Result<Play> => {
   if (cardIds.length === 0) {
     throw new Error("[douno] played cards empty");
   }
@@ -302,6 +315,18 @@ const parsePlay = (cardIds: readonly string[]): Result<Play> => {
       return {
         ok: true,
         value: { type: "Draw2Cards", cards: draw2Cards },
+      };
+    }
+
+    case "Wild": {
+      const colorResult = parseColor(selectedColor);
+      if (!colorResult.ok) {
+        return { ok: false, error: `must specify valid color: ${colorResult.error}` };
+      }
+      const wildCards = cards as WildCard[];
+      return {
+        ok: true,
+        value: { type: "WildCards", cards: wildCards, color: colorResult.value },
       };
     }
   }

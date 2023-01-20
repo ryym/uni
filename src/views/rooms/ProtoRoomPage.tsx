@@ -204,7 +204,7 @@ function GameStateView(props: {
           disabled={!canPlay}
           onClick={() => {
             setCardSelection([]);
-            props.update({ type: "Play", cardIndice: cardSelection });
+            props.update({ type: "Play", cardIndice: cardSelection, color: null });
           }}
         >
           Play
@@ -284,6 +284,9 @@ function CardView(props: { card: Card }): ReactElement {
     }
     case "Draw2": {
       return <span style={{ color: props.card.color }}>Draw2</span>;
+    }
+    case "Wild": {
+      return <span>Wild</span>;
     }
   }
 }
