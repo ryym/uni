@@ -114,6 +114,16 @@
     "value": 9
   },
   {
+    "id": "reverse-0-0",
+    "type": "Reverse",
+    "color": "Red"
+  },
+  {
+    "id": "reverse-0-1",
+    "type": "Reverse",
+    "color": "Red"
+  },
+  {
     "id": "draw2-0-0",
     "type": "Draw2",
     "color": "Red"
@@ -236,6 +246,16 @@
     "type": "Number",
     "color": "Blue",
     "value": 9
+  },
+  {
+    "id": "reverse-1-0",
+    "type": "Reverse",
+    "color": "Blue"
+  },
+  {
+    "id": "reverse-1-1",
+    "type": "Reverse",
+    "color": "Blue"
   },
   {
     "id": "draw2-1-0",
@@ -362,6 +382,16 @@
     "value": 9
   },
   {
+    "id": "reverse-2-0",
+    "type": "Reverse",
+    "color": "Green"
+  },
+  {
+    "id": "reverse-2-1",
+    "type": "Reverse",
+    "color": "Green"
+  },
+  {
     "id": "draw2-2-0",
     "type": "Draw2",
     "color": "Green"
@@ -484,6 +514,16 @@
     "type": "Number",
     "color": "Yellow",
     "value": 9
+  },
+  {
+    "id": "reverse-3-0",
+    "type": "Reverse",
+    "color": "Yellow"
+  },
+  {
+    "id": "reverse-3-1",
+    "type": "Reverse",
+    "color": "Yellow"
   },
   {
     "id": "draw2-3-0",
