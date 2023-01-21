@@ -1,45 +1,5 @@
 [
   {
-    "id": "draw2-0-0",
-    "type": "Draw2",
-    "color": "Red"
-  },
-  {
-    "id": "draw2-0-1",
-    "type": "Draw2",
-    "color": "Red"
-  },
-  {
-    "id": "draw2-1-0",
-    "type": "Draw2",
-    "color": "Blue"
-  },
-  {
-    "id": "draw2-1-1",
-    "type": "Draw2",
-    "color": "Blue"
-  },
-  {
-    "id": "draw2-2-0",
-    "type": "Draw2",
-    "color": "Green"
-  },
-  {
-    "id": "draw2-2-1",
-    "type": "Draw2",
-    "color": "Green"
-  },
-  {
-    "id": "draw2-3-0",
-    "type": "Draw2",
-    "color": "Yellow"
-  },
-  {
-    "id": "draw2-3-1",
-    "type": "Draw2",
-    "color": "Yellow"
-  },
-  {
     "id": "num-0-0-0",
     "type": "Number",
     "color": "Red",
@@ -152,6 +112,16 @@
     "type": "Number",
     "color": "Red",
     "value": 9
+  },
+  {
+    "id": "draw2-0-0",
+    "type": "Draw2",
+    "color": "Red"
+  },
+  {
+    "id": "draw2-0-1",
+    "type": "Draw2",
+    "color": "Red"
   },
   {
     "id": "num-1-0-0",
@@ -268,6 +238,16 @@
     "value": 9
   },
   {
+    "id": "draw2-1-0",
+    "type": "Draw2",
+    "color": "Blue"
+  },
+  {
+    "id": "draw2-1-1",
+    "type": "Draw2",
+    "color": "Blue"
+  },
+  {
     "id": "num-2-0-0",
     "type": "Number",
     "color": "Green",
@@ -382,6 +362,16 @@
     "value": 9
   },
   {
+    "id": "draw2-2-0",
+    "type": "Draw2",
+    "color": "Green"
+  },
+  {
+    "id": "draw2-2-1",
+    "type": "Draw2",
+    "color": "Green"
+  },
+  {
     "id": "num-3-0-0",
     "type": "Number",
     "color": "Yellow",
@@ -494,5 +484,31 @@
     "type": "Number",
     "color": "Yellow",
     "value": 9
+  },
+  {
+    "id": "draw2-3-0",
+    "type": "Draw2",
+    "color": "Yellow"
+  },
+  {
+    "id": "draw2-3-1",
+    "type": "Draw2",
+    "color": "Yellow"
+  },
+  {
+    "id": "wild-0",
+    "type": "Wild"
+  },
+  {
+    "id": "wild-1",
+    "type": "Wild"
+  },
+  {
+    "id": "wild-2",
+    "type": "Wild"
+  },
+  {
+    "id": "wild-3",
+    "type": "Wild"
   }
 ]
