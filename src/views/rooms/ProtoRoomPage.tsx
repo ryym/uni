@@ -287,6 +287,9 @@ function CardView(props: { card: Card }): ReactElement {
     case "Number": {
       return <span style={{ color: props.card.color }}>Number {props.card.value}</span>;
     }
+    case "Reverse": {
+      return <span style={{ color: props.card.color }}>Reverse</span>;
+    }
     case "Draw2": {
       return <span style={{ color: props.card.color }}>Draw2</span>;
     }

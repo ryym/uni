@@ -6,6 +6,7 @@ import {
   Draw2Card,
   Draw4Card,
   NumberCard,
+  ReverseCard,
   WildCard,
   cardById,
   parseColor,
@@ -180,6 +181,18 @@ const buildPatch = (
             },
           };
         }
+        case "ReverseCards": {
+          const clockwise = play.cards.length % 2 === 1 ? !state.clockwise : state.clockwise;
+          return {
+            ok: true,
+            value: {
+              deckTopIdx: state.deckTopIdx,
+              discardPile,
+              playerHand,
+              playerMove: { step: 1, clockwise },
+            },
+          };
+        }
         case "Draw2Cards": {
           const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 2;
           return {
@@ -218,6 +231,9 @@ export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
         (card.color === pile.color || (pileTop.type === "Number" && pileTop.value === card.value))
       );
     }
+    case "Reverse": {
+      return pile.attackTotal == null && (card.color === pile.color || card.type === pileTop.type);
+    }
     case "Draw2": {
       return card.color === pile.color || card.type === pileTop.type;
     }
@@ -238,6 +254,7 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
     case "Number": {
       return firstCard.value === (nextCard as NumberCard).value;
     }
+    case "Reverse":
     case "Draw2":
     case "Wild":
     case "Draw4": {
@@ -312,6 +329,10 @@ type Play =
       readonly cards: readonly NumberCard[];
     }
   | {
+      readonly type: "ReverseCards";
+      readonly cards: readonly ReverseCard[];
+    }
+  | {
       readonly type: "Draw2Cards";
       readonly cards: readonly Draw2Card[];
     }
@@ -345,6 +366,14 @@ const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Re
       return {
         ok: true,
         value: { type: "NumberCards", cards: numCards },
+      };
+    }
+
+    case "Reverse": {
+      const reverseCards = cards as ReverseCard[];
+      return {
+        ok: true,
+        value: { type: "ReverseCards", cards: reverseCards },
       };
     }
 
