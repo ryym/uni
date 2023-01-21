@@ -10,7 +10,7 @@ export type Color = typeof COLORS[number];
 
 export type NumberValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-export type Card = NumberCard | Draw2Card | WildCard | Draw4Card | ReverseCard;
+export type Card = NumberCard | ReverseCard | Draw2Card | WildCard | Draw4Card;
 
 export type NumberCard = {
   readonly id: string;
