@@ -88,6 +88,7 @@ const tmpInitGameState = async (firestore) => {
     state: {
       turn: 1,
       currentPlayerUid: playerUids[0],
+      clockwise: true,
       deckTopIdx,
       playerMap,
       discardPile: {

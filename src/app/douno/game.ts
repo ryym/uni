@@ -19,6 +19,7 @@ export type GameConfig = {
 export type GameState = {
   readonly turn: number;
   readonly currentPlayerUid: string;
+  readonly clockwise: boolean;
   readonly deckTopIdx: number;
   readonly playerMap: {
     readonly [uid: string]: PlayerState;
@@ -80,6 +81,7 @@ type GameStatePatch = {
 
 type PlayerMove = {
   readonly step: number;
+  readonly clockwise: boolean;
 };
 
 const buildPatch = (
@@ -102,7 +104,7 @@ const buildPatch = (
           deckTopIdx: state.deckTopIdx,
           discardPile: state.discardPile,
           playerHand: state.playerMap[state.currentPlayerUid].hand,
-          playerMove: { step: 1 },
+          playerMove: { step: 1, clockwise: state.clockwise },
         },
       };
     }
@@ -118,7 +120,7 @@ const buildPatch = (
             deckTopIdx: state.deckTopIdx + 1,
             discardPile: state.discardPile,
             playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
-            playerMove: { step: 0 },
+            playerMove: { step: 0, clockwise: state.clockwise },
           },
         };
       } else {
@@ -130,7 +132,7 @@ const buildPatch = (
             deckTopIdx: nextDeckTopIdx,
             discardPile: { ...state.discardPile, attackTotal: null },
             playerHand: [...state.playerMap[state.currentPlayerUid].hand, ...drawn],
-            playerMove: { step: 1 },
+            playerMove: { step: 1, clockwise: state.clockwise },
           },
         };
       }
@@ -174,7 +176,7 @@ const buildPatch = (
               deckTopIdx: state.deckTopIdx,
               discardPile,
               playerHand,
-              playerMove: { step: 1 },
+              playerMove: { step: 1, clockwise: state.clockwise },
             },
           };
         }
@@ -186,7 +188,7 @@ const buildPatch = (
               deckTopIdx: state.deckTopIdx,
               discardPile: { ...discardPile, attackTotal },
               playerHand,
-              playerMove: { step: 1 },
+              playerMove: { step: 1, clockwise: state.clockwise },
             },
           };
         }
@@ -198,7 +200,7 @@ const buildPatch = (
               deckTopIdx: state.deckTopIdx,
               discardPile: { ...discardPile, attackTotal },
               playerHand,
-              playerMove: { step: 1 },
+              playerMove: { step: 1, clockwise: state.clockwise },
             },
           };
         }
@@ -265,6 +267,7 @@ const applyPatch = (
   return {
     turn: state.turn + 1,
     currentPlayerUid: nextPlayerUid,
+    clockwise: patch.playerMove.clockwise,
     deckTopIdx: patch.deckTopIdx,
     discardPile: patch.discardPile,
     playerMap: {
@@ -294,7 +297,14 @@ const determineNextPlayer = (
   if (idx === -1) {
     throw new Error("[douno] current player not listed in remaining players");
   }
-  const nextIdx = (idx + move.step) % playerUids.length;
+  let nextIdx: number;
+  if (move.clockwise) {
+    nextIdx = (idx + move.step) % playerUids.length;
+  } else if (move.step <= idx) {
+    nextIdx = idx - move.step;
+  } else {
+    nextIdx = playerUids.length - move.step - idx;
+  }
   return playerUids[nextIdx];
 };
 
