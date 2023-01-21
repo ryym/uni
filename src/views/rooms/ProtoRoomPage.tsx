@@ -204,7 +204,12 @@ function GameStateView(props: {
           disabled={!canPlay}
           onClick={() => {
             setCardSelection([]);
-            props.update({ type: "Play", cardIndice: cardSelection, color: null });
+            const cardType = cardById(props.gameConfig.deck[cardSelection[0]]).type;
+            let color: string | null = null;
+            if (cardType === "Wild") {
+              color = window.prompt("color (Red | Blue | Green | Yellow)");
+            }
+            props.update({ type: "Play", cardIndice: cardSelection, color });
           }}
         >
           Play
