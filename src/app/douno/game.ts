@@ -238,9 +238,7 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
     case "Number": {
       return firstCard.value === (nextCard as NumberCard).value;
     }
-    case "Draw2": {
-      return firstCard.color === (nextCard as Draw2Card).color;
-    }
+    case "Draw2":
     case "Wild":
     case "Draw4": {
       return true;
