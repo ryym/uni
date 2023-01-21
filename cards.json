@@ -496,6 +496,22 @@
     "color": "Yellow"
   },
   {
+    "id": "draw4-0",
+    "type": "Draw4"
+  },
+  {
+    "id": "draw4-1",
+    "type": "Draw4"
+  },
+  {
+    "id": "draw4-2",
+    "type": "Draw4"
+  },
+  {
+    "id": "draw4-3",
+    "type": "Draw4"
+  },
+  {
     "id": "wild-0",
     "type": "Wild"
   },

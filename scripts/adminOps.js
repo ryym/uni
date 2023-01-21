@@ -92,7 +92,8 @@ const tmpInitGameState = async (firestore) => {
       playerMap,
       discardPile: {
         topCards: [discardPileTop.id],
-        color: discardPileTop.color,
+        // The color should be random if the top card is Wild or Draw4.
+        color: discardPileTop.color || "Red",
         attackTotal: null,
       },
     },

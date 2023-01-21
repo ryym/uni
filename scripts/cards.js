@@ -6,6 +6,7 @@ const path = require("path");
 const makeDeck = () => {
   const num = (id, color, value) => ({ id: `num-${id}`, type: "Number", color, value });
   const draw2 = (id, color) => ({ id: `draw2-${id}`, type: "Draw2", color });
+  const draw4 = (id) => ({ id: `draw4-${id}`, type: "Draw4" });
   const wild = (id) => ({ id: `wild-${id}`, type: "Wild" });
 
   const colors = ["Red", "Blue", "Green", "Yellow"];
@@ -22,6 +23,7 @@ const makeDeck = () => {
       ...range(0, 1).map((i) => draw2(`${ci}-${i}`, color)),
     ]),
 
+    ...range(0, 3).map((i) => draw4(i)),
     ...range(0, 3).map((i) => wild(i)),
   ];
 };
