@@ -1,6 +1,15 @@
 import { range } from "~/lib/array";
 import { Result } from "~/lib/types";
-import { Card, Color, Draw2Card, NumberCard, WildCard, cardById, parseColor } from "./cards";
+import {
+  Card,
+  Color,
+  Draw2Card,
+  Draw4Card,
+  NumberCard,
+  WildCard,
+  cardById,
+  parseColor,
+} from "./cards";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -181,6 +190,18 @@ const buildPatch = (
             },
           };
         }
+        case "Draw4Cards": {
+          const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 4;
+          return {
+            ok: true,
+            value: {
+              deckTopIdx: state.deckTopIdx,
+              discardPile: { ...discardPile, attackTotal },
+              playerHand,
+              playerMove: { step: 1 },
+            },
+          };
+        }
       }
     }
   }
@@ -201,6 +222,9 @@ export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
     case "Wild": {
       return pile.attackTotal == null;
     }
+    case "Draw4": {
+      return true;
+    }
   }
 };
 
@@ -215,7 +239,8 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
     case "Draw2": {
       return firstCard.color === (nextCard as Draw2Card).color;
     }
-    case "Wild": {
+    case "Wild":
+    case "Draw4": {
       return true;
     }
   }
@@ -286,6 +311,11 @@ type Play =
       readonly type: "WildCards";
       readonly cards: readonly WildCard[];
       readonly color: Color;
+    }
+  | {
+      readonly type: "Draw4Cards";
+      readonly cards: readonly Draw4Card[];
+      readonly color: Color;
     };
 
 const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Result<Play> => {
@@ -327,6 +357,18 @@ const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Re
       return {
         ok: true,
         value: { type: "WildCards", cards: wildCards, color: colorResult.value },
+      };
+    }
+
+    case "Draw4": {
+      const colorResult = parseColor(selectedColor);
+      if (!colorResult.ok) {
+        return { ok: false, error: `must specify valid color: ${colorResult.error}` };
+      }
+      const draw4Cards = cards as Draw4Card[];
+      return {
+        ok: true,
+        value: { type: "Draw4Cards", cards: draw4Cards, color: colorResult.value },
       };
     }
   }

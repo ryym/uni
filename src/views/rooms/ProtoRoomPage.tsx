@@ -206,7 +206,7 @@ function GameStateView(props: {
             setCardSelection([]);
             const cardType = cardById(props.gameConfig.deck[cardSelection[0]]).type;
             let color: string | null = null;
-            if (cardType === "Wild") {
+            if (cardType === "Wild" || cardType === "Draw4") {
               color = window.prompt("color (Red | Blue | Green | Yellow)");
             }
             props.update({ type: "Play", cardIndice: cardSelection, color });
@@ -292,6 +292,9 @@ function CardView(props: { card: Card }): ReactElement {
     }
     case "Wild": {
       return <span>Wild</span>;
+    }
+    case "Draw4": {
+      return <span>Draw4</span>;
     }
   }
 }
