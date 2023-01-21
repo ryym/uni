@@ -290,6 +290,9 @@ function CardView(props: { card: Card }): ReactElement {
     case "Reverse": {
       return <span style={{ color: props.card.color }}>Reverse</span>;
     }
+    case "Skip": {
+      return <span style={{ color: props.card.color }}>Skip</span>;
+    }
     case "Draw2": {
       return <span style={{ color: props.card.color }}>Draw2</span>;
     }

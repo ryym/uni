@@ -7,6 +7,7 @@ import {
   Draw4Card,
   NumberCard,
   ReverseCard,
+  SkipCard,
   WildCard,
   cardById,
   parseColor,
@@ -193,6 +194,18 @@ const buildPatch = (
             },
           };
         }
+        case "SkipCards": {
+          const step = play.cards.length * 2;
+          return {
+            ok: true,
+            value: {
+              deckTopIdx: state.deckTopIdx,
+              discardPile,
+              playerHand,
+              playerMove: { step, clockwise: state.clockwise },
+            },
+          };
+        }
         case "Draw2Cards": {
           const attackTotal = (discardPile.attackTotal || 0) + play.cards.length * 2;
           return {
@@ -231,7 +244,8 @@ export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
         (card.color === pile.color || (pileTop.type === "Number" && pileTop.value === card.value))
       );
     }
-    case "Reverse": {
+    case "Reverse":
+    case "Skip": {
       return pile.attackTotal == null && (card.color === pile.color || card.type === pileTop.type);
     }
     case "Draw2": {
@@ -247,18 +261,16 @@ export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
 };
 
 export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
-  if (firstCard.type !== nextCard.type) {
-    return false;
-  }
   switch (firstCard.type) {
     case "Number": {
-      return firstCard.value === (nextCard as NumberCard).value;
+      return firstCard.type === nextCard.type && firstCard.value === nextCard.value;
     }
     case "Reverse":
+    case "Skip":
     case "Draw2":
     case "Wild":
     case "Draw4": {
-      return true;
+      return firstCard.type === nextCard.type;
     }
   }
 };
@@ -333,6 +345,10 @@ type Play =
       readonly cards: readonly ReverseCard[];
     }
   | {
+      readonly type: "SkipCards";
+      readonly cards: readonly SkipCard[];
+    }
+  | {
       readonly type: "Draw2Cards";
       readonly cards: readonly Draw2Card[];
     }
@@ -374,6 +390,14 @@ const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Re
       return {
         ok: true,
         value: { type: "ReverseCards", cards: reverseCards },
+      };
+    }
+
+    case "Skip": {
+      const skipCards = cards as SkipCard[];
+      return {
+        ok: true,
+        value: { type: "SkipCards", cards: skipCards },
       };
     }
 
