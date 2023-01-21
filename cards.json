@@ -124,6 +124,16 @@
     "color": "Red"
   },
   {
+    "id": "skip-0-0",
+    "type": "Skip",
+    "color": "Red"
+  },
+  {
+    "id": "skip-0-1",
+    "type": "Skip",
+    "color": "Red"
+  },
+  {
     "id": "draw2-0-0",
     "type": "Draw2",
     "color": "Red"
@@ -255,6 +265,16 @@
   {
     "id": "reverse-1-1",
     "type": "Reverse",
+    "color": "Blue"
+  },
+  {
+    "id": "skip-1-0",
+    "type": "Skip",
+    "color": "Blue"
+  },
+  {
+    "id": "skip-1-1",
+    "type": "Skip",
     "color": "Blue"
   },
   {
@@ -392,6 +412,16 @@
     "color": "Green"
   },
   {
+    "id": "skip-2-0",
+    "type": "Skip",
+    "color": "Green"
+  },
+  {
+    "id": "skip-2-1",
+    "type": "Skip",
+    "color": "Green"
+  },
+  {
     "id": "draw2-2-0",
     "type": "Draw2",
     "color": "Green"
@@ -523,6 +553,16 @@
   {
     "id": "reverse-3-1",
     "type": "Reverse",
+    "color": "Yellow"
+  },
+  {
+    "id": "skip-3-0",
+    "type": "Skip",
+    "color": "Yellow"
+  },
+  {
+    "id": "skip-3-1",
+    "type": "Skip",
     "color": "Yellow"
   },
   {
