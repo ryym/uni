@@ -151,7 +151,7 @@ const buildPatch = (
 
       const discardPile: typeof state["discardPile"] = {
         ...state.discardPile,
-        topCards: [...playedCardIds, ...state.discardPile.topCards].slice(0, 5),
+        topCards: [...playedCardIds.reverse(), ...state.discardPile.topCards].slice(0, 5),
         color: "color" in play ? play.color : play.cards[0].color,
       };
 
