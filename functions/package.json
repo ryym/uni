@@ -1,0 +1,23 @@
+{
+  "name": "douno-functions",
+  "private": true,
+  "version": "0.0.0",
+  "author": "ryym <ryym.64@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "build:w": "tsc --watch",
+    "shell": "firebase functions:shell"
+  },
+  "main": "dist/index.js",
+  "engines": {
+    "node": 16
+  },
+  "dependencies": {
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}

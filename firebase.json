@@ -23,10 +23,21 @@
     "firestore": {
       "port": 9001
     },
+    "functions": {
+      "port": 9002
+    },
     "ui": {
       "enabled": true,
       "port": 5184
     },
     "singleProjectMode": true
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+    }
+  ]
 }

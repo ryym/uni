@@ -16,6 +16,7 @@
     "deploy:PROD": "npm run build:PROD && firebase --project production deploy; rm -rf dist",
     "adminops": "node scripts/adminOps.js",
     "cards": "node scripts/cards.js",
+    "functions": "npm --prefix functions",
     "git:pre-commit": "lint-staged"
   },
   "dependencies": {

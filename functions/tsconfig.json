@@ -1,0 +1,12 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "strict": true,
+    "outDir": "dist",
+  }
+}
