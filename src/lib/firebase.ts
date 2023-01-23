@@ -2,12 +2,14 @@ import { initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { Database, connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { Firestore, connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { Functions, connectFunctionsEmulator, getFunctions } from "firebase/functions";
 import { log } from "./logger";
 
 export type FirebaseClient = {
   readonly auth: Auth;
   readonly rtdb: Database;
   readonly db: Firestore;
+  readonly functions: Functions;
 };
 
 export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
@@ -24,6 +26,7 @@ export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
   const auth = getAuth(app);
   const rtdb = getDatabase(app);
   const db = getFirestore(app);
+  const functions = getFunctions(app, "asia-northeast1");
 
   if (__FIREBASE_EMULATOR__) {
     log.debug("starting Firebase emulator...");
@@ -32,9 +35,10 @@ export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
     const host = "localhost";
     connectDatabaseEmulator(rtdb, host, em.database.port);
     connectFirestoreEmulator(db, host, em.firestore.port);
+    connectFunctionsEmulator(functions, host, em.functions.port);
   }
 
-  return Object.freeze({ auth, rtdb, db });
+  return Object.freeze({ auth, rtdb, db, functions });
 };
 
 const getEnv = (name: string): string => {

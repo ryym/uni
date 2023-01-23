@@ -6,6 +6,7 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { Card, cardById } from "~/app/douno/cards";
@@ -49,7 +50,7 @@ const gameConfigDocRef = (db: Firestore) => {
 };
 
 export function ProtoRoomPage(): ReactElement {
-  const { db } = useAtomValue(firebaseAtom);
+  const { db, functions } = useAtomValue(firebaseAtom);
   const user = useAtomValue(userAtom);
 
   const gameConfigRef = useRef<GameConfig | null>(null);
@@ -91,7 +92,17 @@ export function ProtoRoomPage(): ReactElement {
   };
 
   if (synced.type === "unset") {
-    return <div>no game</div>;
+    const handlePing = async () => {
+      const ping = httpsCallable(functions, "ping", {});
+      const result = await ping(`from app ${Date.now()}`);
+      console.log("ping result", result);
+    };
+    return (
+      <div>
+        <span>no game</span>
+        <button onClick={handlePing}>Ping</button>
+      </div>
+    );
   }
   if (synced.type === "invalid") {
     return (
