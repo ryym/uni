@@ -1,53 +1,19 @@
-// Currently we load entire card objects statically for simplicity.
 import { Result } from "~/lib/types";
-import predefineCards from "../../../cards.json";
+import { COLORS, Card, Color, buildDeck } from "~shared/cards";
 
-const CARDS = predefineCards as readonly Card[];
+export type {
+  Color,
+  Card,
+  NumberCard,
+  NumberValue,
+  ReverseCard,
+  SkipCard,
+  Draw2Card,
+  Draw4Card,
+  WildCard,
+} from "~shared/cards";
 
-const COLORS = ["Red", "Blue", "Green", "Yellow"] as const;
-
-export type Color = typeof COLORS[number];
-
-export type NumberValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-
-export type Card = NumberCard | ReverseCard | SkipCard | Draw2Card | WildCard | Draw4Card;
-
-export type NumberCard = {
-  readonly id: string;
-  readonly type: "Number";
-  readonly color: Color;
-  readonly value: NumberValue;
-};
-
-export type ReverseCard = {
-  readonly id: string;
-  readonly type: "Reverse";
-  readonly color: Color;
-};
-
-export type SkipCard = {
-  readonly id: string;
-  readonly type: "Skip";
-  readonly color: Color;
-};
-
-export type Draw2Card = {
-  readonly id: string;
-  readonly type: "Draw2";
-  readonly color: Color;
-};
-
-export type WildCard = {
-  readonly id: string;
-  readonly type: "Wild";
-};
-
-export type Draw4Card = {
-  readonly id: string;
-  readonly type: "Draw4";
-};
-
-const cardMap = CARDS.reduce((m, card) => {
+const cardMap = buildDeck().reduce((m, card) => {
   m[card.id] = card;
   return m;
 }, {} as Record<string, Card>);
