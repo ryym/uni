@@ -13,9 +13,4 @@ module.exports = {
       databaseURL: process.env.VITE_FIREBASE_DATABASE_URL,
     });
   },
-
-  seedBaseData: async (db) => {
-    await db.ref("passwords").set({ dev: 0 });
-    console.log("finish seeding");
-  },
 };

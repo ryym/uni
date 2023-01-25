@@ -5,25 +5,16 @@
 
 const dotenv = require("dotenv");
 const fs = require("fs/promises");
-const { initFirebaseAdminForEmulator, seedBaseData } = require("./lib/firebase");
+const { initFirebaseAdminForEmulator } = require("./lib/firebase");
 
 const main = async () => {
   dotenv.config({ path: ".env.development" });
 
   const app = initFirebaseAdminForEmulator();
-  const db = app.database();
   const firestore = app.firestore();
   try {
     const command = process.argv[2];
     switch (command) {
-      case "seed": {
-        await seedBaseData(db);
-        return;
-      }
-      case "clear-db": {
-        await clearDb(db);
-        return;
-      }
       case "init-game": {
         await tmpInitGameState(firestore);
         return;
@@ -34,13 +25,6 @@ const main = async () => {
   } finally {
     await app.delete();
   }
-};
-
-const clearDb = async (db) => {
-  await db.ref("/").set(null);
-  await seedBaseData(db);
-  const snapshot = await db.ref("/").once("value");
-  console.log("DB cleared", snapshot.val());
 };
 
 /**
