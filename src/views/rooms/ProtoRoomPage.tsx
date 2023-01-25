@@ -23,6 +23,7 @@ import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
+import { CODE_SHARE_TEST } from "~shared/cards";
 
 type GameSnapshot = {
   readonly state: GameState;
@@ -100,6 +101,7 @@ export function ProtoRoomPage(): ReactElement {
     return (
       <div>
         <span>no game</span>
+        <div>shared: {CODE_SHARE_TEST()}</div>
         <button onClick={handlePing}>Ping</button>
       </div>
     );

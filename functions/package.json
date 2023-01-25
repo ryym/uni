@@ -9,7 +9,7 @@
     "build:w": "tsc --watch",
     "shell": "firebase functions:shell"
   },
-  "main": "dist/index.js",
+  "main": "dist/functions/src/index.js",
   "engines": {
     "node": "16"
   },
