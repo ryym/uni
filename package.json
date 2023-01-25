@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "concurrently 'npm:dev:*'",
     "dev:vite": "vite",
-    "dev:emulator": "node scripts/firebaseEmulator.js",
+    "dev:emulator": "firebase emulators:start",
     "dev:hcm": "hcm --watch src/**/*.module.css",
     "dev-connect": "CONNECT_FIREBASE=true vite",
     "build:dev": "tsc && CONNECT_FIREBASE=true vite build --mode development",
