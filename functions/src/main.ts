@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { initGameHandler } from "./funcs/initGame";
 import { pingHandler } from "./funcs/ping";
 
 switch (process.env.NODE_ENV) {
@@ -26,3 +27,4 @@ const app = admin.initializeApp();
 const func = functions.region("asia-northeast1").https;
 
 export const ping = func.onCall(pingHandler(app));
+export const initGame = func.onCall(initGameHandler(app));

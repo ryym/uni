@@ -52,7 +52,7 @@ export type Draw4Card = {
  *   - Wild * 4
  * Cards are not shuffled.
  */
-export const buildDeck = (): readonly Card[] => {
+export const buildDeck = (): Card[] => {
   const colors = ["Red", "Blue", "Green", "Yellow"] as const;
   const num1to9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
   const range = (start: number, end: number) => [...Array(end + 1)].map((_, i) => start + i);
