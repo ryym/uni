@@ -1,7 +1,3 @@
-export const CODE_SHARE_TEST = (): string => {
-  return "shared code";
-};
-
 export const COLORS = ["Red", "Blue", "Green", "Yellow"] as const;
 
 export type Color = typeof COLORS[number];
