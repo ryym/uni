@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { pingHandler } from "./funcs/ping";
 
 switch (process.env.NODE_ENV) {
   case "production": {
@@ -24,11 +25,4 @@ switch (process.env.NODE_ENV) {
 const app = admin.initializeApp();
 const func = functions.region("asia-northeast1").https;
 
-export const ping = func.onCall(async (data, ctx) => {
-  if (ctx.auth == null) {
-    return null;
-  }
-  functions.logger.info("ping with data", data);
-  const doc = await app.firestore().collection("misc").doc("ping").get();
-  return { pong: Date.now(), data: doc.data() };
-});
+export const ping = func.onCall(pingHandler(app));

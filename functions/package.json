@@ -5,11 +5,12 @@
   "author": "ryym <ryym.64@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run clean && tsc",
     "build:w": "tsc --watch",
+    "clean": "rm -rf dist",
     "shell": "firebase functions:shell"
   },
-  "main": "dist/functions/src/index.js",
+  "main": "dist/functions/src/main.js",
   "engines": {
     "node": "16"
   },
