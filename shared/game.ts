@@ -5,6 +5,11 @@ export type GameConfig = {
   readonly playerUids: readonly string[];
 };
 
+export type GameSnapshot = {
+  readonly state: GameState;
+  readonly lastAction: GameAction;
+};
+
 export type GameState = {
   readonly turn: number;
   readonly currentPlayerUid: string;

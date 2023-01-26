@@ -13,6 +13,7 @@ import { Card, cardById } from "~/app/douno/cards";
 import {
   GameAction,
   GameConfig,
+  GameSnapshot,
   GameState,
   canPlayOn,
   canPlayWith,
@@ -23,11 +24,6 @@ import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
-
-type GameSnapshot = {
-  readonly state: GameState;
-  readonly lastAction: GameAction;
-};
 
 type SyncedGameSnapshot =
   | {

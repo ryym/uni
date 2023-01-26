@@ -14,7 +14,7 @@ import {
 } from "./cards";
 import { DiscardPile, GameAction, GameConfig, GameState } from "~shared/game";
 
-export type { GameAction, GameConfig, GameState } from "~shared/game";
+export type { GameAction, GameConfig, GameSnapshot, GameState } from "~shared/game";
 
 export const updateGameState = (
   config: GameConfig,
