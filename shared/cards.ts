@@ -1,3 +1,5 @@
+import { range } from "./array";
+
 export const COLORS = ["Red", "Blue", "Green", "Yellow"] as const;
 
 export type Color = typeof COLORS[number];
@@ -55,20 +57,19 @@ export type Draw4Card = {
 export const buildDeck = (): Card[] => {
   const colors = ["Red", "Blue", "Green", "Yellow"] as const;
   const num1to9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
-  const range = (start: number, end: number) => [...Array(end + 1)].map((_, i) => start + i);
 
   return [
     ...colors.flatMap((color, ci) => [
       num(`${ci}-0-0`, color, 0),
       ...num1to9.flatMap((n) => [num(`${ci}-${n}-0`, color, n), num(`${ci}-${n}-1`, color, n)]),
 
-      ...range(0, 1).map((i) => reverse(`${ci}-${i}`, color)),
-      ...range(0, 1).map((i) => skip(`${ci}-${i}`, color)),
-      ...range(0, 1).map((i) => draw2(`${ci}-${i}`, color)),
+      ...range(0, 2).map((i) => reverse(`${ci}-${i}`, color)),
+      ...range(0, 2).map((i) => skip(`${ci}-${i}`, color)),
+      ...range(0, 2).map((i) => draw2(`${ci}-${i}`, color)),
     ]),
 
-    ...range(0, 3).map((i) => draw4(i)),
-    ...range(0, 3).map((i) => wild(i)),
+    ...range(0, 4).map((i) => draw4(i)),
+    ...range(0, 4).map((i) => wild(i)),
   ];
 };
 
