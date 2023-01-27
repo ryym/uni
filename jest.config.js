@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 module.exports = {
-  roots: ["src"],
+  roots: ["src", "shared"],
   verbose: true,
   moduleFileExtensions: ["js", "ts", "tsx"],
   testMatch: ["**/*.test.ts?(x)"],
