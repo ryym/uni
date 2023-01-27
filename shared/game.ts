@@ -1,4 +1,7 @@
-import { Color } from "./cards";
+import { range } from "./array";
+import { COLORS, Card, Color } from "./cards";
+import { Mutable } from "./mutable";
+import { randomInt } from "./random";
 
 export type GameConfig = {
   readonly deck: readonly string[];
@@ -51,3 +54,41 @@ export type GameAction =
       readonly cardIndice: readonly number[];
       readonly color: string | null;
     };
+
+export type GameStateParams = {
+  readonly cards: readonly Card[];
+  readonly playerUids: readonly string[];
+  readonly handCardsNum: number;
+};
+
+export const initializeGameState = (params: GameStateParams): GameState => {
+  const playerMap: Mutable<GameState["playerMap"]> = {};
+  params.playerUids.forEach((uid, i) => {
+    playerMap[uid] = {
+      hand: range(0, params.handCardsNum).map((j) => params.handCardsNum * i + j),
+      wonAt: null,
+    };
+  });
+
+  const discardPileTopIdx = params.playerUids.length * params.handCardsNum;
+  const discardPile = buildDiscardPile(params.cards[discardPileTopIdx]);
+
+  return {
+    turn: 1,
+    currentPlayerUid: params.playerUids[0],
+    clockwise: true,
+    deckTopIdx: discardPileTopIdx + 1,
+    playerMap,
+    discardPile,
+    lastUpdate: null,
+  };
+};
+
+const buildDiscardPile = (topCard: Card): GameState["discardPile"] => {
+  const color = "color" in topCard ? topCard.color : COLORS[randomInt(COLORS.length)];
+  return {
+    topCards: [topCard.id],
+    color,
+    attackTotal: null,
+  };
+};
