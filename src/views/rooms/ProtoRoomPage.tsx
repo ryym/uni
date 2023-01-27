@@ -88,15 +88,15 @@ export function ProtoRoomPage(): ReactElement {
   };
 
   if (synced.type === "unset") {
-    const handlePing = async () => {
-      const ping = httpsCallable(functions, "ping", {});
-      const result = await ping(`from app ${Date.now()}`);
-      console.log("ping result", result);
+    const handleStartGame = async () => {
+      const initGame = httpsCallable(functions, "initGame", {});
+      const result = await initGame();
+      console.log("initGame result", result);
     };
     return (
       <div>
-        <span>no game</span>
-        <button onClick={handlePing}>Ping</button>
+        <div>no game</div>
+        <button onClick={handleStartGame}>Start Game</button>
       </div>
     );
   }
