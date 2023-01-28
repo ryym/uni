@@ -22,6 +22,9 @@ module.exports = {
     "no-proto": "error",
     "no-sequences": "error",
     "no-void": "error",
+    // Enforce const declarations but relax the rule about destructuring.
+    // https://eslint.org/docs/latest/rules/prefer-const
+    "prefer-const": ["error", { destructuring: "all" }],
     // Enforce an alphabetical order to imported members.
     // https://eslint.org/docs/rules/sort-imports
     "sort-imports": ["error", { ignoreDeclarationSort: true }],
