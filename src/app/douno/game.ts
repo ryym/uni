@@ -97,6 +97,11 @@ const buildPatch = (
     }
 
     case "Play": {
+      const player = state.playerMap[state.currentPlayerUid];
+      if (action.cardIndice.some((i) => !player.hand.includes(i))) {
+        throw new Error("[douno] played cards not in hand");
+      }
+
       const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
 
       const playResult = parsePlay(playedCardIds, action.color);
