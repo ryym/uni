@@ -55,13 +55,22 @@ export type GameAction =
       readonly color: string | null;
     };
 
-export type GameStateParams = {
+export type InitializeGameParams = {
   readonly cards: readonly Card[];
   readonly playerUids: readonly string[];
   readonly handCardsNum: number;
 };
 
-export const initializeGameState = (params: GameStateParams): GameState => {
+export const initializeGame = (params: InitializeGameParams): [GameConfig, GameState] => {
+  const config: GameConfig = {
+    deck: params.cards.map((c) => c.id),
+    playerUids: params.playerUids,
+  };
+  const state = initializeGameState(params);
+  return [config, state];
+};
+
+export const initializeGameState = (params: InitializeGameParams): GameState => {
   const playerMap: Mutable<GameState["playerMap"]> = {};
   params.playerUids.forEach((uid, i) => {
     playerMap[uid] = {

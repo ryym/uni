@@ -1,6 +1,6 @@
 import { app } from "firebase-admin";
 import { Card, buildDeck } from "../../../shared/cards";
-import { GameConfig, GameSnapshot, initializeGameState } from "../../../shared/game";
+import { GameSnapshot, initializeGame } from "../../../shared/game";
 import { randomInt } from "../../../shared/random";
 import { CallHandler } from "../lib/firebaseFunctions";
 
@@ -21,18 +21,8 @@ export const initGameHandler = (app: app.App): CallHandler<unknown, Promise<null
     const cards = buildDeck();
     shuffleCards(cards);
 
-    const gameState = initializeGameState({ cards, playerUids, handCardsNum: 7 });
-
-    const gameConfig: GameConfig = {
-      deck: cards.map((c) => c.id),
-      playerUids,
-    };
-    const gameSnapshot: GameSnapshot = {
-      state: gameState,
-      lastAction: {
-        type: "Start",
-      },
-    };
+    const [gameConfig, gameState] = initializeGame({ cards, playerUids, handCardsNum: 7 });
+    const gameSnapshot: GameSnapshot = { state: gameState, lastAction: { type: "Start" } };
 
     const batch = firestore.batch();
     batch.set(firestore.doc("games/poc"), gameConfig);
