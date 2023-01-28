@@ -16,6 +16,12 @@ import { DiscardPile, GameAction, GameConfig, GameState } from "~shared/game";
 
 export type { GameAction, GameConfig, GameSnapshot, GameState } from "~shared/game";
 
+export class ImpossibleGameStateError extends Error {
+  constructor(message: string) {
+    super(`[douno] impossible game state: ${message}`);
+  }
+}
+
 export const updateGameState = (
   config: GameConfig,
   state: GameState,
@@ -49,7 +55,7 @@ const buildPatch = (
 ): Result<GameStatePatch> => {
   switch (action.type) {
     case "Start": {
-      throw new Error('[douno] "Start" action is fired during game');
+      return { ok: false, error: '"Start" action can be used only at game initialization' };
     }
 
     case "Pass": {
@@ -69,7 +75,7 @@ const buildPatch = (
 
     case "Draw": {
       if (hasDrawnLastTime(state, state.currentPlayerUid)) {
-        throw new Error("[douno] cannot draw twice");
+        return { ok: false, error: "cannot draw twice" };
       }
       if (state.discardPile.attackTotal == null) {
         return {
@@ -99,7 +105,7 @@ const buildPatch = (
     case "Play": {
       const player = state.playerMap[state.currentPlayerUid];
       if (action.cardIndice.some((i) => !player.hand.includes(i))) {
-        throw new Error("[douno] played cards not in hand");
+        return { ok: false, error: "played cards not in hand" };
       }
 
       const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
@@ -121,16 +127,11 @@ const buildPatch = (
         return !action.cardIndice.includes(i);
       });
 
-      const pileCardMismatchErr = (card: Card) => {
-        const pileTop = cardById(state.discardPile.topCards[0]);
-        return new Error(
-          `[douno] cannot play ${JSON.stringify(card)} on ${JSON.stringify(pileTop)}`,
-        );
-      };
-
       if (!canPlayOn(state.discardPile, play.cards[0])) {
-        throw pileCardMismatchErr(play.cards[0]);
+        const pileTopId = state.discardPile.topCards[0];
+        return { ok: false, error: `cannot play ${play.cards[0].id} on ${pileTopId}` };
       }
+
       switch (play.type) {
         case "NumberCards":
         case "WildCards": {
@@ -284,7 +285,7 @@ const determineNextPlayer = (
   }
   const idx = playerUids.indexOf(currentPlayer);
   if (idx === -1) {
-    throw new Error("[douno] current player not listed in remaining players");
+    throw new ImpossibleGameStateError("current player not listed in remaining players");
   }
   let nextIdx: number;
   if (move.clockwise) {
@@ -327,19 +328,19 @@ type Play =
 
 const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Result<Play> => {
   if (cardIds.length === 0) {
-    throw new Error("[douno] played cards empty");
+    return { ok: false, error: "played cards empty" };
   }
 
   const cards = cardIds.map((id) => cardById(id));
   if (cards.some((c) => c.type !== cards[0].type)) {
-    throw new Error("[douno] multiple type cards played");
+    return { ok: false, error: "multiple type cards played" };
   }
 
   switch (cards[0].type) {
     case "Number": {
       const numCards = cards as NumberCard[];
       if (numCards.some((c) => c.value !== numCards[0].value)) {
-        throw new Error("[douno] multiple number values played");
+        return { ok: false, error: "multiple number values played" };
       }
       return {
         ok: true,

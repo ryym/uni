@@ -3,7 +3,7 @@ import { Result } from "~/lib/types";
 import { updateGameState } from "../game";
 import { range } from "~shared/array";
 import { buildDeck } from "~shared/cards";
-import { GameState, initializeGame } from "~shared/game";
+import { GameAction, GameState, initializeGame } from "~shared/game";
 
 describe("updateGameState", () => {
   const cards = buildDeck();
@@ -60,6 +60,30 @@ describe("updateGameState", () => {
         },
       },
     } satisfies Result<GameState>);
+  });
+
+  test("[draw] player cannot draw twice", () => {
+    const cards = [
+      // a's hand
+      card("num-r-1-0"),
+      // b's hand
+      card("num-b-1-0"),
+      // others
+      card("num-b-3-0"),
+      card("num-r-3-0"),
+    ];
+    let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 1 });
+
+    // a's turn
+    state = mustOk(updateGameState(conf, state, { type: "Draw" }));
+    expect(state.currentPlayerUid).toBe("a");
+    // a's turn: cannot draw
+    expect(updateGameState(conf, state, { type: "Draw" }).ok).toBe(false);
+
+    // can pass or play
+    expect(updateGameState(conf, state, { type: "Pass" }).ok).toBe(true);
+    const playAction: GameAction = { type: "Play", cardIndice: [3], color: null };
+    expect(updateGameState(conf, state, playAction).ok).toBe(true);
   });
 
   test("[play] player can play multiple number cards of same value", () => {
