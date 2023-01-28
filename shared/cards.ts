@@ -55,17 +55,22 @@ export type Draw4Card = {
  * Cards are not shuffled.
  */
 export const buildDeck = (): Card[] => {
-  const colors = ["Red", "Blue", "Green", "Yellow"] as const;
+  const colors = [
+    ["Red", "r"],
+    ["Blue", "b"],
+    ["Green", "g"],
+    ["Yellow", "y"],
+  ] satisfies [Color, string][];
   const num1to9 = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
   return [
-    ...colors.flatMap((color, ci) => [
-      num(`${ci}-0-0`, color, 0),
-      ...num1to9.flatMap((n) => [num(`${ci}-${n}-0`, color, n), num(`${ci}-${n}-1`, color, n)]),
+    ...colors.flatMap(([color, cid]) => [
+      num(`${cid}-0-0`, color, 0),
+      ...num1to9.flatMap((n) => [num(`${cid}-${n}-0`, color, n), num(`${cid}-${n}-1`, color, n)]),
 
-      ...range(0, 2).map((i) => reverse(`${ci}-${i}`, color)),
-      ...range(0, 2).map((i) => skip(`${ci}-${i}`, color)),
-      ...range(0, 2).map((i) => draw2(`${ci}-${i}`, color)),
+      ...range(0, 2).map((i) => reverse(`${cid}-${i}`, color)),
+      ...range(0, 2).map((i) => skip(`${cid}-${i}`, color)),
+      ...range(0, 2).map((i) => draw2(`${cid}-${i}`, color)),
     ]),
 
     ...range(0, 4).map((i) => draw4(i)),

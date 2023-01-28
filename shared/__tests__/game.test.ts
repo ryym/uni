@@ -20,7 +20,7 @@ describe("initializeGameState", () => {
         c: { hand: [6, 7, 8], wonAt: null },
       },
       discardPile: {
-        topCards: [cards[9].id],
+        topCards: ["num-r-5-0"],
         color: "Red",
         attackTotal: null,
       },
