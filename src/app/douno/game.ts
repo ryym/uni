@@ -110,10 +110,11 @@ const buildPatch = (
       }
       const play = playResult.value;
 
+      const color = "color" in play ? play.color : play.cards[play.cards.length - 1].color;
       const discardPile: typeof state["discardPile"] = {
         ...state.discardPile,
         topCards: [...playedCardIds.reverse(), ...state.discardPile.topCards].slice(0, 5),
-        color: "color" in play ? play.color : play.cards[0].color,
+        color,
       };
 
       const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((i) => {
