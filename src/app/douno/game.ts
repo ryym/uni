@@ -54,7 +54,7 @@ const buildPatch = (
 
     case "Pass": {
       if (state.discardPile.attackTotal != null) {
-        throw new Error("[douno] cannot pass during attack: must play or draw");
+        return { ok: false, error: "must play or draw during attack" };
       }
       return {
         ok: true,
