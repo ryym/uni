@@ -23,14 +23,19 @@ describe("updateGameState", () => {
     return result.value;
   };
 
-  test("[pass] player can pass", () => {
-    const [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 1 });
-    const next = updateGameState(conf, state, { type: "Pass" });
-    expect(next).toStrictEqual({
+  test("[pass] player can pass after draw", () => {
+    let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 1 });
+    expect(updateGameState(conf, state, { type: "Pass" }).ok).toBe(false);
+
+    state = mustOk(updateGameState(conf, state, { type: "Draw" }));
+    expect(state.currentPlayerUid).toBe("a");
+
+    const result = updateGameState(conf, state, { type: "Pass" });
+    expect(result).toStrictEqual({
       ok: true,
       value: {
         ...state,
-        turn: 2,
+        turn: 3,
         currentPlayerUid: "b",
         lastUpdate: {
           action: { type: "Pass" },
@@ -199,10 +204,11 @@ describe("updateGameState", () => {
     state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [2, 3], color: null }));
     expect(state.playerMap["b"]).toStrictEqual({ hand: [], wonAt: 2 });
     // c's turn
+    state = mustOk(updateGameState(conf, state, { type: "Draw" }));
     state = mustOk(updateGameState(conf, state, { type: "Pass" }));
-    expect(state.playerMap["c"]).toStrictEqual({ hand: [4, 5], wonAt: null });
+    expect(state.playerMap["c"]).toStrictEqual({ hand: [4, 5, 7], wonAt: null });
     // a's turn: win
     state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [1], color: null }));
-    expect(state.playerMap["a"]).toStrictEqual({ hand: [], wonAt: 4 });
+    expect(state.playerMap["a"]).toStrictEqual({ hand: [], wonAt: 5 });
   });
 });

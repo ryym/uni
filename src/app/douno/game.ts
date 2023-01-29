@@ -59,8 +59,9 @@ const buildPatch = (
     }
 
     case "Pass": {
-      if (state.discardPile.attackTotal != null) {
-        return { ok: false, error: "must play or draw during attack" };
+      const passResult = checkPassIsAvailable(state, state.currentPlayerUid);
+      if (!passResult.ok) {
+        return { ok: false, error: `cannot pass: ${passResult.error}` };
       }
       return {
         ok: true,
@@ -240,6 +241,16 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
 
 export const hasDrawnLastTime = (state: GameState, uid: string): boolean => {
   return state.lastUpdate?.playerUid === uid && state.lastUpdate.action.type === "Draw";
+};
+
+export const checkPassIsAvailable = (state: GameState, uid: string): Result<null> => {
+  if (state.discardPile.attackTotal != null) {
+    return { ok: false, error: "must play or draw during attack" };
+  }
+  if (!(state.lastUpdate?.playerUid === uid && state.lastUpdate.action.type === "Draw")) {
+    return { ok: false, error: "must draw before pass or play cards" };
+  }
+  return { ok: true, value: null };
 };
 
 const applyPatch = (
