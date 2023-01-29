@@ -332,14 +332,14 @@ const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Re
   }
 
   const cards = cardIds.map((id) => cardById(id));
-  if (cards.some((c) => c.type !== cards[0].type)) {
+  if (cards.length > 1 && cards.some((c) => c.type !== cards[0].type)) {
     return { ok: false, error: "multiple type cards played" };
   }
 
   switch (cards[0].type) {
     case "Number": {
       const numCards = cards as NumberCard[];
-      if (numCards.some((c) => c.value !== numCards[0].value)) {
+      if (numCards.length > 1 && numCards.some((c) => c.value !== numCards[0].value)) {
         return { ok: false, error: "multiple number values played" };
       }
       return {
