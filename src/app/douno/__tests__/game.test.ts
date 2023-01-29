@@ -132,6 +132,42 @@ describe("updateGameState", () => {
     ]);
   });
 
+  test("[attack] player cannot play non-attack cards during attack", () => {
+    const cards = [
+      // a's hand
+      card("draw2-g-0"),
+      card("num-b-5-0"),
+      // b's hand
+      card("num-g-1-0"),
+      card("num-g-2-0"),
+      // others
+      card("num-g-0-0"),
+      card("num-y-3-0"),
+      card("num-y-4-0"),
+    ];
+    let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 2 });
+
+    // a's turn
+    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [0], color: null }));
+    expect([state.discardPile.attackTotal, state.currentPlayerUid]).toStrictEqual([2, "b"]);
+    // b's turn: cannot play a green card on green Draw2 since the attack is active.
+    let result = updateGameState(conf, state, { type: "Play", cardIndice: [2], color: null });
+    expect(result.ok).toBe(false);
+    state = mustOk(updateGameState(conf, state, { type: "Draw" }));
+    expect([
+      state.discardPile.attackTotal,
+      state.playerMap["b"].hand.length,
+      state.currentPlayerUid,
+    ]).toStrictEqual([null, 4, "a"]);
+
+    // a's turn
+    state = mustOk(updateGameState(conf, state, { type: "Draw" }));
+    state = mustOk(updateGameState(conf, state, { type: "Pass" }));
+    // b's turn: now can play a green card on the same green Draw2.
+    result = updateGameState(conf, state, { type: "Play", cardIndice: [2], color: null });
+    expect(result.ok).toBe(true);
+  });
+
   test("[attack] players can chain draw2/4 attacks", () => {
     const cards = [
       // a's hand
