@@ -16,6 +16,10 @@ describe("updateGameState", () => {
     return c;
   };
 
+  const playAction = (cardIndice: readonly number[], color: string | null = null): GameAction => {
+    return { type: "Play", cardIndice, color };
+  };
+
   const mustOk = <T>(result: Result<T>): T => {
     if (!result.ok) {
       throw new Error(`[mustOk] result is not ok: ${result.error}`);
@@ -87,8 +91,7 @@ describe("updateGameState", () => {
 
     // can pass or play
     expect(updateGameState(conf, state, { type: "Pass" }).ok).toBe(true);
-    const playAction: GameAction = { type: "Play", cardIndice: [3], color: null };
-    expect(updateGameState(conf, state, playAction).ok).toBe(true);
+    expect(updateGameState(conf, state, playAction([3])).ok).toBe(true);
   });
 
   test("[play] player can play multiple number cards of same value", () => {
@@ -108,7 +111,7 @@ describe("updateGameState", () => {
     let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 3 });
 
     // a's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [0, 1], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([0, 1])));
     expect([state.playerMap["a"].hand, state.currentPlayerUid, state.discardPile]).toStrictEqual([
       [2],
       "b",
@@ -120,7 +123,7 @@ describe("updateGameState", () => {
     ]);
 
     // b's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [5, 4], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([5, 4])));
     expect([state.playerMap["b"].hand, state.currentPlayerUid, state.discardPile]).toStrictEqual([
       [3],
       "a",
@@ -148,11 +151,10 @@ describe("updateGameState", () => {
     let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 2 });
 
     // a's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [0], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([0])));
     expect([state.discardPile.attackTotal, state.currentPlayerUid]).toStrictEqual([2, "b"]);
     // b's turn: cannot play a green card on green Draw2 since the attack is active.
-    let result = updateGameState(conf, state, { type: "Play", cardIndice: [2], color: null });
-    expect(result.ok).toBe(false);
+    expect(updateGameState(conf, state, playAction([2])).ok).toBe(false);
     state = mustOk(updateGameState(conf, state, { type: "Draw" }));
     expect([
       state.discardPile.attackTotal,
@@ -164,8 +166,7 @@ describe("updateGameState", () => {
     state = mustOk(updateGameState(conf, state, { type: "Draw" }));
     state = mustOk(updateGameState(conf, state, { type: "Pass" }));
     // b's turn: now can play a green card on the same green Draw2.
-    result = updateGameState(conf, state, { type: "Play", cardIndice: [2], color: null });
-    expect(result.ok).toBe(true);
+    expect(updateGameState(conf, state, playAction([2])).ok).toBe(true);
   });
 
   test("[attack] players can chain draw2/4 attacks", () => {
@@ -185,13 +186,13 @@ describe("updateGameState", () => {
     let [conf, state] = initializeGame({ cards, playerUids: ["a", "b", "c"], handCardsNum: 2 });
 
     // a's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [0], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([0])));
     expect(state.discardPile.attackTotal).toBe(2);
     // b's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [2], color: "Blue" }));
+    state = mustOk(updateGameState(conf, state, playAction([2], "Blue")));
     expect(state.discardPile.attackTotal).toBe(6);
     // c's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [4], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([4])));
     expect(state.discardPile.attackTotal).toBe(8);
     // a's turn: must draw
     expect(updateGameState(conf, state, { type: "Pass" }).ok).toBe(false);
@@ -234,17 +235,17 @@ describe("updateGameState", () => {
     let [conf, state] = initializeGame({ cards, playerUids: ["a", "b", "c"], handCardsNum: 2 });
 
     // a's turn
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [0], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([0])));
     expect(state.playerMap["a"]).toStrictEqual({ hand: [1], wonAt: null });
     // b's turn: win
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [2, 3], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([2, 3])));
     expect(state.playerMap["b"]).toStrictEqual({ hand: [], wonAt: 2 });
     // c's turn
     state = mustOk(updateGameState(conf, state, { type: "Draw" }));
     state = mustOk(updateGameState(conf, state, { type: "Pass" }));
     expect(state.playerMap["c"]).toStrictEqual({ hand: [4, 5, 7], wonAt: null });
     // a's turn: win
-    state = mustOk(updateGameState(conf, state, { type: "Play", cardIndice: [1], color: null }));
+    state = mustOk(updateGameState(conf, state, playAction([1])));
     expect(state.playerMap["a"]).toStrictEqual({ hand: [], wonAt: 5 });
   });
 });
