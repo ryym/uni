@@ -1,15 +1,16 @@
 import { describe, expect, it } from "@jest/globals";
 import { buildDeck } from "../cards";
-import { GameState, initializeGameState } from "../game";
+import { GameState, initializeGame } from "../game";
 
-describe("initializeGameState", () => {
-  it("builds initial game state", () => {
+describe("initializeGame", () => {
+  it("builds initial game config and state", () => {
     const cards = buildDeck();
-    const state = initializeGameState({
+    const [config, state] = initializeGame({
       cards,
       playerUids: ["a", "b", "c"],
       handCardsNum: 3,
     });
+    expect([config.deck.length, config.playerUids]).toStrictEqual([cards.length, ["a", "b", "c"]]);
     expect(state).toStrictEqual({
       turn: 1,
       clockwise: true,

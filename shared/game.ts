@@ -70,7 +70,7 @@ export const initializeGame = (params: InitializeGameParams): [GameConfig, GameS
   return [config, state];
 };
 
-export const initializeGameState = (params: InitializeGameParams): GameState => {
+const initializeGameState = (params: InitializeGameParams): GameState => {
   const playerMap: Mutable<GameState["playerMap"]> = {};
   params.playerUids.forEach((uid, i) => {
     playerMap[uid] = {
