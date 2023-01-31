@@ -137,7 +137,7 @@ function GameStateView(props: {
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
-  const [cardSelection, setCardSelection] = useState<readonly number[]>([]);
+  const [cardSelection, setCardSelection] = useState<readonly string[]>([]);
 
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
@@ -150,29 +150,29 @@ function GameStateView(props: {
     if (cardSelection.length === 0) {
       return canPlayOn(props.gameState.discardPile, card);
     }
-    return canPlayWith(cardById(props.gameConfig.deck[cardSelection[0]]), card);
+    return canPlayWith(cardById(cardSelection[0]), card);
   };
 
-  const selectCard = (idx: number) => {
-    if (cardSelection.indexOf(idx) === -1) {
-      setCardSelection([...cardSelection, idx]);
+  const selectCard = (cardId: string) => {
+    if (cardSelection.indexOf(cardId) === -1) {
+      setCardSelection([...cardSelection, cardId]);
     }
   };
 
-  const unselectCard = (idx: number) => {
+  const unselectCard = (cardId: string) => {
     // Just unselect the card if it is not the first one.
-    if (cardSelection.length <= 1 || cardSelection.indexOf(idx) !== 0) {
-      setCardSelection(cardSelection.filter((i) => i !== idx));
+    if (cardSelection.length <= 1 || cardSelection.indexOf(cardId) !== 0) {
+      setCardSelection(cardSelection.filter((id) => id !== cardId));
       return;
     }
     // Otherwise, validate whole selection using the second card.
-    const second = cardById(props.gameConfig.deck[cardSelection[1]]);
+    const second = cardById(cardSelection[1]);
     if (!canPlayOn(props.gameState.discardPile, second)) {
       setCardSelection([]);
       return;
     }
-    const nextSelection = cardSelection.slice(1).filter((i) => {
-      return i === cardSelection[1] || canPlayWith(second, cardById(props.gameConfig.deck[i]));
+    const nextSelection = cardSelection.slice(1).filter((id) => {
+      return id === cardSelection[1] || canPlayWith(second, cardById(id));
     });
     setCardSelection(nextSelection);
   };
@@ -211,13 +211,12 @@ function GameStateView(props: {
           }
           onClick={() => {
             setCardSelection([]);
-            const cardType = cardById(props.gameConfig.deck[cardSelection[0]]).type;
+            const cardType = cardById(cardSelection[0]).type;
             let color: string | null = null;
             if (cardType === "Wild" || cardType === "Draw4") {
               color = window.prompt("color (Red | Blue | Green | Yellow)");
             }
-            const cardIds = cardSelection.map((idx) => props.gameConfig.deck[idx]);
-            props.update({ type: "Play", cardIds, color });
+            props.update({ type: "Play", cardIds: cardSelection, color });
           }}
         >
           Play
@@ -256,29 +255,29 @@ function GameStateView(props: {
             </div>
             {uid === user.uid && isMyTurn ? (
               <ul>
-                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => {
-                  const checked = cardSelection.includes(cardIdx);
-                  const card = cardById(props.gameConfig.deck[cardIdx]);
+                {props.gameState.playerMap[uid]?.hand.map((cardId) => {
+                  const checked = cardSelection.includes(cardId);
+                  const card = cardById(cardId);
                   return (
-                    <li key={cardIdx}>
+                    <li key={cardId}>
                       <input
                         type="checkbox"
                         checked={checked}
                         disabled={!checked && !canSelectCard(card)}
                         onChange={(e) =>
-                          e.target.checked ? selectCard(cardIdx) : unselectCard(cardIdx)
+                          e.target.checked ? selectCard(cardId) : unselectCard(cardId)
                         }
                       />
-                      <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
+                      <CardView card={cardById(cardId)} />
                     </li>
                   );
                 })}
               </ul>
             ) : (
               <ul>
-                {props.gameState.playerMap[uid]?.hand.map((cardIdx) => (
-                  <li key={cardIdx}>
-                    <CardView card={cardById(props.gameConfig.deck[cardIdx])} />
+                {props.gameState.playerMap[uid]?.hand.map((cardId) => (
+                  <li key={cardId}>
+                    <CardView card={cardById(cardId)} />
                   </li>
                 ))}
               </ul>

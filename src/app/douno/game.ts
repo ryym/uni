@@ -39,7 +39,7 @@ export const updateGameState = (
 type GameStatePatch = {
   readonly deckTopIdx: number;
   readonly discardPile: GameState["discardPile"];
-  readonly playerHand: readonly number[];
+  readonly playerHand: readonly string[];
   readonly playerMove: PlayerMove;
 };
 
@@ -84,13 +84,16 @@ const buildPatch = (
           value: {
             deckTopIdx: state.deckTopIdx + 1,
             discardPile: state.discardPile,
-            playerHand: [...state.playerMap[state.currentPlayerUid].hand, state.deckTopIdx],
+            playerHand: [
+              ...state.playerMap[state.currentPlayerUid].hand,
+              config.deck[state.deckTopIdx],
+            ],
             playerMove: { step: 0, clockwise: state.clockwise },
           },
         };
       } else {
         const nextDeckTopIdx = state.deckTopIdx + state.discardPile.attackTotal;
-        const drawn = range(state.deckTopIdx, nextDeckTopIdx);
+        const drawn = range(state.deckTopIdx, nextDeckTopIdx).map((idx) => config.deck[idx]);
         return {
           ok: true,
           value: {
@@ -106,8 +109,7 @@ const buildPatch = (
     case "Play": {
       const player = state.playerMap[state.currentPlayerUid];
 
-      const handCardIds = player.hand.map((idx) => config.deck[idx]);
-      if (action.cardIds.some((id) => !handCardIds.includes(id))) {
+      if (action.cardIds.some((id) => !player.hand.includes(id))) {
         return { ok: false, error: "played cards not in hand" };
       }
 
@@ -125,7 +127,7 @@ const buildPatch = (
       };
 
       const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((_, i) => {
-        return !action.cardIds.includes(handCardIds[i]);
+        return !action.cardIds.includes(player.hand[i]);
       });
 
       if (!canPlayOn(state.discardPile, play.cards[0])) {

@@ -29,7 +29,7 @@ export type GameState = {
 };
 
 export type PlayerState = {
-  readonly hand: readonly number[];
+  readonly hand: readonly string[];
   readonly wonAt: number | null;
 };
 
@@ -66,17 +66,15 @@ export const initializeGame = (params: InitializeGameParams): [GameConfig, GameS
     deck: params.cards.map((c) => c.id),
     playerUids: params.playerUids,
   };
-  const state = initializeGameState(params);
+  const state = initializeGameState(params, config.deck);
   return [config, state];
 };
 
-const initializeGameState = (params: InitializeGameParams): GameState => {
+const initializeGameState = (params: InitializeGameParams, deck: readonly string[]): GameState => {
   const playerMap: Mutable<GameState["playerMap"]> = {};
   params.playerUids.forEach((uid, i) => {
-    playerMap[uid] = {
-      hand: range(0, params.handCardsNum).map((j) => params.handCardsNum * i + j),
-      wonAt: null,
-    };
+    const hand = range(0, params.handCardsNum).map((j) => deck[params.handCardsNum * i + j]);
+    playerMap[uid] = { hand, wonAt: null };
   });
 
   const discardPileTopIdx = params.playerUids.length * params.handCardsNum;

@@ -1,10 +1,23 @@
 import { describe, expect, it } from "@jest/globals";
-import { buildDeck } from "../cards";
+import { makeCardFactory } from "../__testlib__/cardFactory";
 import { GameState, initializeGame } from "../game";
 
 describe("initializeGame", () => {
+  const { card } = makeCardFactory();
+
   it("builds initial game config and state", () => {
-    const cards = buildDeck();
+    const cards = [
+      card("num-r-1-0"),
+      card("num-b-1-0"),
+      card("num-g-1-0"),
+      card("num-r-2-0"),
+      card("num-b-2-0"),
+      card("num-g-2-0"),
+      card("num-r-3-0"),
+      card("num-b-3-0"),
+      card("num-g-3-0"),
+      card("num-y-9-0"),
+    ];
     const [config, state] = initializeGame({
       cards,
       playerUids: ["a", "b", "c"],
@@ -16,13 +29,13 @@ describe("initializeGame", () => {
       clockwise: true,
       currentPlayerUid: "a",
       playerMap: {
-        a: { hand: [0, 1, 2], wonAt: null },
-        b: { hand: [3, 4, 5], wonAt: null },
-        c: { hand: [6, 7, 8], wonAt: null },
+        a: { hand: ["num-r-1-0", "num-b-1-0", "num-g-1-0"], wonAt: null },
+        b: { hand: ["num-r-2-0", "num-b-2-0", "num-g-2-0"], wonAt: null },
+        c: { hand: ["num-r-3-0", "num-b-3-0", "num-g-3-0"], wonAt: null },
       },
       discardPile: {
-        topCards: ["num-r-5-0"],
-        color: "Red",
+        topCards: ["num-y-9-0"],
+        color: "Yellow",
         attackTotal: null,
       },
       deckTopIdx: 10,
