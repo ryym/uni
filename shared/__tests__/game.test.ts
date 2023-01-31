@@ -34,7 +34,7 @@ describe("initializeGame", () => {
         c: { hand: ["num-r-3-0", "num-b-3-0", "num-g-3-0"], wonAt: null },
       },
       discardPile: {
-        topCards: ["num-y-9-0"],
+        topCardIds: ["num-y-9-0"],
         color: "Yellow",
         attackTotal: null,
       },

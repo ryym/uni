@@ -235,7 +235,7 @@ function GameStateView(props: {
         <div>discard pile (color: {props.gameState.discardPile.color})</div>
         <div>top cards:</div>
         <ul>
-          {props.gameState.discardPile.topCards.map((id) => (
+          {props.gameState.discardPile.topCardIds.map((id) => (
             <li key={id}>
               <CardView card={cardById(id)} />
             </li>

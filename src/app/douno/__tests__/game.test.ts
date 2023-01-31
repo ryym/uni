@@ -121,7 +121,7 @@ describe("updateGameState", () => {
       ["num-r-4-0"],
       "b",
       {
-        topCards: ["num-r-3-1", "num-g-3-0", "num-b-3-0"],
+        topCardIds: ["num-r-3-1", "num-g-3-0", "num-b-3-0"],
         color: "Red",
         attackTotal: null,
       } satisfies GameState["discardPile"],
@@ -133,7 +133,7 @@ describe("updateGameState", () => {
       ["num-r-5-0"],
       "a",
       {
-        topCards: ["num-r-6-0", "num-r-6-1", "num-r-3-1", "num-g-3-0", "num-b-3-0"],
+        topCardIds: ["num-r-6-0", "num-r-6-1", "num-r-3-1", "num-g-3-0", "num-b-3-0"],
         color: "Red",
         attackTotal: null,
       } satisfies GameState["discardPile"],
@@ -241,7 +241,7 @@ describe("updateGameState", () => {
         c: { hand: ["num-b-1-0"], wonAt: null },
       },
       discardPile: {
-        topCards: ["draw2-b-0", "draw4-0", "draw2-y-0", "num-y-0-0"],
+        topCardIds: ["draw2-b-0", "draw4-0", "draw2-y-0", "num-y-0-0"],
         color: "Blue",
         attackTotal: null,
       },

@@ -122,7 +122,7 @@ const buildPatch = (
       const color = "color" in play ? play.color : play.cards[play.cards.length - 1].color;
       const discardPile: typeof state["discardPile"] = {
         ...state.discardPile,
-        topCards: [...[...action.cardIds].reverse(), ...state.discardPile.topCards].slice(0, 5),
+        topCardIds: [...[...action.cardIds].reverse(), ...state.discardPile.topCardIds].slice(0, 5),
         color,
       };
 
@@ -131,7 +131,7 @@ const buildPatch = (
       });
 
       if (!canPlayOn(state.discardPile, play.cards[0])) {
-        const pileTopId = state.discardPile.topCards[0];
+        const pileTopId = state.discardPile.topCardIds[0];
         return { ok: false, error: `cannot play ${play.cards[0].id} on ${pileTopId}` };
       }
 
@@ -202,7 +202,7 @@ const buildPatch = (
 };
 
 export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
-  const pileTop = cardById(pile.topCards[0]);
+  const pileTop = cardById(pile.topCardIds[0]);
   switch (card.type) {
     case "Number": {
       return (

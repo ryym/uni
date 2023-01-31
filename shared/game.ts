@@ -34,7 +34,7 @@ export type PlayerState = {
 };
 
 export type DiscardPile = {
-  readonly topCards: readonly string[];
+  readonly topCardIds: readonly string[];
   readonly color: Color;
   readonly attackTotal: null | number;
 };
@@ -94,7 +94,7 @@ const initializeGameState = (params: InitializeGameParams, deck: readonly string
 const buildDiscardPile = (topCard: Card): GameState["discardPile"] => {
   const color = "color" in topCard ? topCard.color : COLORS[randomInt(COLORS.length)];
   return {
-    topCards: [topCard.id],
+    topCardIds: [topCard.id],
     color,
     attackTotal: null,
   };
