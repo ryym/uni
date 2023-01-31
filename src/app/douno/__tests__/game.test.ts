@@ -1,20 +1,12 @@
 import { describe, expect, test } from "@jest/globals";
 import { Result } from "~/lib/types";
 import { updateGameState } from "../game";
+import { makeCardFactory } from "~shared/__testlib__/cardFactory";
 import { range } from "~shared/array";
-import { buildDeck } from "~shared/cards";
 import { GameAction, GameState, initializeGame } from "~shared/game";
 
 describe("updateGameState", () => {
-  const cards = buildDeck();
-
-  const card = (id: string) => {
-    const c = cards.find((c) => c.id === id);
-    if (c == null) {
-      throw new Error(`card ${id} not found`);
-    }
-    return c;
-  };
+  const { allCards, card } = makeCardFactory();
 
   const playAction = (cardIds: readonly string[], color: string | null = null): GameAction => {
     return { type: "Play", cardIds, color };
@@ -28,7 +20,11 @@ describe("updateGameState", () => {
   };
 
   test("[pass] player can pass after draw", () => {
-    let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 1 });
+    let [conf, state] = initializeGame({
+      cards: allCards,
+      playerUids: ["a", "b"],
+      handCardsNum: 1,
+    });
     expect(updateGameState(conf, state, { type: "Pass" }).ok).toBe(false);
 
     state = mustOk(updateGameState(conf, state, { type: "Draw" }));
@@ -50,6 +46,15 @@ describe("updateGameState", () => {
   });
 
   test("[draw] player can draw card from deck", () => {
+    const cards = [
+      // a's hand
+      card("num-r-1-0"),
+      // b's hand
+      card("num-b-1-0"),
+      // others
+      card("num-g-2-0"),
+      card("num-y-3-0"),
+    ];
     const [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 1 });
     const next = updateGameState(conf, state, { type: "Draw" });
     expect(next).toStrictEqual({
