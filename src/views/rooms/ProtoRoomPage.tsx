@@ -43,7 +43,7 @@ type SyncedGameSnapshot =
     };
 
 const gameSnapDocRef = (db: Firestore) => {
-  return doc(db, "games/poc/states/current") as DocumentReference<GameSnapshot>;
+  return doc(db, "games/poc/snapshots/current") as DocumentReference<GameSnapshot>;
 };
 const gameConfigDocRef = (db: Firestore) => {
   return doc(db, "games/poc") as DocumentReference<GameConfig>;

@@ -26,7 +26,7 @@ export const initGameHandler = (app: app.App): CallHandler<unknown, Promise<null
 
     const batch = firestore.batch();
     batch.set(firestore.doc("games/poc"), gameConfig);
-    batch.set(firestore.doc("games/poc/states/current"), gameSnapshot);
+    batch.set(firestore.doc("games/poc/snapshots/current"), gameSnapshot);
     await batch.commit();
 
     return null;
