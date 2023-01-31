@@ -135,6 +135,30 @@ describe("updateGameState", () => {
     ]);
   });
 
+  test("[play] player cannot play cards that do not exist in their hand", () => {
+    const cards = [
+      // a's hand
+      card("num-r-1-0"),
+      card("num-r-1-1"),
+      // b's hand
+      card("num-b-1-0"),
+      card("num-b-1-1"),
+      // others
+      card("num-r-3-0"),
+    ];
+    let [conf, state] = initializeGame({ cards, playerUids: ["a", "b"], handCardsNum: 2 });
+
+    // a's turn
+    expect(updateGameState(conf, state, playAction(["num-r-9-0"])).ok).toBe(false);
+    expect(updateGameState(conf, state, playAction(["num-b-1-0"])).ok).toBe(false);
+    state = mustOk(updateGameState(conf, state, playAction(["num-r-1-0"])));
+
+    // b's turn
+    expect(updateGameState(conf, state, playAction(["num-b-9-0"])).ok).toBe(false);
+    expect(updateGameState(conf, state, playAction(["num-r-1-1"])).ok).toBe(false);
+    mustOk(updateGameState(conf, state, playAction(["num-b-1-1"])));
+  });
+
   test("[attack] player cannot play non-attack cards during attack", () => {
     const cards = [
       // a's hand
