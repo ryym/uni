@@ -15,9 +15,13 @@ import {
   GameConfig,
   GameSnapshot,
   GameState,
+  canAct,
+  canDraw,
+  canPass,
+  canPlayCards,
   canPlayOn,
   canPlayWith,
-  hasDrawnLastTime,
+  isGameFinished,
   updateGameState,
 } from "~/app/douno/game";
 import { deepStrictEqual } from "~/lib/deepEqual";
@@ -140,13 +144,7 @@ function GameStateView(props: {
     wonAt: props.gameState.playerMap[uid].wonAt,
   }));
   const myState = props.gameState.playerMap[user.uid];
-  const gameFinished =
-    props.gameConfig.playerUids.length === 1
-      ? myState.wonAt != null
-      : players.filter((s) => s.wonAt == null).length <= 1;
-  const isMyTurn = user.uid === props.gameState.currentPlayerUid;
-  const canPlay = !gameFinished && isMyTurn && myState.wonAt == null;
-  const canDraw = isMyTurn && !hasDrawnLastTime(props.gameState, user.uid);
+  const isMyTurn = canAct(props.gameConfig, props.gameState, user.uid);
 
   const canSelectCard = (card: Card): boolean => {
     if (cardSelection.length === 0) {
@@ -181,7 +179,7 @@ function GameStateView(props: {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {gameFinished && (
+      {isGameFinished(props.gameConfig, props.gameState) && (
         <div>
           <hr />
           <GameResultView gameState={props.gameState} players={players} />
@@ -190,7 +188,7 @@ function GameStateView(props: {
       )}
       <div>
         <div>turn: {props.gameState.turn}</div>
-        <div>my turn?: {canPlay ? "yes" : "no"}</div>
+        <div>my turn?: {isMyTurn ? "yes" : "no"}</div>
         <div>won?: {myState.wonAt != null ? "yes" : "no"}</div>
         <div>
           <div>deck top: {props.gameState.deckTopIdx}</div>
@@ -199,7 +197,7 @@ function GameStateView(props: {
       </div>
       <div>
         <button
-          disabled={!canPlay || !canDraw}
+          disabled={!canDraw(props.gameConfig, props.gameState, user.uid)}
           onClick={() => {
             setCardSelection([]);
             props.update({ type: "Draw" });
@@ -208,7 +206,9 @@ function GameStateView(props: {
           Draw
         </button>
         <button
-          disabled={!canPlay}
+          disabled={
+            !canPlayCards(props.gameConfig, props.gameState, user.uid, cardSelection.length)
+          }
           onClick={() => {
             setCardSelection([]);
             const cardType = cardById(props.gameConfig.deck[cardSelection[0]]).type;
@@ -222,7 +222,7 @@ function GameStateView(props: {
           Play
         </button>
         <button
-          disabled={!canPlay}
+          disabled={!canPass(props.gameConfig, props.gameState, user.uid)}
           onClick={() => {
             setCardSelection([]);
             props.update({ type: "Pass" });
@@ -253,7 +253,7 @@ function GameStateView(props: {
               hand of {uid}
               {uid === user.uid ? " (YOU)" : ""}
             </div>
-            {uid === user.uid && canPlay ? (
+            {uid === user.uid && isMyTurn ? (
               <ul>
                 {props.gameState.playerMap[uid]?.hand.map((cardIdx) => {
                   const checked = cardSelection.includes(cardIdx);

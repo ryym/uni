@@ -239,11 +239,42 @@ export const canPlayWith = (firstCard: Card, nextCard: Card): boolean => {
   }
 };
 
-export const hasDrawnLastTime = (state: GameState, uid: string): boolean => {
+const hasDrawnLastTime = (state: GameState, uid: string): boolean => {
   return state.lastUpdate?.playerUid === uid && state.lastUpdate.action.type === "Draw";
 };
 
-export const checkPassIsAvailable = (state: GameState, uid: string): Result<null> => {
+export const isGameFinished = (config: GameConfig, state: GameState): boolean => {
+  const threshhold = config.playerUids.length > 1 ? 1 : 0;
+  const nonWinners = config.playerUids.filter((uid) => state.playerMap[uid].wonAt == null);
+  return nonWinners.length <= threshhold;
+};
+
+export const canAct = (config: GameConfig, state: GameState, uid: string): boolean => {
+  return (
+    state.currentPlayerUid === uid &&
+    state.playerMap[uid].wonAt == null &&
+    !isGameFinished(config, state)
+  );
+};
+
+export const canDraw = (config: GameConfig, state: GameState, uid: string): boolean => {
+  return canAct(config, state, uid) && !hasDrawnLastTime(state, uid);
+};
+
+export const canPlayCards = (
+  config: GameConfig,
+  state: GameState,
+  uid: string,
+  numOfCards: number,
+): boolean => {
+  return canAct(config, state, uid) && 0 < numOfCards && numOfCards <= MAX_PLAY_CARDS;
+};
+
+export const canPass = (config: GameConfig, state: GameState, uid: string): boolean => {
+  return canAct(config, state, uid) && checkPassIsAvailable(state, uid).ok;
+};
+
+const checkPassIsAvailable = (state: GameState, uid: string): Result<null> => {
   if (state.discardPile.attackTotal != null) {
     return { ok: false, error: "must play or draw during attack" };
   }
@@ -337,9 +368,14 @@ type Play =
       readonly color: Color;
     };
 
+const MAX_PLAY_CARDS = 50;
+
 const parsePlay = (cardIds: readonly string[], selectedColor: string | null): Result<Play> => {
   if (cardIds.length === 0) {
     return { ok: false, error: "played cards empty" };
+  }
+  if (cardIds.length > MAX_PLAY_CARDS) {
+    return { ok: false, error: "played cards too many" };
   }
 
   const cards = cardIds.map((id) => cardById(id));
