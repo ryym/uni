@@ -105,13 +105,13 @@ const buildPatch = (
 
     case "Play": {
       const player = state.playerMap[state.currentPlayerUid];
-      if (action.cardIndice.some((i) => !player.hand.includes(i))) {
+
+      const handCardIds = player.hand.map((idx) => config.deck[idx]);
+      if (action.cardIds.some((id) => !handCardIds.includes(id))) {
         return { ok: false, error: "played cards not in hand" };
       }
 
-      const playedCardIds = action.cardIndice.map((idx) => config.deck[idx]);
-
-      const playResult = parsePlay(playedCardIds, action.color);
+      const playResult = parsePlay(action.cardIds, action.color);
       if (!playResult.ok) {
         return { ok: false, error: `failed to parse play: ${playResult.error}` };
       }
@@ -120,12 +120,12 @@ const buildPatch = (
       const color = "color" in play ? play.color : play.cards[play.cards.length - 1].color;
       const discardPile: typeof state["discardPile"] = {
         ...state.discardPile,
-        topCards: [...playedCardIds.reverse(), ...state.discardPile.topCards].slice(0, 5),
+        topCards: [...[...action.cardIds].reverse(), ...state.discardPile.topCards].slice(0, 5),
         color,
       };
 
-      const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((i) => {
-        return !action.cardIndice.includes(i);
+      const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((_, i) => {
+        return !action.cardIds.includes(handCardIds[i]);
       });
 
       if (!canPlayOn(state.discardPile, play.cards[0])) {

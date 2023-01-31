@@ -51,7 +51,7 @@ export type GameAction =
     }
   | {
       readonly type: "Play";
-      readonly cardIndice: readonly number[];
+      readonly cardIds: readonly string[];
       readonly color: string | null;
     };
 

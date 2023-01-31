@@ -216,7 +216,8 @@ function GameStateView(props: {
             if (cardType === "Wild" || cardType === "Draw4") {
               color = window.prompt("color (Red | Blue | Green | Yellow)");
             }
-            props.update({ type: "Play", cardIndice: cardSelection, color });
+            const cardIds = cardSelection.map((idx) => props.gameConfig.deck[idx]);
+            props.update({ type: "Play", cardIds, color });
           }}
         >
           Play
