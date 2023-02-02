@@ -123,6 +123,22 @@ const buildDiscardPile = (topCard: Card): GameState["discardPile"] => {
   };
 };
 
-export const cardIdHash = (cardId: string, _salt: string): string => {
-  return cardId;
+export const cardIdHash = (cardId: string, salt: string): string => {
+  if (__ENV_TEST__) {
+    return `${cardId}-hash`;
+  }
+
+  const value = `${cardId}${salt}`;
+
+  // I copy pasted this logic from https://stackoverflow.com/a/7616484/7222928.
+  // And I generated hashes more than 120000 times but no collision has occurred in a deck
+  // so it seems work fine for our use case.
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    const chr = value.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return hash.toString();
 };

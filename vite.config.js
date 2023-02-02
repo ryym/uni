@@ -21,6 +21,7 @@ export default defineConfig((env) => {
     },
     define: {
       __FIREBASE_EMULATOR__: env.mode === "development" && process.env.CONNECT_FIREBASE !== "true",
+      __ENV_TEST__: false,
     },
   };
 });

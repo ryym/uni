@@ -65,8 +65,8 @@ describe("updateGameState", () => {
         deckTopIdx: 4,
         currentPlayerUid: "a",
         playerMap: {
-          a: { hand: ["num-r-1-0", "num-y-3-0"], wonAt: null },
-          b: { hand: ["num-b-1-0"], wonAt: null },
+          a: { hand: ["num-r-1-0-hash", "num-y-3-0-hash"], wonAt: null },
+          b: { hand: ["num-b-1-0-hash"], wonAt: null },
         },
         lastUpdate: {
           action: { type: "Draw" },
@@ -118,7 +118,7 @@ describe("updateGameState", () => {
     // a's turn
     state = mustOk(updateGameState(conf, state, playAction(["num-g-3-0", "num-r-3-1"])));
     expect([state.playerMap["a"].hand, state.currentPlayerUid, state.discardPile]).toStrictEqual([
-      ["num-r-4-0"],
+      ["num-r-4-0-hash"],
       "b",
       {
         topCardIds: ["num-r-3-1", "num-g-3-0", "num-b-3-0"],
@@ -130,7 +130,7 @@ describe("updateGameState", () => {
     // b's turn
     state = mustOk(updateGameState(conf, state, playAction(["num-r-6-1", "num-r-6-0"])));
     expect([state.playerMap["b"].hand, state.currentPlayerUid, state.discardPile]).toStrictEqual([
-      ["num-r-5-0"],
+      ["num-r-5-0-hash"],
       "a",
       {
         topCardIds: ["num-r-6-0", "num-r-6-1", "num-r-3-1", "num-g-3-0", "num-b-3-0"],
@@ -234,11 +234,11 @@ describe("updateGameState", () => {
       currentPlayerUid: "b",
       playerMap: {
         a: {
-          hand: ["num-r-1-0", /* attacked */ ...range(1, 9).map((i) => `num-y-${i}-0`)],
+          hand: ["num-r-1-0-hash", /* attacked */ ...range(1, 9).map((i) => `num-y-${i}-0-hash`)],
           wonAt: null,
         },
-        b: { hand: ["num-r-1-1"], wonAt: null },
-        c: { hand: ["num-b-1-0"], wonAt: null },
+        b: { hand: ["num-r-1-1-hash"], wonAt: null },
+        c: { hand: ["num-b-1-0-hash"], wonAt: null },
       },
       discardPile: {
         topCardIds: ["draw2-b-0", "draw4-0", "draw2-y-0", "num-y-0-0"],
@@ -268,7 +268,7 @@ describe("updateGameState", () => {
 
     // a's turn
     state = mustOk(updateGameState(conf, state, playAction(["num-r-1-0"])));
-    expect(state.playerMap["a"]).toStrictEqual({ hand: ["num-r-1-1"], wonAt: null });
+    expect(state.playerMap["a"]).toStrictEqual({ hand: ["num-r-1-1-hash"], wonAt: null });
     // b's turn: win
     state = mustOk(updateGameState(conf, state, playAction(["num-r-2-0", "num-r-2-1"])));
     expect(state.playerMap["b"]).toStrictEqual({ hand: [], wonAt: 2 });
@@ -276,7 +276,7 @@ describe("updateGameState", () => {
     state = mustOk(updateGameState(conf, state, { type: "Draw" }));
     state = mustOk(updateGameState(conf, state, { type: "Pass" }));
     expect(state.playerMap["c"]).toStrictEqual({
-      hand: ["num-b-1-0", "num-b-1-1", "num-r-9-1"],
+      hand: ["num-b-1-0-hash", "num-b-1-1-hash", "num-r-9-1-hash"],
       wonAt: null,
     });
     // a's turn: win

@@ -11,4 +11,7 @@ module.exports = {
   },
   preset: "ts-jest",
   testEnvironment: "node",
+  globals: {
+    __ENV_TEST__: true,
+  },
 };
