@@ -20,6 +20,13 @@ service cloud.firestore {
           && request.resource.data.state.turn == resource.data.state.turn + 1
         );
       }
+
+      match /cards/{hash} {
+        allow read: if (
+          request.auth != null
+          && hash in get(/databases/$(database)/documents/games/$(roomId)/snapshots/current).data.state.playerMap[request.auth.uid].hand
+        )
+      }
     }
   }
 }

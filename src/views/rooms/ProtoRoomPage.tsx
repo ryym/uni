@@ -1,10 +1,15 @@
 import {
   DocumentReference,
   Firestore,
+  collection,
   doc,
+  documentId,
   getDoc,
+  getDocs,
   onSnapshot,
+  query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { useAtomValue } from "jotai";
@@ -28,6 +33,19 @@ import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
+
+type HandCardMap = {
+  readonly [hash: string]: HandCardState;
+};
+
+type HandCardState =
+  | {
+      readonly type: "getting";
+    }
+  | {
+      readonly type: "got";
+      readonly card: Card;
+    };
 
 type SyncedGameSnapshot =
   | {
@@ -57,7 +75,11 @@ export function ProtoRoomPage(): ReactElement {
   const [synced, setSynced] = useState<SyncedGameSnapshot>({ type: "unset" });
 
   useEffect(() => {
-    return onSnapshot(gameSnapDocRef(db), async (d) => {
+    return onSnapshot(gameSnapDocRef(db), { includeMetadataChanges: true }, async (d) => {
+      if (d.metadata.hasPendingWrites) {
+        return;
+      }
+
       const snapshot = d.data();
       if (snapshot == null) {
         return;
@@ -137,7 +159,39 @@ function GameStateView(props: {
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
+  const { db } = useAtomValue(firebaseAtom);
   const [cardSelection, setCardSelection] = useState<readonly string[]>([]);
+
+  const [handCardMap, setHandCardMap] = useState<HandCardMap>({});
+  useEffect(() => {
+    const handCardHashes = props.gameState.playerMap[user.uid].hand;
+    const newCardHashes = handCardHashes.filter((h) => handCardMap[h] == null);
+    log.debug("new card hashes", newCardHashes);
+    if (newCardHashes.length > 0) {
+      setHandCardMap((cur) => {
+        const m = { ...cur };
+        newCardHashes.forEach((h) => {
+          m[h] = { type: "getting" };
+        });
+        return m;
+      });
+      // Each player can only see the contents of the cards in their own hand so note that
+      // you need to run the query after the game snapshot has written to the server
+      // (that is, after metadata.hasPendingWrites becomes false).
+      const q = query(collection(db, "games/poc/cards"), where(documentId(), "in", newCardHashes));
+      getDocs(q).then((r) => {
+        const hashAndIds = r.docs.map((d) => [d.id, d.data().cardId as string]);
+        log.debug("new cards got", hashAndIds);
+        setHandCardMap((cur) => {
+          const m = { ...cur };
+          hashAndIds.forEach(([hash, cardId]) => {
+            m[hash] = { type: "got", card: cardById(cardId) };
+          });
+          return m;
+        });
+      });
+    }
+  }, [props.gameState, user, db, handCardMap]);
 
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
@@ -190,10 +244,7 @@ function GameStateView(props: {
         <div>turn: {props.gameState.turn}</div>
         <div>my turn?: {isMyTurn ? "yes" : "no"}</div>
         <div>won?: {myState.wonAt != null ? "yes" : "no"}</div>
-        <div>
-          <div>deck top: {props.gameState.deckTopIdx}</div>
-          <CardView card={cardById(props.gameConfig.deck[props.gameState.deckTopIdx])} />
-        </div>
+        <div>deck top: {props.gameState.deckTopIdx}</div>
       </div>
       <div>
         <button
@@ -253,32 +304,51 @@ function GameStateView(props: {
               hand of {uid}
               {uid === user.uid ? " (YOU)" : ""}
             </div>
-            {uid === user.uid && isMyTurn ? (
-              <ul>
-                {props.gameState.playerMap[uid]?.hand.map((cardId) => {
-                  const checked = cardSelection.includes(cardId);
-                  const card = cardById(cardId);
-                  return (
-                    <li key={cardId}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={!checked && !canSelectCard(card)}
-                        onChange={(e) =>
-                          e.target.checked ? selectCard(cardId) : unselectCard(cardId)
-                        }
-                      />
-                      <CardView card={cardById(cardId)} />
-                    </li>
-                  );
-                })}
-              </ul>
+            {uid === user.uid ? (
+              isMyTurn ? (
+                <ul>
+                  {props.gameState.playerMap[uid]?.hand.map((cardHash) => {
+                    const cardState = handCardMap[cardHash];
+                    if (cardState == null || cardState.type === "getting") {
+                      return <li key={cardHash}>???</li>;
+                    }
+                    const { card } = cardState;
+                    const checked = cardSelection.includes(card.id);
+                    return (
+                      <li key={card.id}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={!checked && !canSelectCard(card)}
+                          onChange={(e) =>
+                            e.target.checked ? selectCard(card.id) : unselectCard(card.id)
+                          }
+                        />
+                        <CardView card={card} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <ul>
+                  {props.gameState.playerMap[uid]?.hand.map((cardHash) => {
+                    const cardState = handCardMap[cardHash];
+                    return (
+                      <li key={cardHash}>
+                        {cardState?.type === "got" ? (
+                          <CardView card={cardState.card} />
+                        ) : (
+                          <div>???</div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )
             ) : (
               <ul>
-                {props.gameState.playerMap[uid]?.hand.map((cardId) => (
-                  <li key={cardId}>
-                    <CardView card={cardById(cardId)} />
-                  </li>
+                {props.gameState.playerMap[uid]?.hand.map((cardHash) => (
+                  <li key={cardHash}>??? ({cardHash})</li>
                 ))}
               </ul>
             )}

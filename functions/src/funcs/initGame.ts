@@ -21,12 +21,21 @@ export const initGameHandler = (app: app.App): CallHandler<unknown, Promise<null
     const cards = buildDeck();
     shuffleCards(cards);
 
-    const [gameConfig, gameState] = initializeGame({ cards, playerUids, handCardsNum: 7 });
+    const [gameConfig, gameState, idHashMap] = initializeGame({
+      cards,
+      playerUids,
+      handCardsNum: 7,
+    });
     const gameSnapshot: GameSnapshot = { state: gameState, lastAction: { type: "Start" } };
 
     const batch = firestore.batch();
     batch.set(firestore.doc("games/poc"), gameConfig);
     batch.set(firestore.doc("games/poc/snapshots/current"), gameSnapshot);
+
+    cards.forEach((c) => {
+      batch.set(firestore.doc(`games/poc/cards/${idHashMap[c.id]}`), { cardId: c.id });
+    });
+
     await batch.commit();
 
     return null;

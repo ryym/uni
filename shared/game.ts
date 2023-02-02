@@ -4,8 +4,12 @@ import { Mutable } from "./mutable";
 import { randomInt } from "./random";
 
 export type GameConfig = {
+  /** An array of card hashes. */
   readonly deck: readonly string[];
   readonly playerUids: readonly string[];
+  readonly protection: {
+    readonly salt: string;
+  };
 };
 
 export type GameSnapshot = {
@@ -29,6 +33,7 @@ export type GameState = {
 };
 
 export type PlayerState = {
+  /** An array of card hashes. */
   readonly hand: readonly string[];
   readonly wonAt: number | null;
 };
@@ -61,13 +66,31 @@ export type InitializeGameParams = {
   readonly handCardsNum: number;
 };
 
-export const initializeGame = (params: InitializeGameParams): [GameConfig, GameState] => {
+export type CardIdHashMap = {
+  readonly [cardId: string]: string;
+};
+
+export const initializeGame = (
+  params: InitializeGameParams,
+): [GameConfig, GameState, CardIdHashMap] => {
+  const salt = "";
+
+  const idHashMap = params.cards.reduce((m, c) => {
+    m[c.id] = cardIdHash(c.id, salt);
+    return m;
+  }, {} as Mutable<CardIdHashMap>);
+
+  if (new Set(Object.values(idHashMap)).size !== params.cards.length) {
+    throw new Error(`[douno] id hash collision detected. salt: ${salt}`);
+  }
+
   const config: GameConfig = {
-    deck: params.cards.map((c) => c.id),
+    deck: params.cards.map((c) => idHashMap[c.id]),
     playerUids: params.playerUids,
+    protection: { salt },
   };
   const state = initializeGameState(params, config.deck);
-  return [config, state];
+  return [config, state, idHashMap];
 };
 
 const initializeGameState = (params: InitializeGameParams, deck: readonly string[]): GameState => {
@@ -98,4 +121,8 @@ const buildDiscardPile = (topCard: Card): GameState["discardPile"] => {
     color,
     attackTotal: null,
   };
+};
+
+export const cardIdHash = (cardId: string, _salt: string): string => {
+  return cardId;
 };

@@ -12,7 +12,7 @@ import {
   cardById,
   parseColor,
 } from "./cards";
-import { DiscardPile, GameAction, GameConfig, GameState } from "~shared/game";
+import { DiscardPile, GameAction, GameConfig, GameState, cardIdHash } from "~shared/game";
 
 export type { GameAction, GameConfig, GameSnapshot, GameState } from "~shared/game";
 
@@ -108,8 +108,11 @@ const buildPatch = (
 
     case "Play": {
       const player = state.playerMap[state.currentPlayerUid];
+      const playedCardHashes = action.cardIds.map((id) => {
+        return cardIdHash(id, config.protection.salt);
+      });
 
-      if (action.cardIds.some((id) => !player.hand.includes(id))) {
+      if (playedCardHashes.some((hash) => !player.hand.includes(hash))) {
         return { ok: false, error: "played cards not in hand" };
       }
 
@@ -127,7 +130,7 @@ const buildPatch = (
       };
 
       const playerHand = state.playerMap[state.currentPlayerUid].hand.filter((_, i) => {
-        return !action.cardIds.includes(player.hand[i]);
+        return !playedCardHashes.includes(player.hand[i]);
       });
 
       if (!canPlayOn(state.discardPile, play.cards[0])) {
