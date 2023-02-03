@@ -15,11 +15,8 @@ import { httpsCallable } from "firebase/functions";
 import { useAtomValue } from "jotai";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { Card, cardById } from "~/app/douno/cards";
+import { GameAction, GameConfig, GameSnapshot, GameState, updateGameState } from "~/app/douno/game";
 import {
-  GameAction,
-  GameConfig,
-  GameSnapshot,
-  GameState,
   canAct,
   canDraw,
   canPass,
@@ -27,8 +24,7 @@ import {
   canPlayOn,
   canPlayWith,
   isGameFinished,
-  updateGameState,
-} from "~/app/douno/game";
+} from "~/app/douno/game/readers";
 import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";

@@ -18,6 +18,8 @@ const cardMap = buildDeck().reduce((m, card) => {
   return m;
 }, {} as Record<string, Card>);
 
+export const MAX_PLAY_CARDS = 50;
+
 export const cardById = (id: string): Card => {
   if (cardMap[id] == null) {
     throw new Error(`[douno] unknown card id: ${id}`);
