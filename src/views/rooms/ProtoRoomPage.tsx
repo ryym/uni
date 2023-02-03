@@ -50,6 +50,7 @@ type SyncedGameSnapshot =
   | {
       readonly type: "valid";
       readonly snapshot: GameSnapshot;
+      readonly syncFinished: boolean;
     }
   | {
       readonly type: "invalid";
@@ -72,10 +73,6 @@ export function ProtoRoomPage(): ReactElement {
 
   useEffect(() => {
     return onSnapshot(gameSnapDocRef(db), { includeMetadataChanges: true }, async (d) => {
-      if (d.metadata.hasPendingWrites) {
-        return;
-      }
-
       const snapshot = d.data();
       if (snapshot == null) {
         return;
@@ -89,7 +86,9 @@ export function ProtoRoomPage(): ReactElement {
         gameConfigRef.current = config;
       }
       log.debug("game snapshot broadcasted", snapshot);
-      setSynced((synced) => syncGameState(gameConfigRef.current, synced, snapshot));
+      setSynced((synced) => {
+        return syncGameState(gameConfigRef.current, synced, snapshot, d.metadata.hasPendingWrites);
+      });
     });
   }, [db]);
 
@@ -137,6 +136,7 @@ export function ProtoRoomPage(): ReactElement {
         <GameStateView
           gameConfig={gameConfigRef.current}
           gameState={synced.snapshot.state}
+          stateSyncFinished={synced.syncFinished}
           update={publishNextGameState}
         />
       )}
@@ -152,6 +152,7 @@ type Player = {
 function GameStateView(props: {
   readonly gameConfig: GameConfig;
   readonly gameState: GameState;
+  readonly stateSyncFinished: boolean;
   readonly update: (action: GameAction) => void;
 }): ReactElement {
   const user = useAtomValue(userAtom);
@@ -163,7 +164,7 @@ function GameStateView(props: {
     const handCardHashes = props.gameState.playerMap[user.uid].hand;
     const newCardHashes = handCardHashes.filter((h) => handCardMap[h] == null);
     log.debug("new card hashes", newCardHashes);
-    if (newCardHashes.length > 0) {
+    if (newCardHashes.length > 0 && props.stateSyncFinished) {
       setHandCardMap((cur) => {
         const m = { ...cur };
         newCardHashes.forEach((h) => {
@@ -171,9 +172,6 @@ function GameStateView(props: {
         });
         return m;
       });
-      // Each player can only see the contents of the cards in their own hand so note that
-      // you need to run the query after the game snapshot has written to the server
-      // (that is, after metadata.hasPendingWrites becomes false).
       const q = query(collection(db, "games/poc/cards"), where(documentId(), "in", newCardHashes));
       getDocs(q).then((r) => {
         const hashAndIds = r.docs.map((d) => [d.id, d.data().cardId as string]);
@@ -187,7 +185,7 @@ function GameStateView(props: {
         });
       });
     }
-  }, [props.gameState, user, db, handCardMap]);
+  }, [props.gameState, props.stateSyncFinished, user, db, handCardMap]);
 
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
@@ -404,15 +402,21 @@ const syncGameState = (
   config: GameConfig | null,
   lastSynced: SyncedGameSnapshot,
   remote: GameSnapshot,
+  hasPendingWrites: boolean,
 ): SyncedGameSnapshot => {
+  const syncFinished = !hasPendingWrites;
   switch (lastSynced.type) {
     case "unset": {
-      return { type: "valid", snapshot: remote };
+      return { type: "valid", snapshot: remote, syncFinished };
     }
     case "invalid": {
       return lastSynced;
     }
     case "valid": {
+      if (lastSynced.snapshot.state.turn === remote.state.turn) {
+        return { ...lastSynced, syncFinished };
+      }
+
       const result = updateGameStateIfPossible(config, lastSynced.snapshot, remote.lastAction);
       if (!result.ok) {
         return { type: "invalid", errors: [result.error] };
@@ -426,7 +430,7 @@ const syncGameState = (
           ],
         };
       }
-      return { type: "valid", snapshot: remote };
+      return { type: "valid", snapshot: remote, syncFinished };
     }
   }
 };
