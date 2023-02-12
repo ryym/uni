@@ -1,21 +1,8 @@
-import {
-  DocumentReference,
-  Firestore,
-  collection,
-  doc,
-  documentId,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
+import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { useAtomValue } from "jotai";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Card, cardById } from "~/app/douno/cards";
-import { GameAction, GameConfig, GameSnapshot, GameState, updateGameState } from "~/app/douno/game";
+import { GameAction, GameConfig, GameState } from "~/app/douno/game";
 import {
   canAct,
   canDraw,
@@ -25,10 +12,10 @@ import {
   canPlayWith,
   isGameFinished,
 } from "~/app/douno/game/readers";
-import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
+import { useSyncedGame } from "./useSyncedGame";
 
 type HandCardMap = {
   readonly [hash: string]: HandCardState;
@@ -43,103 +30,35 @@ type HandCardState =
       readonly card: Card;
     };
 
-type SyncedGameSnapshot =
-  | {
-      readonly type: "unset";
-    }
-  | {
-      readonly type: "valid";
-      readonly snapshot: GameSnapshot;
-      readonly syncFinished: boolean;
-    }
-  | {
-      readonly type: "invalid";
-      readonly errors: readonly string[];
-    };
-
-const gameSnapDocRef = (db: Firestore) => {
-  return doc(db, "games/poc/snapshots/current") as DocumentReference<GameSnapshot>;
-};
-const gameConfigDocRef = (db: Firestore) => {
-  return doc(db, "games/poc") as DocumentReference<GameConfig>;
-};
-
 export function ProtoRoomPage(): ReactElement {
-  const { db, functions } = useAtomValue(firebaseAtom);
   const user = useAtomValue(userAtom);
+  const [synced, ops] = useSyncedGame();
 
-  const gameConfigRef = useRef<GameConfig | null>(null);
-  const [synced, setSynced] = useState<SyncedGameSnapshot>({ type: "unset" });
-
-  useEffect(() => {
-    return onSnapshot(gameSnapDocRef(db), { includeMetadataChanges: true }, async (d) => {
-      const snapshot = d.data();
-      if (snapshot == null) {
-        return;
-      }
-      if (gameConfigRef.current == null) {
-        log.debug("fetching game config");
-        const config = (await getDoc(gameConfigDocRef(db))).data();
-        if (config == null) {
-          throw new Error("[douno] game state exists without game config");
-        }
-        gameConfigRef.current = config;
-      }
-      log.debug("game snapshot broadcasted", snapshot);
-      setSynced((synced) => {
-        return syncGameState(gameConfigRef.current, synced, snapshot, d.metadata.hasPendingWrites);
-      });
-    });
-  }, [db]);
-
-  const publishNextGameState = (action: GameAction) => {
-    if (synced.type !== "valid" || synced.snapshot.state.currentPlayerUid !== user.uid) {
-      return;
-    }
-    const result = updateGameStateIfPossible(gameConfigRef.current, synced.snapshot, action);
-    log.debug("updated game state locally", result);
-    if (result.ok) {
-      const updateData: GameSnapshot = { state: result.value, lastAction: action };
-      // XXX: https://github.com/googleapis/nodejs-firestore/issues/1745
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      updateDoc(gameSnapDocRef(db), updateData as any);
-    } else {
-      setSynced({ type: "invalid", errors: [result.error] });
-    }
-  };
-
-  if (synced.type === "unset") {
-    const handleStartGame = async () => {
-      const initGame = httpsCallable(functions, "initGame", {});
-      const result = await initGame();
-      console.log("initGame result", result);
-    };
+  if (synced.status === "unsynced" || synced.status === "nogame") {
     return (
       <div>
         <div>no game</div>
-        <button onClick={handleStartGame}>Start Game</button>
+        <button onClick={ops.startGame}>Start Game</button>
       </div>
     );
   }
-  if (synced.type === "invalid") {
+  if (synced.status === "invalid") {
     return (
       <div>
         <div>unexpected game state</div>
-        <div>{JSON.stringify(synced.errors)}</div>
+        <div>{synced.error}</div>
       </div>
     );
   }
   return (
     <div style={{ backgroundColor: "#eee" }}>
       <h1>proto room page</h1>
-      {gameConfigRef.current == null ? null : (
-        <GameStateView
-          gameConfig={gameConfigRef.current}
-          gameState={synced.snapshot.state}
-          stateSyncFinished={synced.syncFinished}
-          update={publishNextGameState}
-        />
-      )}
+      <GameStateView
+        gameConfig={synced.config}
+        gameState={synced.snapshot.state}
+        stateSyncFinished={synced.syncFinished}
+        update={(action) => ops.updateAndSync(user.uid, synced, action)}
+      />
     </div>
   );
 }
@@ -397,51 +316,3 @@ function GameResultView(props: {
     </div>
   );
 }
-
-const syncGameState = (
-  config: GameConfig | null,
-  lastSynced: SyncedGameSnapshot,
-  remote: GameSnapshot,
-  hasPendingWrites: boolean,
-): SyncedGameSnapshot => {
-  const syncFinished = !hasPendingWrites;
-  switch (lastSynced.type) {
-    case "unset": {
-      return { type: "valid", snapshot: remote, syncFinished };
-    }
-    case "invalid": {
-      return lastSynced;
-    }
-    case "valid": {
-      if (lastSynced.snapshot.state.turn === remote.state.turn) {
-        return { ...lastSynced, syncFinished };
-      }
-
-      const result = updateGameStateIfPossible(config, lastSynced.snapshot, remote.lastAction);
-      if (!result.ok) {
-        return { type: "invalid", errors: [result.error] };
-      }
-      if (!deepStrictEqual(result.value, remote.state)) {
-        log.debug("local and remote state mismatch", lastSynced.snapshot, remote, result.value);
-        return {
-          type: "invalid",
-          errors: [
-            "予期しないゲーム状態になりました。リロードしても直らない場合はゲームを中断してください。",
-          ],
-        };
-      }
-      return { type: "valid", snapshot: remote, syncFinished };
-    }
-  }
-};
-
-const updateGameStateIfPossible = (
-  config: GameConfig | null,
-  snapshot: GameSnapshot,
-  action: GameAction,
-): ReturnType<typeof updateGameState> => {
-  if (config == null) {
-    throw new Error("[douno] cannot update game state if game config is null");
-  }
-  return updateGameState(config, snapshot.state, action);
-};
