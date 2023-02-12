@@ -1,7 +1,5 @@
-import { useAtomValue } from "jotai";
 import { ReactElement, useState } from "react";
-import { Card, cardById } from "~/app/douno/cards";
-import { GameAction, GameConfig, GameState } from "~/app/douno/game";
+import { cardById } from "~/app/douno/cards";
 import {
   canAct,
   canDraw,
@@ -11,66 +9,34 @@ import {
   canPlayWith,
   isGameFinished,
 } from "~/app/douno/game/readers";
-import { userAtom } from "../_store/session";
-import { HandCardMap, useHandCardMap } from "./useHandCardMap";
-import { useSyncedGame } from "./useSyncedGame";
-
-export function ProtoRoomPage(): ReactElement {
-  const user = useAtomValue(userAtom);
-  const [synced, ops] = useSyncedGame();
-  const handCardMap = useHandCardMap(user.uid, synced);
-
-  if (synced.status === "unsynced" || synced.status === "nogame") {
-    return (
-      <div>
-        <div>no game</div>
-        <button onClick={ops.startGame}>Start Game</button>
-      </div>
-    );
-  }
-  if (synced.status === "invalid") {
-    return (
-      <div>
-        <div>unexpected game state</div>
-        <div>{synced.error}</div>
-      </div>
-    );
-  }
-  return (
-    <div style={{ backgroundColor: "#eee" }}>
-      <h1>proto room page</h1>
-      <GameStateView
-        gameConfig={synced.config}
-        gameState={synced.snapshot.state}
-        stateSyncFinished={synced.syncFinished}
-        update={(action) => ops.updateAndSync(user.uid, synced, action)}
-        handCardMap={handCardMap}
-      />
-    </div>
-  );
-}
+import { User } from "~/app/models";
+import { CardView } from "./CardView";
+import { HandCardMap } from "./useHandCardMap";
+import { Card } from "~shared/cards";
+import { GameAction, GameConfig, GameState } from "~shared/game";
 
 type Player = {
   readonly uid: string;
   readonly wonAt: number | null;
 };
 
-function GameStateView(props: {
+export type OngoingGameProps = {
+  readonly user: User;
   readonly gameConfig: GameConfig;
   readonly gameState: GameState;
-  readonly stateSyncFinished: boolean;
-  readonly update: (action: GameAction) => void;
   readonly handCardMap: HandCardMap;
-}): ReactElement {
-  const user = useAtomValue(userAtom);
+  readonly update: (action: GameAction) => void;
+};
+
+export function OngoingGame(props: OngoingGameProps): ReactElement {
   const [cardSelection, setCardSelection] = useState<readonly string[]>([]);
 
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
     wonAt: props.gameState.playerMap[uid].wonAt,
   }));
-  const myState = props.gameState.playerMap[user.uid];
-  const isMyTurn = canAct(props.gameConfig, props.gameState, user.uid);
+  const myState = props.gameState.playerMap[props.user.uid];
+  const isMyTurn = canAct(props.gameConfig, props.gameState, props.user.uid);
 
   const canSelectCard = (card: Card): boolean => {
     if (cardSelection.length === 0) {
@@ -120,7 +86,7 @@ function GameStateView(props: {
       </div>
       <div>
         <button
-          disabled={!canDraw(props.gameConfig, props.gameState, user.uid)}
+          disabled={!canDraw(props.gameConfig, props.gameState, props.user.uid)}
           onClick={() => {
             setCardSelection([]);
             props.update({ type: "Draw" });
@@ -130,7 +96,7 @@ function GameStateView(props: {
         </button>
         <button
           disabled={
-            !canPlayCards(props.gameConfig, props.gameState, user.uid, cardSelection.length)
+            !canPlayCards(props.gameConfig, props.gameState, props.user.uid, cardSelection.length)
           }
           onClick={() => {
             setCardSelection([]);
@@ -145,7 +111,7 @@ function GameStateView(props: {
           Play
         </button>
         <button
-          disabled={!canPass(props.gameConfig, props.gameState, user.uid)}
+          disabled={!canPass(props.gameConfig, props.gameState, props.user.uid)}
           onClick={() => {
             setCardSelection([]);
             props.update({ type: "Pass" });
@@ -174,9 +140,9 @@ function GameStateView(props: {
               }}
             >
               hand of {uid}
-              {uid === user.uid ? " (YOU)" : ""}
+              {uid === props.user.uid ? " (YOU)" : ""}
             </div>
-            {uid === user.uid ? (
+            {uid === props.user.uid ? (
               isMyTurn ? (
                 <ul>
                   {props.gameState.playerMap[uid]?.hand.map((cardHash) => {
@@ -229,29 +195,6 @@ function GameStateView(props: {
       </div>
     </div>
   );
-}
-
-function CardView(props: { card: Card }): ReactElement {
-  switch (props.card.type) {
-    case "Number": {
-      return <span style={{ color: props.card.color }}>Number {props.card.value}</span>;
-    }
-    case "Reverse": {
-      return <span style={{ color: props.card.color }}>Reverse</span>;
-    }
-    case "Skip": {
-      return <span style={{ color: props.card.color }}>Skip</span>;
-    }
-    case "Draw2": {
-      return <span style={{ color: props.card.color }}>Draw2</span>;
-    }
-    case "Wild": {
-      return <span>Wild</span>;
-    }
-    case "Draw4": {
-      return <span>Draw4</span>;
-    }
-  }
 }
 
 function GameResultView(props: {
