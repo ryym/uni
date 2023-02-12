@@ -1,6 +1,5 @@
-import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { useAtomValue } from "jotai";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { Card, cardById } from "~/app/douno/cards";
 import { GameAction, GameConfig, GameState } from "~/app/douno/game";
 import {
@@ -12,27 +11,14 @@ import {
   canPlayWith,
   isGameFinished,
 } from "~/app/douno/game/readers";
-import { log } from "~/lib/logger";
-import { firebaseAtom } from "../_store/firebase";
 import { userAtom } from "../_store/session";
+import { HandCardMap, useHandCardMap } from "./useHandCardMap";
 import { useSyncedGame } from "./useSyncedGame";
-
-type HandCardMap = {
-  readonly [hash: string]: HandCardState;
-};
-
-type HandCardState =
-  | {
-      readonly type: "getting";
-    }
-  | {
-      readonly type: "got";
-      readonly card: Card;
-    };
 
 export function ProtoRoomPage(): ReactElement {
   const user = useAtomValue(userAtom);
   const [synced, ops] = useSyncedGame();
+  const handCardMap = useHandCardMap(user.uid, synced);
 
   if (synced.status === "unsynced" || synced.status === "nogame") {
     return (
@@ -58,6 +44,7 @@ export function ProtoRoomPage(): ReactElement {
         gameState={synced.snapshot.state}
         stateSyncFinished={synced.syncFinished}
         update={(action) => ops.updateAndSync(user.uid, synced, action)}
+        handCardMap={handCardMap}
       />
     </div>
   );
@@ -73,38 +60,10 @@ function GameStateView(props: {
   readonly gameState: GameState;
   readonly stateSyncFinished: boolean;
   readonly update: (action: GameAction) => void;
+  readonly handCardMap: HandCardMap;
 }): ReactElement {
   const user = useAtomValue(userAtom);
-  const { db } = useAtomValue(firebaseAtom);
   const [cardSelection, setCardSelection] = useState<readonly string[]>([]);
-
-  const [handCardMap, setHandCardMap] = useState<HandCardMap>({});
-  useEffect(() => {
-    const handCardHashes = props.gameState.playerMap[user.uid].hand;
-    const newCardHashes = handCardHashes.filter((h) => handCardMap[h] == null);
-    log.debug("new card hashes", newCardHashes);
-    if (newCardHashes.length > 0 && props.stateSyncFinished) {
-      setHandCardMap((cur) => {
-        const m = { ...cur };
-        newCardHashes.forEach((h) => {
-          m[h] = { type: "getting" };
-        });
-        return m;
-      });
-      const q = query(collection(db, "games/poc/cards"), where(documentId(), "in", newCardHashes));
-      getDocs(q).then((r) => {
-        const hashAndIds = r.docs.map((d) => [d.id, d.data().cardId as string]);
-        log.debug("new cards got", hashAndIds);
-        setHandCardMap((cur) => {
-          const m = { ...cur };
-          hashAndIds.forEach(([hash, cardId]) => {
-            m[hash] = { type: "got", card: cardById(cardId) };
-          });
-          return m;
-        });
-      });
-    }
-  }, [props.gameState, props.stateSyncFinished, user, db, handCardMap]);
 
   const players: Player[] = props.gameConfig.playerUids.map((uid) => ({
     uid,
@@ -221,8 +180,8 @@ function GameStateView(props: {
               isMyTurn ? (
                 <ul>
                   {props.gameState.playerMap[uid]?.hand.map((cardHash) => {
-                    const cardState = handCardMap[cardHash];
-                    if (cardState == null || cardState.type === "getting") {
+                    const cardState = props.handCardMap[cardHash];
+                    if (cardState == null || cardState.type === "fetching") {
                       return <li key={cardHash}>???</li>;
                     }
                     const { card } = cardState;
@@ -245,7 +204,7 @@ function GameStateView(props: {
               ) : (
                 <ul>
                   {props.gameState.playerMap[uid]?.hand.map((cardHash) => {
-                    const cardState = handCardMap[cardHash];
+                    const cardState = props.handCardMap[cardHash];
                     return (
                       <li key={cardHash}>
                         {cardState?.type === "got" ? (
