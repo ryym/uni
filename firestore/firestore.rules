@@ -10,10 +10,10 @@ service cloud.firestore {
     }
 
     match /games/{roomId} {
-      allow read: if request.auth != null && request.auth.uid in resource.data.playerUids;
+      allow get: if request.auth != null && request.auth.uid in resource.data.playerUids;
 
       match /snapshots/current {
-        allow read: if request.auth != null && (resource == null || request.auth.uid in resource.data.state.playerMap);
+        allow get: if request.auth != null && (resource == null || request.auth.uid in resource.data.state.playerMap);
         allow update: if (
           request.auth != null
           && request.auth.uid == resource.data.state.currentPlayerUid
