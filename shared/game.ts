@@ -124,7 +124,7 @@ const buildDiscardPile = (topCard: Card): GameState["discardPile"] => {
 };
 
 export const cardIdHash = (cardId: string, salt: string): string => {
-  if (__ENV_TEST__) {
+  if (global.__ENV_TEST__) {
     return `${cardId}-hash`;
   }
 

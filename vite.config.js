@@ -21,7 +21,12 @@ export default defineConfig((env) => {
     },
     define: {
       __FIREBASE_EMULATOR__: env.mode === "development" && process.env.CONNECT_FIREBASE !== "true",
-      __ENV_TEST__: false,
+
+      // Constants used in shared/ must be prefixed with "global." since
+      // the build for Cloud Function environment does not use Vite, so
+      // replacements are not executed. In that case we need to arrange the
+      // global variable values at runtime.
+      "global.__ENV_TEST__": "true",
     },
   };
 });
