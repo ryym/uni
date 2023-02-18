@@ -1,18 +1,18 @@
-import { useAtomValue } from "jotai";
 import { ReactElement } from "react";
-import { sessionAtom, useAuthStateSubscription, useSignIn } from "./_store/session";
+import { Route, Switch } from "wouter";
+import { useAuthStateSubscription } from "./_store/session";
+import { HomePage } from "./home/HomePage";
 import { RoomPage } from "./rooms/RoomPage";
 
 export function Body(): ReactElement {
-  const session = useAtomValue(sessionAtom);
-  const signIn = useSignIn();
   useAuthStateSubscription();
   return (
     <div>
-      <h1>Prototype</h1>
-      <button onClick={() => signIn()}>sign in</button>
-      <hr />
-      {session.signedIn && <RoomPage />}
+      <h1>DoUno</h1>
+      <Switch>
+        <Route path="/" component={HomePage} />
+        <Route path="/rooms/:roomId" component={RoomPage} />
+      </Switch>
     </div>
   );
 }
