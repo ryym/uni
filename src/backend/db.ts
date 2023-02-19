@@ -8,6 +8,7 @@ import {
   updateDoc as originalUpdateDoc,
 } from "firebase/firestore";
 import { GameConfig, GameSnapshot } from "~shared/game";
+import { RoomState } from "~shared/room";
 
 export const updateDoc = async <T>(
   tx: Transaction | null,
@@ -23,6 +24,22 @@ export const updateDoc = async <T>(
   } else {
     await originalUpdateDoc(ref, untypedData);
   }
+};
+
+export type RoomCreatorForm = {
+  readonly password: string;
+  readonly registeredAt: number;
+};
+
+export const roomCreatorDocRef = (
+  db: Firestore,
+  uid: string,
+): DocumentReference<RoomCreatorForm> => {
+  return doc(db, `creators/${uid}`) as DocumentReference<RoomCreatorForm>;
+};
+
+export const roomCollectionRef = (db: Firestore): CollectionReference<RoomState> => {
+  return collection(db, "rooms") as CollectionReference<RoomState>;
 };
 
 export const gameSnapDocRef = (db: Firestore): DocumentReference<GameSnapshot> => {
