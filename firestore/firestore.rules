@@ -9,6 +9,23 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Currently we restrict our app users.
+    match /creators/{uid} {
+      allow create, update: if (
+        request.auth != null
+        && request.auth.uid == uid
+        && exists(/databases/$(database)/documents/passwords/$(request.resource.data.password))
+      );
+    }
+
+    match /rooms/{roomId} {
+      allow create: if (
+        request.auth != null
+        && exists(/databases/$(database)/documents/creators/$(request.auth.uid))
+      );
+      allow get, update: if request.auth != null;
+    }
+
     match /games/{roomId} {
       allow get: if request.auth != null && request.auth.uid in resource.data.playerUids;
 
