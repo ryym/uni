@@ -3,6 +3,7 @@ import { GameView } from "./GameView";
 import { RoomState } from "~shared/room";
 
 export type RoomViewProps = {
+  readonly roomId: string;
   readonly room: RoomState;
 };
 
@@ -22,7 +23,7 @@ export function RoomView(props: RoomViewProps): ReactElement {
       </ul>
       <hr />
 
-      <GameView />
+      <GameView roomId={props.roomId} />
     </div>
   );
 }

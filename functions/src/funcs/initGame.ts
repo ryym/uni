@@ -1,23 +1,32 @@
 import { app } from "firebase-admin";
 import { Card, buildDeck } from "../../../shared/cards";
+import { InitGameParams, InitGameResult } from "../../../shared/functions";
 import { GameSnapshot, initializeGame } from "../../../shared/game";
 import { randomInt } from "../../../shared/random";
+import { RoomState } from "../../../shared/room";
 import { CallHandler } from "../lib/firebaseFunctions";
 
-export const initGameHandler = (app: app.App): CallHandler<unknown, Promise<null>> => {
-  return async (_data, ctx) => {
+export const initGameHandler = (
+  app: app.App,
+): CallHandler<InitGameParams, Promise<InitGameResult>> => {
+  return async (params, ctx) => {
     if (ctx.auth == null) {
-      return null;
+      return { error: "invalid call" };
     }
 
     const firestore = app.firestore();
 
-    const playerUids = [
-      "OY7hfWeGKJZfzkFf4QShzeCmVnn2",
-      "HxImD58lt4OMIgkQ7mOsMx3DPmn1",
-      "RU1N3xxK7YTHoybGitUkm907sDU2",
-    ];
+    const roomRef = await firestore.doc(`rooms/${params.roomId}`).get();
+    const room = roomRef.data() as RoomState | undefined;
 
+    if (room == null) {
+      return { error: "room not found" };
+    }
+    if (room.ownerUid !== ctx.auth.uid) {
+      return { error: "non-owner call not allowed" };
+    }
+
+    const playerUids = Object.keys(room.members);
     const cards = buildDeck();
     shuffleCards(cards);
 
@@ -38,7 +47,7 @@ export const initGameHandler = (app: app.App): CallHandler<unknown, Promise<null
 
     await batch.commit();
 
-    return null;
+    return { error: null };
   };
 };
 

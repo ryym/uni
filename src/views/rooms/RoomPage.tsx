@@ -16,7 +16,7 @@ export function RoomPage(props: RoomPageProps): ReactElement {
       return <Entrance joinRoom={joinRoom} />;
     }
     case "synced": {
-      return <RoomView room={room.state} />;
+      return <RoomView roomId={props.params.roomId} room={room.state} />;
     }
   }
 }

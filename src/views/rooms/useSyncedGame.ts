@@ -9,7 +9,7 @@ import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
 
 export type SyncedGameOperations = {
-  readonly startGame: () => Promise<void>;
+  readonly startGame: (roomId: string) => Promise<void>;
   readonly updateAndSync: UpdateAndSyncGame;
 };
 
@@ -52,7 +52,12 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
 
   const ops: SyncedGameOperations = useMemo(() => {
     return {
-      startGame: () => callInitGameFunction(functions),
+      startGame: async (roomId) => {
+        const result = await callInitGameFunction(functions, { roomId });
+        if (result.error != null) {
+          setGame({ status: "invalid", error: result.error });
+        }
+      },
       updateAndSync: async (userUid, game, action) => {
         if (game.status !== "valid" || game.snapshot.state.currentPlayerUid !== userUid) {
           return;
