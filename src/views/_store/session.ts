@@ -43,7 +43,7 @@ export const useAuthStateSubscription = (): void => {
   }, [auth, setSession]);
 };
 
-export type SignInFunc = () => Promise<boolean>;
+export type SignInFunc = () => Promise<User>;
 
 export const useSignIn = (): SignInFunc => {
   const firebase = useAtomValue(firebaseAtom);
@@ -58,7 +58,7 @@ export const useSignIn = (): SignInFunc => {
       user = buildUser(cred.user);
     }
     setSession({ signedIn: true, user });
-    return true;
+    return user;
   }, [firebase, session, setSession]);
 
   return signIn;
