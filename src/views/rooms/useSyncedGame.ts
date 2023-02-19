@@ -7,9 +7,10 @@ import { gameConfigDocRef, gameSnapDocRef, updateDoc } from "~/backend/db";
 import { callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
+import { roomAtom } from "./_store/room";
 
 export type SyncedGameOperations = {
-  readonly startGame: (roomId: string) => Promise<void>;
+  readonly startGame: () => Promise<void>;
   readonly updateAndSync: UpdateAndSyncGame;
 };
 
@@ -22,6 +23,7 @@ export type UpdateAndSyncGame = (
 export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperations] => {
   const { db, functions } = useAtomValue(firebaseAtom);
 
+  const room = useAtomValue(roomAtom);
   const gameConfigRef = useRef<GameConfig | null>(null);
   const [game, setGame] = useState<SyncedGameSnapshot>({ status: "unsynced" });
 
@@ -52,8 +54,8 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
 
   const ops: SyncedGameOperations = useMemo(() => {
     return {
-      startGame: async (roomId) => {
-        const result = await callInitGameFunction(functions, { roomId });
+      startGame: async () => {
+        const result = await callInitGameFunction(functions, { roomId: room.id });
         if (result.error != null) {
           setGame({ status: "invalid", error: result.error });
         }
@@ -71,7 +73,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         }
       },
     };
-  }, [db, functions]);
+  }, [db, functions, room]);
 
   return [game, ops];
 };

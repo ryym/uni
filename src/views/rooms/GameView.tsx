@@ -7,11 +7,7 @@ import { OngoingGame } from "./OngoingGame";
 import { useHandCardMap } from "./useHandCardMap";
 import { useSyncedGame } from "./useSyncedGame";
 
-export type GameViewProps = {
-  readonly roomId: string;
-};
-
-export function GameView(props: GameViewProps): ReactElement {
+export function GameView(): ReactElement {
   const user = useAtomValue(userAtom);
   const [game, ops] = useSyncedGame();
   const handCardMap = useHandCardMap(user.uid, game);
@@ -21,7 +17,7 @@ export function GameView(props: GameViewProps): ReactElement {
       return <div>connecting...</div>;
     }
     case "nogame": {
-      return <NoGame onStartGame={() => ops.startGame(props.roomId)} />;
+      return <NoGame onStartGame={ops.startGame} />;
     }
     case "invalid": {
       return <InvalidGame message={game.error} />;

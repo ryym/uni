@@ -2,7 +2,7 @@ import { Firestore, onSnapshot, runTransaction } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { User } from "~/app/models";
-import { SyncedRoom } from "~/app/room";
+import { Room, SyncedRoom } from "~/app/room";
 import { roomDocRef, updateDoc } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
@@ -14,8 +14,9 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
   const { db } = useAtomValue(firebaseAtom);
   const signIn = useSignIn();
 
-  const [room, setRoom] = useState<SyncedRoom>({ status: "unsynced" });
+  const [sync, setSync] = useState<SyncedRoom>({ status: "unsynced" });
   const [joined, setJoined] = useState(false);
+  const [room] = useState<Room>({ id: roomId });
 
   const joinRoom: JoinAndSubscribeRoom = useCallback(
     async (userName) => {
@@ -31,16 +32,16 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
     if (!joined) {
       return;
     }
-    return onSnapshot(roomDocRef(db, roomId), (d) => {
-      const room = d.data();
-      if (room == null) {
+    return onSnapshot(roomDocRef(db, room.id), (d) => {
+      const state = d.data();
+      if (state == null) {
         throw new Error("room not found (in subscription)");
       }
-      setRoom({ status: "synced", state: room });
+      setSync({ status: "synced", room, state });
     });
-  }, [db, roomId, joined]);
+  }, [db, room, joined]);
 
-  return [room, joinRoom];
+  return [sync, joinRoom];
 };
 
 const registerAsRoomMember = (db: Firestore, roomId: string, user: User, userName: string) => {
