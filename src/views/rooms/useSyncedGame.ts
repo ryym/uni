@@ -60,7 +60,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         const result = updateGameState(game.config, game.snapshot.state, action);
         log.debug("updated game state locally", result);
         if (result.ok) {
-          await updateDoc(gameSnapDocRef(db), { state: result.value, lastAction: action });
+          await updateDoc(null, gameSnapDocRef(db), { state: result.value, lastAction: action });
         } else {
           setGame({ status: "invalid", error: result.error });
         }

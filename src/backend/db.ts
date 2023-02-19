@@ -2,16 +2,27 @@ import {
   CollectionReference,
   DocumentReference,
   Firestore,
+  Transaction,
   collection,
   doc,
   updateDoc as originalUpdateDoc,
 } from "firebase/firestore";
 import { GameConfig, GameSnapshot } from "~shared/game";
 
-export const updateDoc = <T>(ref: DocumentReference<T>, data: T): Promise<void> => {
+export const updateDoc = async <T>(
+  tx: Transaction | null,
+  ref: DocumentReference<T>,
+  data: Partial<T>,
+): Promise<void> => {
   // XXX: https://github.com/googleapis/nodejs-firestore/issues/1745
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return originalUpdateDoc(ref, data as any);
+  const untypedData = data as any;
+
+  if (tx != null) {
+    tx.update(ref, untypedData);
+  } else {
+    await originalUpdateDoc(ref, untypedData);
+  }
 };
 
 export const gameSnapDocRef = (db: Firestore): DocumentReference<GameSnapshot> => {
