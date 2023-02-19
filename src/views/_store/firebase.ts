@@ -1,12 +1,12 @@
-import { Atom, atom } from "jotai";
+import { atom } from "jotai";
 import { FirebaseClient } from "~/lib/firebase";
-import { pair } from "../_lib/jotai";
+import { AtomInitializer, pair } from "../_lib/jotai";
 
 const mutFirebaseAtom = atom<FirebaseClient | null>(null);
 
 export const firebaseAtomInitializers = (
   client: FirebaseClient,
-): Array<readonly [Atom<unknown>, unknown]> => {
+): Array<AtomInitializer<unknown>> => {
   return [pair(mutFirebaseAtom, client)];
 };
 
