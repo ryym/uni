@@ -42,6 +42,10 @@ export const roomCollectionRef = (db: Firestore): CollectionReference<RoomState>
   return collection(db, "rooms") as CollectionReference<RoomState>;
 };
 
+export const roomDocRef = (db: Firestore, roomId: string): DocumentReference<RoomState> => {
+  return doc(db, `rooms/${roomId}`) as DocumentReference<RoomState>;
+};
+
 export const gameSnapDocRef = (db: Firestore): DocumentReference<GameSnapshot> => {
   return doc(db, "games/poc/snapshots/current") as DocumentReference<GameSnapshot>;
 };
