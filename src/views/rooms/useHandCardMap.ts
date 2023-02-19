@@ -6,6 +6,7 @@ import { SyncedGameSnapshot } from "~/app/douno/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";
+import { roomAtom } from "./_store/room";
 import { Card } from "~shared/cards";
 
 export type HandCardMap = {
@@ -23,6 +24,8 @@ export type HandCardState =
 
 export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandCardMap => {
   const { db } = useAtomValue(firebaseAtom);
+  const room = useAtomValue(roomAtom);
+
   const [handCardMap, setHandCardMap] = useState<HandCardMap>({});
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandC
       return m;
     });
 
-    openCards(db, newCardHashes).then((hashAndIds) => {
+    openCards(db, room.id, newCardHashes).then((hashAndIds) => {
       log.debug("new cards got", hashAndIds);
       setHandCardMap((cur) => {
         const m = { ...cur };
@@ -55,13 +58,13 @@ export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandC
         return m;
       });
     });
-  }, [userUid, db, game, handCardMap]);
+  }, [userUid, db, room, game, handCardMap]);
 
   return handCardMap;
 };
 
-const openCards = async (db: Firestore, cardHashes: readonly string[]) => {
-  const q = query(cardCollectionRef(db), where(documentId(), "in", cardHashes));
+const openCards = async (db: Firestore, roomId: string, cardHashes: readonly string[]) => {
+  const q = query(cardCollectionRef(db, roomId), where(documentId(), "in", cardHashes));
   const result = await getDocs(q);
   return result.docs.map((d) => {
     const cardHash = d.id;

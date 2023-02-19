@@ -38,11 +38,11 @@ export const initGameHandler = (
     const gameSnapshot: GameSnapshot = { state: gameState, lastAction: { type: "Start" } };
 
     const batch = firestore.batch();
-    batch.set(firestore.doc("games/poc"), gameConfig);
-    batch.set(firestore.doc("games/poc/snapshots/current"), gameSnapshot);
+    batch.set(firestore.doc(`games/${params.roomId}`), gameConfig);
+    batch.set(firestore.doc(`games/${params.roomId}/snapshots/current`), gameSnapshot);
 
     cards.forEach((c) => {
-      batch.set(firestore.doc(`games/poc/cards/${idHashMap[c.id]}`), { cardId: c.id });
+      batch.set(firestore.doc(`games/${params.roomId}/cards/${idHashMap[c.id]}`), { cardId: c.id });
     });
 
     await batch.commit();

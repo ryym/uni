@@ -46,18 +46,21 @@ export const roomDocRef = (db: Firestore, roomId: string): DocumentReference<Roo
   return doc(db, `rooms/${roomId}`) as DocumentReference<RoomState>;
 };
 
-export const gameSnapDocRef = (db: Firestore): DocumentReference<GameSnapshot> => {
-  return doc(db, "games/poc/snapshots/current") as DocumentReference<GameSnapshot>;
+export const gameSnapDocRef = (db: Firestore, roomId: string): DocumentReference<GameSnapshot> => {
+  return doc(db, `games/${roomId}/snapshots/current`) as DocumentReference<GameSnapshot>;
 };
 
-export const gameConfigDocRef = (db: Firestore): DocumentReference<GameConfig> => {
-  return doc(db, "games/poc") as DocumentReference<GameConfig>;
+export const gameConfigDocRef = (db: Firestore, roomId: string): DocumentReference<GameConfig> => {
+  return doc(db, `games/${roomId}`) as DocumentReference<GameConfig>;
 };
 
 export type HiddenCardInfo = {
   readonly cardId: string;
 };
 
-export const cardCollectionRef = (db: Firestore): CollectionReference<HiddenCardInfo> => {
-  return collection(db, "games/poc/cards") as CollectionReference<HiddenCardInfo>;
+export const cardCollectionRef = (
+  db: Firestore,
+  roomId: string,
+): CollectionReference<HiddenCardInfo> => {
+  return collection(db, `games/${roomId}/cards`) as CollectionReference<HiddenCardInfo>;
 };

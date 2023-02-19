@@ -28,7 +28,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
   const [game, setGame] = useState<SyncedGameSnapshot>({ status: "unsynced" });
 
   useEffect(() => {
-    return onSnapshot(gameSnapDocRef(db), { includeMetadataChanges: true }, async (d) => {
+    return onSnapshot(gameSnapDocRef(db, room.id), { includeMetadataChanges: true }, async (d) => {
       const snapshot = d.data();
       if (snapshot == null) {
         setGame({ status: "nogame" });
@@ -38,7 +38,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
 
       if (gameConfigRef.current == null) {
         log.debug("fetching game config");
-        const remoteConfig = (await getDoc(gameConfigDocRef(db))).data();
+        const remoteConfig = (await getDoc(gameConfigDocRef(db, room.id))).data();
         if (remoteConfig == null) {
           throw new Error("[douno] game state exists without game config");
         }
@@ -50,7 +50,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         return syncGame(config, game, snapshot, !d.metadata.hasPendingWrites);
       });
     });
-  }, [db]);
+  }, [db, room]);
 
   const ops: SyncedGameOperations = useMemo(() => {
     return {
@@ -67,7 +67,10 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         const result = updateGameState(game.config, game.snapshot.state, action);
         log.debug("updated game state locally", result);
         if (result.ok) {
-          await updateDoc(null, gameSnapDocRef(db), { state: result.value, lastAction: action });
+          await updateDoc(null, gameSnapDocRef(db, room.id), {
+            state: result.value,
+            lastAction: action,
+          });
         } else {
           setGame({ status: "invalid", error: result.error });
         }
