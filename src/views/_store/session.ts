@@ -50,13 +50,11 @@ export const useSignIn = (): SignInFunc => {
   const [session, setSession] = useAtom(mutSessionAtom);
 
   const signIn: SignInFunc = useCallback(async () => {
-    let user: User;
     if (session.signedIn) {
-      user = session.user;
-    } else {
-      const cred = await signInAnonymously(firebase.auth);
-      user = buildUser(cred.user);
+      return session.user;
     }
+    const cred = await signInAnonymously(firebase.auth);
+    const user = buildUser(cred.user);
     setSession({ signedIn: true, user });
     return user;
   }, [firebase, session, setSession]);
