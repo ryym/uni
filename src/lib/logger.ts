@@ -18,7 +18,7 @@ export class Logger {
   }
 
   private prefix(): string {
-    return `[douno]`;
+    return `[uni]`;
   }
 }
 

@@ -1,8 +1,8 @@
 import { getDoc, onSnapshot } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GameAction, GameConfig, updateGameState } from "~/app/douno/game";
-import { SyncedGameSnapshot, syncGame } from "~/app/douno/game/sync";
+import { GameAction, GameConfig, updateGameState } from "~/app/uni/game";
+import { SyncedGameSnapshot, syncGame } from "~/app/uni/game/sync";
 import { gameConfigDocRef, gameSnapDocRef, updateDoc } from "~/backend/db";
 import { callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
@@ -40,7 +40,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         log.debug("fetching game config");
         const remoteConfig = (await getDoc(gameConfigDocRef(db, room.id))).data();
         if (remoteConfig == null) {
-          throw new Error("[douno] game state exists without game config");
+          throw new Error("[uni] game state exists without game config");
         }
         gameConfigRef.current = remoteConfig;
       }

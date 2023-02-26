@@ -81,7 +81,7 @@ export const initializeGame = (
   }, {} as Mutable<CardIdHashMap>);
 
   if (new Set(Object.values(idHashMap)).size !== params.cards.length) {
-    throw new Error(`[douno] id hash collision detected. salt: ${salt}`);
+    throw new Error(`[uni] id hash collision detected. salt: ${salt}`);
   }
 
   const config: GameConfig = {

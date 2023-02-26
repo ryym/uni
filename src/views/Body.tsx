@@ -13,7 +13,7 @@ export function Body(): ReactElement {
   }
   return (
     <div>
-      <h1>DoUno</h1>
+      <h1>Uni</h1>
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/rooms/:roomId" component={RoomPage} />

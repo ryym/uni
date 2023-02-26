@@ -1,8 +1,8 @@
 import { Firestore, documentId, getDocs, query, where } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import { cardById } from "~/app/douno/cards";
-import { SyncedGameSnapshot } from "~/app/douno/game/sync";
+import { cardById } from "~/app/uni/cards";
+import { SyncedGameSnapshot } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "../_store/firebase";

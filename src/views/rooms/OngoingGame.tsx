@@ -1,5 +1,6 @@
 import { ReactElement, useState } from "react";
-import { cardById } from "~/app/douno/cards";
+import { User } from "~/app/models";
+import { cardById } from "~/app/uni/cards";
 import {
   canAct,
   canDraw,
@@ -8,8 +9,7 @@ import {
   canPlayOn,
   canPlayWith,
   isGameFinished,
-} from "~/app/douno/game/readers";
-import { User } from "~/app/models";
+} from "~/app/uni/game/readers";
 import { CardView } from "./CardView";
 import { HandCardMap } from "./useHandCardMap";
 import { Card } from "~shared/cards";
