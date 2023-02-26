@@ -19,7 +19,7 @@ function RoomPageBody(props: RoomPageProps): ReactElement {
   const [sync, joinRoom] = useSyncedRoom(props.params.roomId);
   switch (sync.status) {
     case "unsynced": {
-      return <Entrance joinRoom={joinRoom} joining={sync.joining} />;
+      return <Entrance joinRoom={joinRoom} joining={sync.syncing} />;
     }
     case "synced": {
       return (

@@ -17,7 +17,6 @@ type MemberCache = {
 type JoinState =
   | {
       readonly joined: false;
-      readonly joining: boolean;
     }
   | {
       readonly joined: true;
@@ -28,24 +27,21 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
   const { db } = useAtomValue(firebaseAtom);
   const signIn = useSignIn();
   const session = useAtomValue(sessionAtom);
-
   const [memberCache, setMemberCache] = useMemberCache();
-  const hadBeenMember = memberCache?.roomId === roomId;
 
   const [joinState, setJoinState] = useState<JoinState>(() => {
-    const joining = hadBeenMember && (session.signedIn || session.restoring);
-    return { joined: false, joining };
+    if (session.signedIn && memberCache?.roomId === roomId) {
+      return { joined: true, user: session.user };
+    }
+    return { joined: false };
   });
 
-  const [sync, setSync] = useState<SyncedRoom>({
-    status: "unsynced",
-    joining: !joinState.joined && joinState.joining,
-  });
+  const [sync, setSync] = useState<SyncedRoom>({ status: "unsynced", syncing: joinState.joined });
   const [room] = useState<Room>({ id: roomId });
 
   const joinRoom: JoinAndSubscribeRoom = useCallback(
     async (userName) => {
-      setJoinState({ joined: false, joining: true });
+      setSync({ status: "unsynced", syncing: true });
       const user = await signIn();
       log.debug("joining room", user.uid, userName);
       await registerAsRoomMember(db, roomId, user, userName);
@@ -54,13 +50,6 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
     },
     [db, signIn, setMemberCache, roomId],
   );
-
-  useEffect(() => {
-    // Join the room automatically if possible.
-    if (!joinState.joined && joinState.joining && session.signedIn && hadBeenMember) {
-      setJoinState({ joined: true, user: session.user });
-    }
-  }, [joinState, session, hadBeenMember]);
 
   useEffect(() => {
     if (!joinState.joined) {

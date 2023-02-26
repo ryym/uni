@@ -7,7 +7,7 @@ export type Room = {
 export type SyncedRoom =
   | {
       readonly status: "unsynced";
-      readonly joining: boolean;
+      readonly syncing: boolean;
     }
   | {
       readonly status: "synced";
