@@ -14,6 +14,8 @@ module.exports = {
   plugins: [
     // https://github.com/benmosher/eslint-plugin-import
     "eslint-plugin-import",
+    // https://www.npmjs.com/package/eslint-plugin-react-hooks
+    "eslint-plugin-react-hooks",
   ],
   extends: ["eslint:recommended", "plugin:react-hooks/recommended", "prettier"],
   rules: {
