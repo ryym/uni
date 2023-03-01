@@ -1,9 +1,9 @@
 import { describe, expect, test } from "@jest/globals";
 import { Result } from "~/lib/types";
-import { updateGameState } from "../game";
 import { makeCardFactory } from "~shared/__testlib__/cardFactory";
 import { range } from "~shared/array";
 import { GameAction, GameState, initializeGame } from "~shared/game";
+import { updateGameState } from "../game";
 
 describe("updateGameState", () => {
   const { allCards, card } = makeCardFactory();

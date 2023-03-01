@@ -1,6 +1,6 @@
 import { Result } from "~/lib/types";
-import { applyGameStatePatch, buildGameStatePatch } from "./game/patch";
 import { GameAction, GameConfig, GameState } from "~shared/game";
+import { applyGameStatePatch, buildGameStatePatch } from "./game/patch";
 
 export type { GameAction, GameConfig, GameSnapshot, GameState } from "~shared/game";
 

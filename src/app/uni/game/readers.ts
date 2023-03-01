@@ -1,6 +1,6 @@
 import { Result } from "~/lib/types";
-import { Card, MAX_PLAY_CARDS, cardById } from "../cards";
 import { DiscardPile, GameConfig, GameState } from "~shared/game";
+import { Card, MAX_PLAY_CARDS, cardById } from "../cards";
 
 export const canPlayOn = (pile: DiscardPile, card: Card): boolean => {
   const pileTop = cardById(pile.topCardIds[0]);

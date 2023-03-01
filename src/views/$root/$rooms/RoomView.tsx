@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
-import { GameView } from "./GameView";
 import { RoomState } from "~shared/room";
+import { GameView } from "./GameView";
 
 export type RoomViewProps = {
   readonly room: RoomState;

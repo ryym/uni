@@ -6,8 +6,8 @@ import { SyncedGameSnapshot } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
-import { roomAtom } from "./store/room";
 import { Card } from "~shared/cards";
+import { roomAtom } from "./store/room";
 
 export type HandCardMap = {
   readonly [hash: string]: HandCardState;

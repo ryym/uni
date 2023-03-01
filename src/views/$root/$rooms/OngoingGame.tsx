@@ -10,10 +10,10 @@ import {
   canPlayWith,
   isGameFinished,
 } from "~/app/uni/game/readers";
-import { CardView } from "./CardView";
-import { HandCardMap } from "./useHandCardMap";
 import { Card } from "~shared/cards";
 import { GameAction, GameConfig, GameState } from "~shared/game";
+import { CardView } from "./CardView";
+import { HandCardMap } from "./useHandCardMap";
 
 type Player = {
   readonly uid: string;
