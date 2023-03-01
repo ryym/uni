@@ -1,3 +1,4 @@
 _work/
 dist/
-!.*.js
+node_modules/
+!.*
