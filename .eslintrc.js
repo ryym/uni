@@ -16,8 +16,15 @@ module.exports = {
     "eslint-plugin-import",
     // https://www.npmjs.com/package/eslint-plugin-react-hooks
     "eslint-plugin-react-hooks",
+    // https://www.npmjs.com/package/eslint-plugin-storybook
+    "eslint-plugin-storybook",
   ],
-  extends: ["eslint:recommended", "plugin:react-hooks/recommended", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:storybook/recommended",
+    "prettier",
+  ],
   rules: {
     camelcase: "error",
     curly: "error",
@@ -64,6 +71,12 @@ module.exports = {
           "warn",
           { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
         ],
+      },
+    },
+    {
+      files: ["*.stories.tsx"],
+      rules: {
+        "import/no-default-export": "off",
       },
     },
   ],
