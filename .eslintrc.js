@@ -47,7 +47,6 @@ module.exports = {
         alphabetize: { order: "asc" },
       },
     ],
-    "import/no-default-export": "error",
     "import/no-duplicates": "error",
   },
   overrides: [
@@ -71,12 +70,6 @@ module.exports = {
           "warn",
           { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
         ],
-      },
-    },
-    {
-      files: ["*.stories.tsx"],
-      rules: {
-        "import/no-default-export": "off",
       },
     },
   ],

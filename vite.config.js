@@ -6,7 +6,6 @@ import { defineConfig } from "vite";
 import fullReload from "vite-plugin-full-reload";
 
 // https://vitejs.dev/config/
-// eslint-disable-next-line import/no-default-export
 export default defineConfig((env) => {
   return {
     server: {
