@@ -5,9 +5,8 @@
   "author": "ryym <ryym.64@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "concurrently 'npm:dev:*'",
-    "dev:vite": "vite",
-    "dev:hcm": "hcm --watch src/**/*.module.css",
+    "dev": "concurrently npm:vite npm:hcm",
+    "vite": "vite",
     "emulator": "firebase emulators:start",
     "dev-connect": "CONNECT_FIREBASE=true vite",
     "build:dev": "tsc && CONNECT_FIREBASE=true vite build --mode development",
@@ -19,6 +18,8 @@
     "test:w": "jest --watch",
     "functions": "npm --prefix functions",
     "git:pre-commit": "lint-staged",
+    "ui": "concurrently npm:storybook npm:hcm",
+    "hcm": "hcm --watch src/**/*.module.css",
     "storybook": "storybook dev --port 6006 --no-open"
   },
   "dependencies": {
