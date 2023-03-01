@@ -5,8 +5,8 @@ import { User } from "~/app/models";
 import { Room, SyncedRoom } from "~/app/room";
 import { roomDocRef, updateDoc } from "~/backend/db";
 import { log } from "~/lib/logger";
-import { firebaseAtom } from "../_store/firebase";
-import { sessionAtom, useSignIn } from "../_store/session";
+import { firebaseAtom } from "~/views/store/firebase";
+import { sessionAtom, useSignIn } from "~/views/store/session";
 
 export type JoinAndSubscribeRoom = (userName: string) => Promise<void>;
 

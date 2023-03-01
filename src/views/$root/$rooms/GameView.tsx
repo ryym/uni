@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { ReactElement } from "react";
-import { userAtom } from "../_store/session";
+import { userAtom } from "~/views/store/session";
 import { InvalidGame } from "./InvalidGame";
 import { NoGame } from "./NoGame";
 import { OngoingGame } from "./OngoingGame";

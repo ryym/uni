@@ -6,8 +6,8 @@ import { SyncedGameSnapshot, syncGame } from "~/app/uni/game/sync";
 import { gameConfigDocRef, gameSnapDocRef, updateDoc } from "~/backend/db";
 import { callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
-import { firebaseAtom } from "../_store/firebase";
-import { roomAtom } from "./_store/room";
+import { firebaseAtom } from "~/views/store/firebase";
+import { roomAtom } from "./store/room";
 
 export type SyncedGameOperations = {
   readonly startGame: () => Promise<void>;

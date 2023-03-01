@@ -2,8 +2,8 @@ import { Provider } from "jotai";
 import { ReactElement, StrictMode } from "react";
 import { FirebaseClient } from "~/lib/firebase";
 import { Body } from "./Body";
-import { InitAtoms } from "./_lib/InitAtoms";
-import { firebaseAtomInitializers } from "./_store/firebase";
+import { InitAtoms } from "./lib/InitAtoms";
+import { firebaseAtomInitializers } from "./store/firebase";
 
 export type AppProps = {
   readonly firebase: FirebaseClient;

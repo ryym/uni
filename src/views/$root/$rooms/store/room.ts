@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { Room } from "~/app/room";
-import { AtomInitializer, pair } from "~/views/_lib/jotai";
+import { AtomInitializer, pair } from "~/views/lib/jotai";
 
 const mutRoomAtom = atom<Room | null>(null);
 

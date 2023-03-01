@@ -3,8 +3,8 @@ import { useAtomValue } from "jotai";
 import { useCallback } from "react";
 import { roomCollectionRef, roomCreatorDocRef } from "~/backend/db";
 import { log } from "~/lib/logger";
-import { firebaseAtom } from "../_store/firebase";
-import { useSignIn } from "../_store/session";
+import { firebaseAtom } from "~/views/store/firebase";
+import { useSignIn } from "~/views/store/session";
 
 export type CreateRoom = (masterPassword: string) => Promise<NewRoomInfo>;
 

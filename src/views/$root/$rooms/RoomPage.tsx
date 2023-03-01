@@ -1,8 +1,8 @@
 import { ReactElement } from "react";
-import { InitAtoms } from "../_lib/InitAtoms";
+import { InitAtoms } from "~/views/lib/InitAtoms";
 import { Entrance } from "./Entrance";
 import { RoomView } from "./RoomView";
-import { roomAtomInitializers } from "./_store/room";
+import { roomAtomInitializers } from "./store/room";
 import { useSyncedRoom } from "./useSyncedRoom";
 
 export type RoomPageProps = {

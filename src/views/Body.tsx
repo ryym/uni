@@ -1,9 +1,9 @@
 import { useAtomValue } from "jotai";
 import { ReactElement } from "react";
 import { Route, Switch } from "wouter";
-import { sessionAtom, useAuthStateSubscription } from "./_store/session";
-import { HomePage } from "./home/HomePage";
-import { RoomPage } from "./rooms/RoomPage";
+import { RoomPage } from "./$root/$rooms/RoomPage";
+import { HomePage } from "./$root/HomePage";
+import { sessionAtom, useAuthStateSubscription } from "./store/session";
 
 export function Body(): ReactElement {
   useAuthStateSubscription();

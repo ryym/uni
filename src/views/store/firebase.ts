@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { FirebaseClient } from "~/lib/firebase";
-import { AtomInitializer, pair } from "../_lib/jotai";
+import { AtomInitializer, pair } from "~/views/lib/jotai";
 
 const mutFirebaseAtom = atom<FirebaseClient | null>(null);
 

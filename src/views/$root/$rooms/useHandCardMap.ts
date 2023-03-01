@@ -5,8 +5,8 @@ import { cardById } from "~/app/uni/cards";
 import { SyncedGameSnapshot } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
-import { firebaseAtom } from "../_store/firebase";
-import { roomAtom } from "./_store/room";
+import { firebaseAtom } from "~/views/store/firebase";
+import { roomAtom } from "./store/room";
 import { Card } from "~shared/cards";
 
 export type HandCardMap = {
