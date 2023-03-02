@@ -1,5 +1,13 @@
 :root {
+  --color-white: white;
   --color-black: #475569;
+  --color-gray: #bbb;
+
+  --color-logo: #fbbf24;
+  --color-card-red: #f87171;
+  --color-card-blue: #06b6d4;
+  --color-card-green: #84cc16;
+  --color-card-yellow: #fbbf24;
 
   font-family: sans-serif;
 }
@@ -12,7 +20,7 @@
 
 html,
 body {
-  margin: 0;
   padding: 0;
+  margin: 0;
   color: var(--color-black);
 }
