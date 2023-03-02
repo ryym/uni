@@ -2,3 +2,6 @@ creds/
 dist/
 node_modules/
 *-debug.log
+
+*.css.d.ts
+*.css.d.ts.map
