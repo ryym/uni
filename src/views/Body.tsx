@@ -1,8 +1,8 @@
 import { useAtomValue } from "jotai";
 import { ReactElement } from "react";
 import { Route, Switch } from "wouter";
-import { RoomPage } from "./$root/$rooms/RoomPage";
-import { HomePage } from "./$root/HomePage";
+import { HomePage } from "./_root_/HomePage";
+import { RoomPage } from "./_root_/_rooms_/RoomPage";
 import { sessionAtom, useAuthStateSubscription } from "./store/session";
 
 export function Body(): ReactElement {
