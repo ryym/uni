@@ -119,3 +119,26 @@ const wild = (id: number): WildCard => {
     type: "Wild",
   };
 };
+
+export const cardDigest = (c: Card): string => {
+  switch (c.type) {
+    case "Number": {
+      return `Number-${c.color}-${c.value}`;
+    }
+    case "Reverse": {
+      return `Reverse-${c.color}`;
+    }
+    case "Skip": {
+      return `Skip-${c.color}`;
+    }
+    case "Draw2": {
+      return `Draw2-${c.color}`;
+    }
+    case "Draw4": {
+      return "Draw4";
+    }
+    case "Wild": {
+      return "Wild";
+    }
+  }
+};
