@@ -14,7 +14,6 @@ export const buildFirebaseClient = async (): Promise<FirebaseClient> => {
   const app = initializeApp({
     apiKey: getEnv("VITE_FIREBASE_API_KEY"),
     authDomain: getEnv("VITE_FIREBASE_AUTH_DOMAIN"),
-    databaseURL: getEnv("VITE_FIREBASE_DATABASE_URL"),
     projectId: getEnv("VITE_FIREBASE_PROJECT_ID"),
     storageBucket: getEnv("VITE_FIREBASE_STORAGE_BUCKET"),
     messagingSenderId: getEnv("VITE_FIREBASE_MESSAGING_SENDER_ID"),

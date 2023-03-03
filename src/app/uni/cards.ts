@@ -22,7 +22,7 @@ export const MAX_PLAY_CARDS = 50;
 
 export const cardById = (id: string): Card => {
   if (cardMap[id] == null) {
-    throw new Error(`[douno] unknown card id: ${id}`);
+    throw new Error(`[uni] unknown card id: ${id}`);
   }
   return cardMap[id];
 };

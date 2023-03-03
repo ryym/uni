@@ -215,7 +215,7 @@ const determineNextPlayer = (
   }
   const idx = playerUids.indexOf(currentPlayer);
   if (idx === -1) {
-    throw new Error("[douno] current player not listed in remaining players");
+    throw new Error("[uni] current player not listed in remaining players");
   }
   let nextIdx: number;
   if (move.clockwise) {
