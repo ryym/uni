@@ -64,8 +64,9 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         if (game.status !== "valid" || game.snapshot.state.currentPlayerUid !== userUid) {
           return;
         }
+        log.debug("updating game state", game.snapshot.state, action);
         const result = updateGameState(game.config, game.snapshot.state, action);
-        log.debug("updated game state locally", result);
+        log.debug("local game state update result", result);
         if (result.ok) {
           await updateDoc(null, gameSnapDocRef(db, room.id), {
             state: result.value,
