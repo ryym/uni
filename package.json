@@ -19,7 +19,9 @@
     "git:pre-commit": "lint-staged",
     "ui": "concurrently npm:storybook npm:hcm",
     "hcm": "hcm --watch src/**/*.module.css",
-    "storybook": "storybook dev --port 6006 --no-open"
+    "storybook": "storybook dev --port 6006 --no-open",
+    "lint:js": "eslint --fix .",
+    "lint:css": "stylelint --fix '**/*.css'"
   },
   "dependencies": {
     "firebase": "^9.15.0",
