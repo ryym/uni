@@ -3,6 +3,7 @@ import { InitAtoms } from "~/views/lib/InitAtoms";
 import { Entrance } from "./Entrance";
 import { GameView } from "./GameView";
 import { roomAtomInitializers } from "./store/room";
+import styles from "./styles/RoomPage.module.css";
 import { useSyncedRoom } from "./useSyncedRoom";
 
 export type RoomPageProps = {
@@ -12,7 +13,11 @@ export type RoomPageProps = {
 };
 
 export function RoomPage(props: RoomPageProps): ReactElement {
-  return <RoomPageBody key={props.params.roomId} params={props.params} />;
+  return (
+    <div className={styles.root}>
+      <RoomPageBody key={props.params.roomId} params={props.params} />
+    </div>
+  );
 }
 
 function RoomPageBody(props: RoomPageProps): ReactElement {
