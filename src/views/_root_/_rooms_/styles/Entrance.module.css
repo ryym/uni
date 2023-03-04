@@ -1,0 +1,10 @@
+.root {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.memberForm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
