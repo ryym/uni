@@ -48,8 +48,9 @@ function buildPropertiesOrder() {
     ...dirs,
     "z-index",
     "box-sizing",
-    "display",
 
+    "grid-area",
+    "display",
     "grid-template-areas",
     "grid-template-columns",
     "grid-template-rows",
@@ -61,6 +62,9 @@ function buildPropertiesOrder() {
     "flex-wrap",
     "gap",
 
+    "align-content",
+    "align-items",
+    "justify-content",
     "width",
     "min-width",
     "max-width",
@@ -83,8 +87,5 @@ function buildPropertiesOrder() {
     "text-shadow",
     "background-color",
     "box-shadow",
-    "align-content",
-    "align-items",
-    "justify-content",
   ];
 }
