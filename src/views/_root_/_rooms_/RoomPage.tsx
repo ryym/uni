@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { InitAtoms } from "~/views/lib/InitAtoms";
 import { Entrance } from "./Entrance";
-import { RoomView } from "./RoomView";
+import { GameView } from "./GameView";
 import { roomAtomInitializers } from "./store/room";
 import { useSyncedRoom } from "./useSyncedRoom";
 
@@ -24,7 +24,7 @@ function RoomPageBody(props: RoomPageProps): ReactElement {
     case "synced": {
       return (
         <InitAtoms initialValues={roomAtomInitializers(sync.room)}>
-          <RoomView room={sync.state} />
+          <GameView room={sync.state} />
         </InitAtoms>
       );
     }

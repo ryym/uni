@@ -1,13 +1,18 @@
 import { useAtomValue } from "jotai";
 import { ReactElement } from "react";
 import { userAtom } from "~/views/store/session";
+import { RoomState } from "~shared/room";
 import { InvalidGame } from "./InvalidGame";
 import { NoGame } from "./NoGame";
 import { OngoingGame } from "./OngoingGame";
 import { useHandCardMap } from "./useHandCardMap";
 import { useSyncedGame } from "./useSyncedGame";
 
-export function GameView(): ReactElement {
+export type GameViewProps = {
+  readonly room: RoomState;
+};
+
+export function GameView(props: GameViewProps): ReactElement {
   const user = useAtomValue(userAtom);
   const [game, ops] = useSyncedGame();
   const handCardMap = useHandCardMap(user.uid, game);
@@ -17,7 +22,7 @@ export function GameView(): ReactElement {
       return <div>connecting...</div>;
     }
     case "nogame": {
-      return <NoGame onStartGame={ops.startGame} />;
+      return <NoGame room={props.room} onStartGame={ops.startGame} />;
     }
     case "invalid": {
       return <InvalidGame message={game.error} />;
