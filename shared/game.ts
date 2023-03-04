@@ -73,7 +73,7 @@ export type CardIdHashMap = {
 export const initializeGame = (
   params: InitializeGameParams,
 ): [GameConfig, GameState, CardIdHashMap] => {
-  const salt = "";
+  const salt = `${Date.now()}${randomInt(100)}`;
 
   const idHashMap = params.cards.reduce((m, c) => {
     m[c.id] = cardIdHash(c.id, salt);
