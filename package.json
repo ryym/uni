@@ -13,7 +13,6 @@
     "build:PROD": "tsc && vite build",
     "deploy:dev": "firebase --project default deploy",
     "deploy:PROD": "npm run build:PROD && firebase --project production deploy; rm -rf dist",
-    "cards": "node scripts/cards.js",
     "test": "jest",
     "test:w": "jest --watch",
     "functions": "npm --prefix functions",
