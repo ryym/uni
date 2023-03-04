@@ -1,0 +1,41 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.head {
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-gray);
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.members {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.memberType {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8em;
+  background-color: #ddd;
+}
+
+.isOwner {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background-color: transparent;
+}
+
+.isYou {
+  padding-left: 4px;
+  color: var(--color-accent);
+}
