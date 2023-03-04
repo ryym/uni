@@ -1,5 +1,6 @@
 import { FormEvent, ReactElement, useState } from "react";
 import { useLocation } from "wouter";
+import styles from "./styles/HomePage.module.css";
 import { useCreateRoom } from "./useCreateRoom";
 
 export function HomePage(): ReactElement {
@@ -15,25 +16,28 @@ export function HomePage(): ReactElement {
   };
 
   return (
-    <div>
-      <h2>Join room</h2>
-      <p>Ask the room owner for the room URL.</p>
-      <hr />
-
-      <h2>Create room</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          master password
+    <div className={styles.root}>
+      <section>
+        <div className={styles.head}>合流する</div>
+        <p>部屋のオーナーに URL を聞いてアクセスしてください。</p>
+      </section>
+      <section>
+        <div className={styles.head}>部屋を作る</div>
+        <form className={styles.newRoomForm} onSubmit={handleSubmit}>
+          <label htmlFor="master-password">マスターパスワード</label>
           <input
+            id="master-password"
             type="password"
             required
             value={masterPassword}
             onChange={(e) => setMasterPassword(e.target.value)}
           />
-        </label>
-        <p>Currently this application is open for limited users.</p>
-        <button type="submit">Create</button>
-      </form>
+          <button type="submit">作成</button>
+        </form>
+        <p className={styles.limitNote}>
+          ※ この Web アプリは限定されたユーザーにのみ公開されています。
+        </p>
+      </section>
     </div>
   );
 }
