@@ -26,7 +26,7 @@ export default defineConfig((env) => {
       // the build for server environment does not use Vite, so
       // replacements are not executed. In that case we need to arrange the
       // global variable values at runtime.
-      "global.__ENV_TEST__": "true",
+      "global.__ENV_TEST__": "false",
     },
   };
 });
