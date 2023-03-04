@@ -61,10 +61,13 @@ function buildPropertiesOrder() {
     "flex-shrink",
     "flex-wrap",
     "gap",
+    "column-gap",
+    "row-gap",
 
     "align-content",
     "align-items",
     "justify-content",
+    "appearance",
     "width",
     "min-width",
     "max-width",
@@ -87,5 +90,6 @@ function buildPropertiesOrder() {
     "text-shadow",
     "background-color",
     "box-shadow",
+    "opacity",
   ];
 }
