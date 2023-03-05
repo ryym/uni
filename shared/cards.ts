@@ -65,22 +65,25 @@ export const buildDeck = (): Card[] => {
 
   return [
     ...colors.flatMap(([color, cid]) => [
-      num(`${cid}-0-0`, color, 0),
-      ...num1to9.flatMap((n) => [num(`${cid}-${n}-0`, color, n), num(`${cid}-${n}-1`, color, n)]),
+      num(`num-${cid}-0-0`, color, 0),
+      ...num1to9.flatMap((n) => [
+        num(`num-${cid}-${n}-0`, color, n),
+        num(`num-${cid}-${n}-1`, color, n),
+      ]),
 
-      ...range(0, 2).map((i) => reverse(`${cid}-${i}`, color)),
-      ...range(0, 2).map((i) => skip(`${cid}-${i}`, color)),
-      ...range(0, 2).map((i) => draw2(`${cid}-${i}`, color)),
+      ...range(0, 2).map((i) => reverse(`rev-${cid}-${i}`, color)),
+      ...range(0, 2).map((i) => skip(`skip-${cid}-${i}`, color)),
+      ...range(0, 2).map((i) => draw2(`draw2-${cid}-${i}`, color)),
     ]),
 
-    ...range(0, 4).map((i) => draw4(i)),
-    ...range(0, 4).map((i) => wild(i)),
+    ...range(0, 4).map((i) => draw4(`draw4-${i}`)),
+    ...range(0, 4).map((i) => wild(`wild-${i}`)),
   ];
 };
 
 const num = (id: string, color: Color, value: NumberValue): NumberCard => {
   return {
-    id: `num-${id}`,
+    id,
     type: "Number",
     color,
     value,
@@ -88,34 +91,34 @@ const num = (id: string, color: Color, value: NumberValue): NumberCard => {
 };
 const reverse = (id: string, color: Color): ReverseCard => {
   return {
-    id: `reverse-${id}`,
+    id,
     type: "Reverse",
     color,
   };
 };
 const skip = (id: string, color: Color): SkipCard => {
   return {
-    id: `skip-${id}`,
+    id,
     type: "Skip",
     color,
   };
 };
 const draw2 = (id: string, color: Color): Draw2Card => {
   return {
-    id: `draw2-${id}`,
+    id,
     type: "Draw2",
     color,
   };
 };
-const draw4 = (id: number): Draw4Card => {
+const draw4 = (id: string): Draw4Card => {
   return {
-    id: `draw4-${id}`,
+    id,
     type: "Draw4",
   };
 };
-const wild = (id: number): WildCard => {
+const wild = (id: string): WildCard => {
   return {
-    id: `wild-${id}`,
+    id,
     type: "Wild",
   };
 };
