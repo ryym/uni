@@ -1,0 +1,70 @@
+.root {
+  display: "flex";
+  flex-direction: "column";
+  gap: 12px;
+}
+
+.player {
+  padding: 8px;
+}
+
+.playerHead {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-gray);
+}
+
+.isCurrent {
+  display: flex;
+  align-items: center;
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.isCurrent::before {
+  content: "▶";
+  margin-right: 0.6em;
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+  animation-name: swaying;
+}
+
+@keyframes swaying {
+  0% {
+    transform: translateX(-24%);
+  }
+
+  50% {
+    transform: translateX(24%);
+  }
+
+  100% {
+    transform: translateX(-24%);
+  }
+}
+
+.isYou {
+  margin-left: 0.3em;
+  font-weight: bold;
+}
+
+.hand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 0 0;
+}
+
+.omitted {
+  position: relative;
+}
+
+.omittedCount {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  background-color: rgb(255 255 255 / 80%);
+}

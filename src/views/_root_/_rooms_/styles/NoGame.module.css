@@ -36,6 +36,6 @@
 }
 
 .isYou {
-  padding-left: 4px;
-  color: var(--color-accent);
+  margin-left: 0.3em;
+  font-weight: bold;
 }
