@@ -1,0 +1,16 @@
+.root {
+  position: relative;
+  padding-right: var(--max-shift);
+  padding-bottom: var(--max-shift);
+}
+
+.card {
+  position: absolute;
+  top: var(--shift);
+  left: var(--shift);
+  z-index: 2;
+}
+
+.cardForSpace {
+  visibility: hidden;
+}
