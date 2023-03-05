@@ -1,5 +1,5 @@
-import { range } from "~/lib/array";
 import { Result } from "~/lib/types";
+import { range } from "~shared/array";
 import { DiscardPile, GameAction, GameConfig, GameState, cardIdHash } from "~shared/game";
 import { parsePlay } from "./play";
 import { canPlayOn, checkPassIsAvailable, hasDrawnLastTime } from "./readers";
