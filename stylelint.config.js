@@ -14,12 +14,15 @@ module.exports = {
     "custom-property-empty-line-before": null,
     "declaration-no-important": true,
     "declaration-block-no-redundant-longhand-properties": null,
+    "property-no-unknown": [true, { ignoreProperties: ["composes"] }],
     "selector-class-pattern": [
       "^[a-z]([a-zA-Z0-9]*)*$",
       {
         message: (selector) => `Expected class selector "${selector}" to be camelCase`,
       },
     ],
+    "value-keyword-case": ["lower", { ignoreProperties: ["composes"] }],
+
     "order/properties-order": [
       buildPropertiesOrder(),
       {
@@ -42,6 +45,8 @@ function buildPropertiesOrder() {
   ];
 
   return [
+    "composes",
+
     "all",
     "content",
     "position",
