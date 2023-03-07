@@ -32,7 +32,7 @@
   background-color: var(--color-white);
 }
 
-.cardShadow {
+.cardFloating {
   box-shadow: 2px 2px calc(var(--width) * 0.1) var(--color-black);
 }
 

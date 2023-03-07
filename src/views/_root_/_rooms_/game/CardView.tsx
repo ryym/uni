@@ -5,7 +5,7 @@ import styles from "./styles/CardView.module.css";
 export type CardViewProps = {
   readonly card: CardViewType;
   readonly size?: CardViewSize;
-  readonly shadow?: boolean;
+  readonly floating?: boolean;
 };
 
 export type CardViewType = "hidden" | Card;
@@ -20,7 +20,7 @@ export type CardViewSize = keyof typeof cardSizeClasses;
 export function CardView(props: CardViewProps): ReactElement {
   const sizeClass = cardSizeClasses[props.size || "md"];
   return (
-    <div className={`${styles.card} ${sizeClass} ${props.shadow ? styles.cardShadow : ""}`}>
+    <div className={`${styles.card} ${sizeClass} ${props.floating ? styles.cardFloating : ""}`}>
       <CardViewContent card={props.card} />
     </div>
   );

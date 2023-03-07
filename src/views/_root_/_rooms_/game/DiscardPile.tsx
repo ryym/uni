@@ -71,7 +71,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
             zIndex: p.pileIndex,
           }}
         >
-          <CardView card={p.card} shadow={topCards.length > 1 && p.card === latestCard} />
+          <CardView card={p.card} floating={topCards.length > 1 && p.card === latestCard} />
         </div>
       ))}
     </div>
