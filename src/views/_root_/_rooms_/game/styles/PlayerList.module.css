@@ -14,32 +14,11 @@
 }
 
 .isCurrent {
+  composes: currentPlayerIndicator from "./lib/players.css";
   display: flex;
   align-items: center;
   border-bottom-color: var(--color-accent);
   color: var(--color-accent);
-}
-
-.isCurrent::before {
-  content: "▶";
-  margin-right: 0.6em;
-  animation-duration: 1.2s;
-  animation-iteration-count: infinite;
-  animation-name: swaying;
-}
-
-@keyframes swaying {
-  0% {
-    transform: translateX(-24%);
-  }
-
-  50% {
-    transform: translateX(24%);
-  }
-
-  100% {
-    transform: translateX(-24%);
-  }
 }
 
 .isYou {
