@@ -30,10 +30,18 @@
   border-radius: calc(var(--width) * 0.04);
   font-size: calc(var(--width) * 0.32);
   background-color: var(--color-white);
+  transition-duration: 0.1s;
+  transition-property: transform, box-shadow;
 }
 
 .cardFloating {
   box-shadow: 2px 2px calc(var(--width) * 0.1) var(--color-black);
+}
+
+.cardFocused {
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  transform: scale(1.1);
 }
 
 .hidden {

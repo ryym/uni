@@ -6,6 +6,7 @@ export type CardViewProps = {
   readonly card: CardViewType;
   readonly size?: CardViewSize;
   readonly floating?: boolean;
+  readonly focused?: boolean;
 };
 
 export type CardViewType = "hidden" | Card;
@@ -20,7 +21,14 @@ export type CardViewSize = keyof typeof cardSizeClasses;
 export function CardView(props: CardViewProps): ReactElement {
   const sizeClass = cardSizeClasses[props.size || "md"];
   return (
-    <div className={`${styles.card} ${sizeClass} ${props.floating ? styles.cardFloating : ""}`}>
+    <div
+      className={[
+        styles.card,
+        sizeClass,
+        props.floating ? styles.cardFloating : "",
+        props.focused ? styles.cardFocused : "",
+      ].join(" ")}
+    >
       <CardViewContent card={props.card} />
     </div>
   );
