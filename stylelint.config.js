@@ -68,10 +68,12 @@ function buildPropertiesOrder() {
     "gap",
     "column-gap",
     "row-gap",
-
     "align-content",
     "align-items",
     "justify-content",
+
+    "align-self",
+    "justify-self",
     "appearance",
     "width",
     "min-width",
