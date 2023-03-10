@@ -1,6 +1,7 @@
 import { ReactElement, useState } from "react";
 import { User } from "~/app/models";
 import { cardById } from "~/app/uni/cards";
+import { GameAction, GameConfig, GameState, HandCardMap } from "~/app/uni/game";
 import {
   canAct,
   canDraw,
@@ -11,9 +12,7 @@ import {
   isGameFinished,
 } from "~/app/uni/game/readers";
 import { Card } from "~shared/cards";
-import { GameAction, GameConfig, GameState } from "~shared/game";
 import { CardView } from "./CardView";
-import { HandCardMap } from "./useHandCardMap";
 
 type Player = {
   readonly uid: string;

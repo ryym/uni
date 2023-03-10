@@ -2,25 +2,12 @@ import { Firestore, documentId, getDocs, query, where } from "firebase/firestore
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { cardById } from "~/app/uni/cards";
+import { HandCardMap } from "~/app/uni/game";
 import { SyncedGameSnapshot } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
-import { Card } from "~shared/cards";
 import { roomAtom } from "./store/room";
-
-export type HandCardMap = {
-  readonly [hash: string]: HandCardState;
-};
-
-export type HandCardState =
-  | {
-      readonly type: "fetching";
-    }
-  | {
-      readonly type: "got";
-      readonly card: Card;
-    };
 
 export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandCardMap => {
   const { db } = useAtomValue(firebaseAtom);
