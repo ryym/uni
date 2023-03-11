@@ -1,17 +1,16 @@
 import { Meta, StoryObj } from "@storybook/react";
-import { buildDeck } from "~shared/cards";
+import { cardById } from "~/app/uni/cards";
+import { HandCardMap } from "~/app/uni/game";
+import { Card, buildDeck } from "~shared/cards";
+import { initializeGame } from "~shared/game";
+import { Mutable } from "~shared/mutable";
 import { MyHand } from "../MyHand";
-
-const allCards = buildDeck();
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const card = (id: string) => allCards.find((c) => id === c.id)!;
 
 export default {
   title: "MyHand",
-  args: {
-    canDraw: false,
-    canPlay: true,
-    canPass: false,
+  args: {},
+  argTypes: {
+    runAction: { action: "action" },
   },
   component: (args) => (
     <div style={{ maxWidth: "1200px" }}>
@@ -22,61 +21,73 @@ export default {
 
 type Story = StoryObj<typeof MyHand>;
 
-export const Empty: Story = {
-  args: {
-    cards: [],
-  },
+const allCards = buildDeck().map((c) => cardById(c.id));
+
+const buildHandCardMap = (cardHashes: readonly string[], cards: readonly Card[]) => {
+  return cardHashes.reduce((map, hash, i) => {
+    map[hash] = { type: "got", card: cards[i] };
+    return map;
+  }, {} as Mutable<HandCardMap>);
 };
 
-export const Base: Story = {
-  args: {
-    cards: [
-      card("num-r-0-0"),
-      card("num-r-3-0"),
-      card("num-r-9-0"),
-      card("num-b-4-0"),
-      card("num-g-4-0"),
-      card("num-g-5-0"),
-      card("rev-r-0"),
-      card("skip-y-0"),
-      card("draw2-g-0"),
-      card("draw4-0"),
-      card("wild-0"),
-    ],
-  },
-};
+export const CardUnrevealed: Story = (() => {
+  const [gameConfig, gameState] = initializeGame({
+    cards: allCards,
+    playerUids: ["p1", "p2"],
+    handCardsNum: 3,
+  });
+  return {
+    args: {
+      user: { uid: "p1" },
+      gameConfig,
+      gameState,
+      handCardMap: {},
+    },
+  };
+})();
 
-export const MyTurn: Story = {
-  args: {
-    isTurn: true,
-    cards: [
-      card("num-r-0-0"),
-      card("num-r-3-0"),
-      card("num-r-9-0"),
-      card("num-b-4-0"),
-      card("num-g-4-0"),
-      card("num-g-5-0"),
-      card("rev-r-0"),
-      card("skip-y-0"),
-      card("draw2-g-0"),
-      card("draw4-0"),
-      card("wild-0"),
-    ],
-  },
-};
+export const SomeCardRevealed: Story = (() => {
+  const [gameConfig, gameState] = initializeGame({
+    cards: allCards,
+    playerUids: ["p1", "p2"],
+    handCardsNum: 3,
+  });
+  return {
+    args: {
+      user: { uid: "p1" },
+      gameConfig,
+      gameState,
+      handCardMap: buildHandCardMap(gameState.playerMap["p1"].hand.slice(0, 2), allCards),
+    },
+  };
+})();
 
-export const ManyCards: Story = {
-  args: {
-    cards: allCards.slice(10, 40),
-  },
-};
+export const NotMyTurn: Story = (() => {
+  const [gameConfig, gameState] = initializeGame({
+    cards: allCards,
+    playerUids: ["p1", "p2"],
+    handCardsNum: 3,
+  });
+  return {
+    args: {
+      user: { uid: "p2" },
+      gameConfig,
+      gameState,
+      handCardMap: buildHandCardMap(gameState.playerMap["p2"].hand, allCards),
+    },
+  };
+})();
 
-export const CannotDrawPlay: Story = {
-  args: {
-    cards: allCards.slice(0, 3),
-    isTurn: true,
-    canDraw: false,
-    canPlay: false,
-    canPass: true,
-  },
-};
+export const ManyCards: Story = (() => {
+  const cards = buildDeck().map((c) => cardById(c.id));
+  const [gameConfig, gameState] = initializeGame({ cards, playerUids: ["p1"], handCardsNum: 40 });
+  const handCardMap = buildHandCardMap(gameState.playerMap["p1"].hand, cards);
+  return {
+    args: {
+      user: { uid: "p1" },
+      gameConfig,
+      gameState,
+      handCardMap,
+    },
+  };
+})();
