@@ -51,10 +51,23 @@ export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandC
 };
 
 const openCards = async (db: Firestore, roomId: string, cardHashes: readonly string[]) => {
-  const q = query(cardCollectionRef(db, roomId), where(documentId(), "in", cardHashes));
-  const result = await getDocs(q);
-  return result.docs.map((d) => {
-    const cardHash = d.id;
-    return [cardHash, d.data().cardId] as const;
+  const maxValueCount = 10; // A maximum number of elements supported by "in" filter.
+  const hashGroups: string[][] = [];
+  for (let i = 0; i < cardHashes.length; i += maxValueCount) {
+    hashGroups.push(cardHashes.slice(i, i + maxValueCount));
+  }
+
+  const results = await Promise.all(
+    hashGroups.map((hashes) => {
+      const q = query(cardCollectionRef(db, roomId), where(documentId(), "in", hashes));
+      return getDocs(q);
+    }),
+  );
+
+  return results.flatMap((r) => {
+    return r.docs.map((d) => {
+      const cardHash = d.id;
+      return [cardHash, d.data().cardId] as const;
+    });
   });
 };
