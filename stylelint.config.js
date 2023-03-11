@@ -90,6 +90,7 @@ function buildPropertiesOrder() {
     ...borderProps(""),
     ...dirs.flatMap((d) => borderProps(`-${d}`)),
 
+    "cursor",
     "font-family",
     "font-size",
     "font-weight",
