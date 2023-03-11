@@ -31,23 +31,23 @@ export const Empty: Story = {
 };
 
 export const Cards1: Story = {
-  args: { cardCount: 1, topCards: cards.slice(0, 1) },
+  args: { cardCount: 1, topCards: cards.slice(0, 1).reverse() },
 };
 
 export const Cards3: Story = {
-  args: { cardCount: 3, topCards: cards.slice(0, 3) },
+  args: { cardCount: 3, topCards: cards.slice(0, 3).reverse() },
 };
 
 export const Cards5: Story = {
-  args: { cardCount: 5, topCards: cards.slice(0, 5) },
+  args: { cardCount: 5, topCards: cards.slice(0, 5).reverse() },
 };
 
 export const Cards6: Story = {
-  args: { cardCount: 6, topCards: cards.slice(1, 6) },
+  args: { cardCount: 6, topCards: cards.slice(1, 6).reverse() },
 };
 
 export const Cards7: Story = {
-  args: { cardCount: 7, topCards: cards.slice(2, 7) },
+  args: { cardCount: 7, topCards: cards.slice(2, 7).reverse() },
 };
 
 export const Cards49: Story = {

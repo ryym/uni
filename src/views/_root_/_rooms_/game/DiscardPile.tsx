@@ -5,6 +5,7 @@ import styles from "./styles/DiscardPile.module.css";
 
 export type DiscardPileProps = {
   readonly cardCount: number;
+  /** Top N cards in the discard pile in newest to oldest order. */
   readonly topCards: readonly Card[];
 };
 
@@ -21,13 +22,13 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
   //   topCards: [3,4,5,6,7] -> placements: [6,7,3,4,5]
   //   ...
 
-  const topCards = props.topCards.slice(0, Math.min(5, props.topCards.length));
-  const lowestTopCardIdx = props.cardCount % topCards.length;
+  const oldToNew = [...props.topCards].reverse();
+  const lowestTopCardIdx = props.cardCount % oldToNew.length;
   const hiddenCardCount = props.cardCount - props.topCards.length;
 
-  const placements: CardPlacement[] = new Array(topCards.length);
-  topCards.forEach((card, idx) => {
-    const pos = (idx + lowestTopCardIdx) % topCards.length;
+  const placements: CardPlacement[] = new Array(oldToNew.length);
+  oldToNew.forEach((card, idx) => {
+    const pos = (idx + lowestTopCardIdx) % oldToNew.length;
     placements[pos] = { card, pileIndex: hiddenCardCount + idx + 1 };
   });
 
@@ -59,7 +60,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
     },
   ];
 
-  const latestCard = topCards[topCards.length - 1];
+  const newest = oldToNew[oldToNew.length - 1];
   return (
     <div className={styles.root}>
       {placements.map((p, i) => (
@@ -71,7 +72,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
             zIndex: p.pileIndex,
           }}
         >
-          <CardView card={p.card} floating={topCards.length > 1 && p.card === latestCard} />
+          <CardView card={p.card} floating={oldToNew.length > 1 && p.card === newest} />
         </div>
       ))}
     </div>
