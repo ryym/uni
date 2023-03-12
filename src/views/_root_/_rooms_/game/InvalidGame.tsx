@@ -1,4 +1,5 @@
 import { ReactElement } from "react";
+import styles from "./styles/InvalidGame.module.css";
 
 export type InvalidGameProps = {
   readonly message: string;
@@ -6,8 +7,8 @@ export type InvalidGameProps = {
 
 export function InvalidGame(props: InvalidGameProps): ReactElement {
   return (
-    <div>
-      <div>ERROR: unexpected game state</div>
+    <div className={styles.root}>
+      <div>ERROR: 予期しないゲーム状態になりました</div>
       <div>{props.message}</div>
     </div>
   );

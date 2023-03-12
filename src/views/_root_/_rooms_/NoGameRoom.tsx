@@ -2,14 +2,14 @@ import { useAtomValue } from "jotai";
 import { Fragment, ReactElement } from "react";
 import { userAtom } from "~/views/store/session";
 import { RoomState } from "~shared/room";
-import styles from "./styles/NoGame.module.css";
+import styles from "./styles/NoGameRoom.module.css";
 
-export type NoGameProps = {
+export type NoGameRoomProps = {
   readonly room: RoomState;
   readonly onStartGame: () => unknown;
 };
 
-export function NoGame(props: NoGameProps): ReactElement {
+export function NoGameRoom(props: NoGameRoomProps): ReactElement {
   const user = useAtomValue(userAtom);
   return (
     <div className={styles.root}>
