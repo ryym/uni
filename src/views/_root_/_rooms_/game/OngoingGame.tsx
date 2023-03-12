@@ -1,4 +1,4 @@
-import { ReactElement, useMemo } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { User } from "~/app/models";
 import { cardById } from "~/app/uni/cards";
 import { GameAction, GameConfig, GameState, HandCardMap } from "~/app/uni/game";
@@ -6,6 +6,7 @@ import { countCardsInDeck, countCardsInHands } from "~/app/uni/game/readers";
 import { RoomMemberMap } from "~shared/room";
 import { Deck } from "./Deck";
 import { DiscardPile } from "./DiscardPile";
+import { GameEventNotice } from "./GameEventNotice";
 import { MyHand } from "./MyHand";
 import { Player, PlayerList } from "./PlayerList";
 import styles from "./styles/OngoingGame.module.css";
@@ -17,6 +18,11 @@ export type OngoingGameProps = {
   readonly gameState: GameState;
   readonly handCardMap: HandCardMap;
   readonly runAction: (action: GameAction) => void;
+};
+
+type GameEvent = {
+  readonly key: number;
+  readonly lastUpdate: GameState["lastUpdate"];
 };
 
 export function OngoingGame(props: OngoingGameProps): ReactElement {
@@ -36,6 +42,14 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
     return props.gameState.discardPile.topCardIds.map((id) => cardById(id));
   }, [props.gameState.discardPile.topCardIds]);
 
+  const [gameEvent, setGameEvent] = useState<GameEvent>({
+    key: 0,
+    lastUpdate: props.gameState.lastUpdate,
+  });
+  if (gameEvent.lastUpdate !== props.gameState.lastUpdate) {
+    setGameEvent({ key: gameEvent.key + 1, lastUpdate: props.gameState.lastUpdate });
+  }
+
   return (
     <div className={styles.root}>
       <div className={styles.players}>
@@ -46,6 +60,15 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
         />
       </div>
       <div className={styles.table}>
+        {gameEvent.key > 0 && gameEvent.lastUpdate != null && (
+          <div key={gameEvent.key} className={styles.event}>
+            <GameEventNotice
+              event={gameEvent.lastUpdate}
+              playerName={(uid) => props.memberMap[uid].name}
+            />
+          </div>
+        )}
+
         <div className={styles.discardPile}>
           <DiscardPile cardCount={pileCardCount} topCards={pileTopCards} />
         </div>

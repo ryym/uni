@@ -26,10 +26,12 @@ export type GameState = {
     readonly [uid: string]: PlayerState;
   };
   readonly discardPile: DiscardPile;
-  readonly lastUpdate: null | {
-    readonly playerUid: string;
-    readonly action: GameAction;
-  };
+  readonly lastUpdate: null | GameUpdate;
+};
+
+export type GameUpdate = {
+  readonly playerUid: string;
+  readonly action: GameAction;
 };
 
 export type PlayerState = {
