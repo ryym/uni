@@ -4,7 +4,7 @@ import { userAtom } from "~/views/store/session";
 import { RoomState } from "~shared/room";
 import { InvalidGame } from "./InvalidGame";
 import { NoGame } from "./NoGame";
-import { OngoingGame } from "./OngoingGame";
+import { OngoingGame } from "./game/OngoingGame";
 import { useHandCardMap } from "./useHandCardMap";
 import { useSyncedGame } from "./useSyncedGame";
 
@@ -31,10 +31,11 @@ export function GameView(props: GameViewProps): ReactElement {
       return (
         <OngoingGame
           user={user}
+          memberMap={props.room.members}
           gameConfig={game.config}
           gameState={game.snapshot.state}
-          update={(action) => ops.updateAndSync(user.uid, game, action)}
           handCardMap={handCardMap}
+          runAction={(action) => ops.updateAndSync(user.uid, game, action)}
         />
       );
     }
