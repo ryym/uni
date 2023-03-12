@@ -1,0 +1,46 @@
+.root {
+  display: grid;
+  grid-template-areas:
+    ". players table ."
+    ". players myhand .";
+  grid-template-columns: auto minmax(80px, 320px) minmax(800px, 1240px) auto;
+  grid-template-rows: max-content auto;
+  gap: 20px;
+  height: 100vh;
+  margin: 0 auto;
+}
+
+.players {
+  grid-area: players;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.table {
+  position: relative;
+  grid-area: table;
+  display: grid;
+  grid-template-areas: "pile deck";
+  grid-template-columns: 3fr max-content;
+  grid-template-rows: 1fr;
+  row-gap: 20px;
+  padding: 80px 0;
+}
+
+.discardPile {
+  grid-area: pile;
+  display: grid;
+  place-items: center;
+}
+
+.deck {
+  grid-area: deck;
+  display: grid;
+  place-items: center;
+}
+
+.myHand {
+  grid-area: myhand;
+  padding-bottom: 20px;
+}
