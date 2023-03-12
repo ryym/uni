@@ -1,5 +1,5 @@
 import { ReactElement, useState } from "react";
-import { Card } from "~shared/cards";
+import { Card, Color } from "~shared/cards";
 import { CardView } from "./CardView";
 import styles from "./styles/DiscardPile.module.css";
 
@@ -7,12 +7,20 @@ export type DiscardPileProps = {
   readonly cardCount: number;
   /** Top N cards in the discard pile in newest to oldest order. */
   readonly topCards: readonly Card[];
+  readonly color: Color;
 };
 
 type CardPlacement = {
   readonly card: Card;
   readonly pileIndex: number;
 };
+
+const colorClasses = {
+  Red: styles.pileRed,
+  Blue: styles.pileBlue,
+  Green: styles.pileGreen,
+  Yellow: styles.pileYellow,
+} satisfies Record<Color, string>;
 
 export function DiscardPile(props: DiscardPileProps): ReactElement {
   // This component represents a discard pile by displaying most recently played N cards (= props.topCards).
@@ -36,35 +44,35 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
 
   const cardPlacements = [
     {
-      top: "15px",
-      left: "30px",
+      top: "65px",
+      left: "80px",
       transform: "rotate(32deg)",
     },
     {
-      top: "90px",
-      left: "41px",
+      top: "140px",
+      left: "91px",
       transform: "rotate(-47deg)",
     },
     {
-      top: "10px",
-      left: "110px",
+      top: "60px",
+      left: "160px",
       transform: "rotate(8deg)",
     },
     {
-      top: "146px",
-      left: "75px",
+      top: "196px",
+      left: "125px",
       transform: "rotate(80deg)",
     },
     {
-      top: "80px",
-      left: "158px",
+      top: "130px",
+      left: "208px",
       transform: "rotate(-20deg)",
     },
   ];
 
   const newest = oldToNew[oldToNew.length - 1];
   return (
-    <div className={styles.root}>
+    <div className={[styles.root, colorClasses[props.color]].join(" ")}>
       {placements.map((p, i) => (
         <div
           key={p.card.id}

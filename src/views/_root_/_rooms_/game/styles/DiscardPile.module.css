@@ -1,8 +1,25 @@
+.pileRed {
+  --pile-color: var(--color-card-red);
+}
+
+.pileBlue {
+  --pile-color: var(--color-card-blue);
+}
+
+.pileGreen {
+  --pile-color: var(--color-card-green);
+}
+
+.pileYellow {
+  --pile-color: var(--color-card-yellow);
+}
+
 .root {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 360px;
+  height: 360px;
   padding: 20px;
+  background-image: radial-gradient(var(--pile-color) 0%, var(--color-white) 70%);
 }
 
 .newCard {

@@ -79,7 +79,11 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
         )}
 
         <div className={styles.discardPile}>
-          <DiscardPile cardCount={pileCardCount} topCards={pileTopCards} />
+          <DiscardPile
+            cardCount={pileCardCount}
+            topCards={pileTopCards}
+            color={gameState.discardPile.color}
+          />
         </div>
         <div className={styles.deck}>
           <Deck cardCount={deckCardCount} />
