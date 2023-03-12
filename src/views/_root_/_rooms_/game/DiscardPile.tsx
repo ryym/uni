@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { Card } from "~shared/cards";
 import { CardView } from "./CardView";
 import styles from "./styles/DiscardPile.module.css";
@@ -21,6 +21,8 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
   //   topCards: [2,3,4,5,6] -> placements: [6,2,3,4,5]
   //   topCards: [3,4,5,6,7] -> placements: [6,7,3,4,5]
   //   ...
+
+  const [initialTopCards] = useState(() => new Set(props.topCards));
 
   const oldToNew = [...props.topCards].reverse();
   const lowestTopCardIdx = props.cardCount % oldToNew.length;
@@ -66,6 +68,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
       {placements.map((p, i) => (
         <div
           key={p.card.id}
+          className={initialTopCards.has(p.card) ? "" : styles.newCard}
           style={{
             position: "absolute",
             ...cardPlacements[i],

@@ -1,9 +1,21 @@
 .currentPlayerIndicator::before {
   content: "▶";
   margin-right: 0.6em;
-  animation-duration: 1.2s;
-  animation-iteration-count: infinite;
-  animation-name: swaying;
+  animation-duration: 0.6s, 1.2s;
+  animation-iteration-count: 1, infinite;
+  animation-name: fade-in, swaying;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.5;
+    scale: 3;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
 }
 
 @keyframes swaying {

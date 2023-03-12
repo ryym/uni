@@ -47,3 +47,38 @@
   place-items: center;
   background-color: rgb(255 255 255 / 80%);
 }
+
+.cardsInOut {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 6px);
+  width: 50px;
+  animation-duration: 0.6s;
+  animation-fill-mode: forwards;
+  animation-name: cards-in-out;
+}
+
+.cardsIn {
+  --cards-from: 100%;
+  --cards-to: 20%;
+}
+
+.cardsOut {
+  --cards-from: 20%;
+  --cards-to: 100%;
+}
+
+@keyframes cards-in-out {
+  0% {
+    opacity: 0;
+    transform: translateX(var(--cards-from));
+  }
+
+  40% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(var(--cards-to));
+  }
+}

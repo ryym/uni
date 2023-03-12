@@ -4,3 +4,21 @@
   height: 240px;
   padding: 20px;
 }
+
+.newCard {
+  animation-duration: 0.6s;
+  animation-fill-mode: forwards;
+  animation-name: card-played;
+}
+
+@keyframes card-played {
+  0% {
+    opacity: 0;
+    scale: 1.5;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}

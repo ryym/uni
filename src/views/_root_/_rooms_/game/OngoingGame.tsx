@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import { User } from "~/app/models";
 import { cardById } from "~/app/uni/cards";
 import { GameAction, GameConfig, GameState, HandCardMap } from "~/app/uni/game";
@@ -26,22 +26,6 @@ type GameEvent = {
 };
 
 export function OngoingGame(props: OngoingGameProps): ReactElement {
-  const players: Player[] = useMemo(() => {
-    return props.gameConfig.playerUids.map((uid) => ({
-      uid,
-      name: props.memberMap[uid].name,
-      hand: props.gameState.playerMap[uid].hand,
-    }));
-  }, [props.gameConfig, props.gameState, props.memberMap]);
-
-  const deckCardCount = countCardsInDeck(props.gameConfig, props.gameState);
-  const handCardCount = countCardsInHands(props.gameState);
-  const pileCardCount = props.gameConfig.deck.length - deckCardCount - handCardCount;
-
-  const pileTopCards = useMemo(() => {
-    return props.gameState.discardPile.topCardIds.map((id) => cardById(id));
-  }, [props.gameState.discardPile.topCardIds]);
-
   const [gameEvent, setGameEvent] = useState<GameEvent>({
     key: 0,
     lastUpdate: props.gameState.lastUpdate,
@@ -50,12 +34,37 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
     setGameEvent({ key: gameEvent.key + 1, lastUpdate: props.gameState.lastUpdate });
   }
 
+  // Update the game state with delay to let players see the game event notice first.
+  const [gameState, setDelayedGameState] = useState<GameState>(props.gameState);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayedGameState(props.gameState);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [props.gameState]);
+
+  const players: Player[] = useMemo(() => {
+    return props.gameConfig.playerUids.map((uid) => ({
+      uid,
+      name: props.memberMap[uid].name,
+      hand: gameState.playerMap[uid].hand,
+    }));
+  }, [props.gameConfig, gameState, props.memberMap]);
+
+  const deckCardCount = countCardsInDeck(props.gameConfig, gameState);
+  const handCardCount = countCardsInHands(gameState);
+  const pileCardCount = props.gameConfig.deck.length - deckCardCount - handCardCount;
+
+  const pileTopCards = useMemo(() => {
+    return gameState.discardPile.topCardIds.map((id) => cardById(id));
+  }, [gameState.discardPile.topCardIds]);
+
   return (
     <div className={styles.root}>
       <div className={styles.players}>
         <PlayerList
           userUid={props.user.uid}
-          currentPlayerUid={props.gameState.currentPlayerUid}
+          currentPlayerUid={gameState.currentPlayerUid}
           players={players}
         />
       </div>
@@ -80,7 +89,7 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
         <MyHand
           user={props.user}
           gameConfig={props.gameConfig}
-          gameState={props.gameState}
+          gameState={gameState}
           handCardMap={props.handCardMap}
           runAction={props.runAction}
         />

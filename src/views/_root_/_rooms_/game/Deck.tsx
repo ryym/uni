@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { range } from "~shared/array";
 import { CardView } from "./CardView";
 import styles from "./styles/Deck.module.css";
@@ -7,10 +7,24 @@ export type DeckProps = {
   readonly cardCount: number;
 };
 
-export function Deck(props: DeckProps): ReactElement | null {
+type DrawnEvent = {
+  readonly key: number;
+  readonly lastCardCount: number;
+};
+
+export function Deck(props: DeckProps): ReactElement {
   if (props.cardCount <= 0) {
-    return null;
+    throw new Error(`[uni] Deck card count must be greater than 0: ${props.cardCount}`);
   }
+
+  const [drawnEvent, setDrawnEvent] = useState<DrawnEvent>({
+    key: 0,
+    lastCardCount: props.cardCount,
+  });
+  if (drawnEvent.lastCardCount !== props.cardCount) {
+    setDrawnEvent({ key: drawnEvent.key + 1, lastCardCount: props.cardCount });
+  }
+
   const card = <CardView card="hidden" />;
   const cardCount = Math.min(props.cardCount, 8);
   const tailPos = (cardCount - 1) * 2;
@@ -21,6 +35,11 @@ export function Deck(props: DeckProps): ReactElement | null {
           {card}
         </div>
       ))}
+      {drawnEvent.key > 0 && (
+        <div key={drawnEvent.key} className={styles.drawn}>
+          {card}
+        </div>
+      )}
       {/*
        * An invisible card just exists for reserving the Deck space.
        * Without this, the Deck height becomes shorter than its content since
