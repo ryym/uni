@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: 4px;
   color: var(--color-accent);
+  animation-name: game-event;
   animation-duration: 3s;
   animation-fill-mode: forwards;
-  animation-name: game-event;
 }
 
 .actor {

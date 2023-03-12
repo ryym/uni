@@ -1,9 +1,9 @@
 .currentPlayerIndicator::before {
   content: "▶";
   margin-right: 0.6em;
+  animation-name: fade-in, swaying;
   animation-duration: 0.6s, 1.2s;
   animation-iteration-count: 1, infinite;
-  animation-name: fade-in, swaying;
 }
 
 @keyframes fade-in {

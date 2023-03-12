@@ -99,5 +99,12 @@ function buildPropertiesOrder() {
     "background-color",
     "box-shadow",
     "opacity",
+    "animation-name",
+    "animation-delay",
+    "animation-direction",
+    "animation-duration",
+    "animation-fill-mode",
+    "animation-iteration-count",
+    "animation-timing-function",
   ];
 }

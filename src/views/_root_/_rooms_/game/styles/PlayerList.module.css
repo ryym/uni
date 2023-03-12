@@ -52,9 +52,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, 6px);
   width: 50px;
+  animation-name: cards-in-out;
   animation-duration: 0.6s;
   animation-fill-mode: forwards;
-  animation-name: cards-in-out;
 }
 
 .cardsIn {
