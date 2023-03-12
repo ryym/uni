@@ -86,3 +86,11 @@ export const checkPassIsAvailable = (state: GameState, uid: string): Result<null
   }
   return { ok: true, value: null };
 };
+
+export const countCardsInDeck = (config: GameConfig, state: GameState): number => {
+  return config.deck.length - state.deckTopIdx;
+};
+
+export const countCardsInHands = (state: GameState): number => {
+  return Object.values(state.playerMap).reduce((n, p) => n + p.hand.length, 0);
+};
