@@ -12,7 +12,8 @@ export type DiscardPileProps = {
 
 type CardPlacement = {
   readonly card: Card;
-  readonly pileIndex: number;
+  readonly index: number;
+  readonly indexInPile: number;
 };
 
 const colorClasses = {
@@ -39,14 +40,14 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
   const placements: CardPlacement[] = new Array(oldToNew.length);
   oldToNew.forEach((card, idx) => {
     const pos = (idx + lowestTopCardIdx) % oldToNew.length;
-    placements[pos] = { card, pileIndex: hiddenCardCount + idx + 1 };
+    placements[pos] = { card, index: idx, indexInPile: hiddenCardCount + idx + 1 };
   });
 
   const cardPlacements = [
     {
-      top: "65px",
-      left: "80px",
-      transform: "rotate(32deg)",
+      top: "105px",
+      left: "130px",
+      transform: "rotate(12deg)",
     },
     {
       top: "140px",
@@ -54,19 +55,19 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
       transform: "rotate(-47deg)",
     },
     {
-      top: "60px",
-      left: "160px",
-      transform: "rotate(8deg)",
+      top: "94px",
+      left: "200px",
+      transform: "rotate(24deg)",
     },
     {
-      top: "196px",
-      left: "125px",
-      transform: "rotate(80deg)",
+      top: "36px",
+      left: "85px",
+      transform: "rotate(50deg)",
     },
     {
-      top: "130px",
-      left: "208px",
-      transform: "rotate(-20deg)",
+      top: "180px",
+      left: "188px",
+      transform: "rotate(70deg)",
     },
   ];
 
@@ -77,13 +78,14 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
         <div
           key={p.card.id}
           className={initialTopCards.has(p.card) ? "" : styles.newCard}
+          data-hoge={p.index}
           style={{
             position: "absolute",
             ...cardPlacements[i],
-            zIndex: p.pileIndex,
+            zIndex: p.indexInPile,
           }}
         >
-          <CardView card={p.card} floating={oldToNew.length > 1 && p.card === newest} />
+          <CardView card={p.card} floating={p.card === newest} />
         </div>
       ))}
     </div>
