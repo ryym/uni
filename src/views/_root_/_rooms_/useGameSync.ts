@@ -2,30 +2,30 @@ import { getDoc, onSnapshot } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameAction, GameConfig, updateGameState } from "~/app/uni/game";
-import { SyncedGameSnapshot, syncGame } from "~/app/uni/game/sync";
+import { GameSync, syncGame } from "~/app/uni/game/sync";
 import { gameConfigDocRef, gameStateDocRef, updateDoc } from "~/backend/db";
 import { callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
 import { roomAtom } from "./store/room";
 
-export type SyncedGameOperations = {
+export type GameSyncOperations = {
   readonly startGame: () => Promise<void>;
   readonly updateAndSync: UpdateAndSyncGame;
 };
 
 export type UpdateAndSyncGame = (
   userUid: string,
-  game: SyncedGameSnapshot,
+  game: GameSync,
   action: GameAction,
 ) => Promise<void>;
 
-export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperations] => {
+export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
   const { db, functions } = useAtomValue(firebaseAtom);
 
   const room = useAtomValue(roomAtom);
   const gameConfigRef = useRef<GameConfig | null>(null);
-  const [game, setGame] = useState<SyncedGameSnapshot>({ status: "unsynced" });
+  const [game, setGame] = useState<GameSync>({ status: "unsynced" });
 
   useEffect(() => {
     return onSnapshot(gameStateDocRef(db, room.id), { includeMetadataChanges: true }, async (d) => {
@@ -53,7 +53,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
     });
   }, [db, room]);
 
-  const ops: SyncedGameOperations = useMemo(() => {
+  const ops: GameSyncOperations = useMemo(() => {
     return {
       startGame: async () => {
         const result = await callInitGameFunction(functions, { roomId: room.id });

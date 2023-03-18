@@ -5,8 +5,8 @@ import { RoomState } from "~shared/room";
 import { NoGameRoom } from "./NoGameRoom";
 import { InvalidGame } from "./game/InvalidGame";
 import { OngoingGame } from "./game/OngoingGame";
+import { useGameSync } from "./useGameSync";
 import { useHandCardMap } from "./useHandCardMap";
-import { useSyncedGame } from "./useSyncedGame";
 
 export type GameViewProps = {
   readonly room: RoomState;
@@ -14,7 +14,7 @@ export type GameViewProps = {
 
 export function GameView(props: GameViewProps): ReactElement {
   const user = useAtomValue(userAtom);
-  const [game, ops] = useSyncedGame();
+  const [game, ops] = useGameSync();
   const handCardMap = useHandCardMap(user.uid, game);
 
   switch (game.status) {

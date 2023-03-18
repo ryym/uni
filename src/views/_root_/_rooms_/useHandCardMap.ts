@@ -3,13 +3,13 @@ import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { cardById } from "~/app/uni/cards";
 import { HandCardMap } from "~/app/uni/game";
-import { SyncedGameSnapshot } from "~/app/uni/game/sync";
+import { GameSync } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
 import { roomAtom } from "./store/room";
 
-export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandCardMap => {
+export const useHandCardMap = (userUid: string, game: GameSync): HandCardMap => {
   const { db } = useAtomValue(firebaseAtom);
   const room = useAtomValue(roomAtom);
 
