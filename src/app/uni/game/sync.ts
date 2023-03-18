@@ -42,6 +42,9 @@ export const syncGame = (
       if (lastSynced.snapshot.state.turn === remote.state.turn) {
         return { ...lastSynced, syncFinished };
       }
+      if (remote.lastAction == null) {
+        return unexpectedGameStateResult();
+      }
 
       const result = updateGameState(config, lastSynced.snapshot.state, remote.lastAction);
       if (!result.ok) {
@@ -49,13 +52,17 @@ export const syncGame = (
       }
       if (!deepStrictEqual(result.value, remote.state)) {
         log.debug("local and remote state mismatch", lastSynced.snapshot, remote, result.value);
-        return {
-          status: "invalid",
-          error: "予期しないゲーム状態です。リロードしても直らない場合は中断してください。",
-        };
+        return unexpectedGameStateResult();
       }
 
       return { status: "valid", config, snapshot: remote, syncFinished };
     }
   }
+};
+
+const unexpectedGameStateResult = (): SyncedGameSnapshot => {
+  return {
+    status: "invalid",
+    error: "予期しないゲーム状態です。リロードしても直らない場合は中断してください。",
+  };
 };

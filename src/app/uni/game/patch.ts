@@ -22,10 +22,6 @@ export const buildGameStatePatch = (
   action: GameAction,
 ): Result<GameStatePatch> => {
   switch (action.type) {
-    case "Start": {
-      return { ok: false, error: '"Start" action can be used only at game initialization' };
-    }
-
     case "Pass": {
       const passResult = checkPassIsAvailable(state, state.currentPlayerUid);
       if (!passResult.ok) {

@@ -11,9 +11,6 @@ export type GameEventNoticeProps = {
 
 export function GameEventNotice(props: GameEventNoticeProps): ReactElement | null {
   switch (props.event.action.type) {
-    case "Start": {
-      return null;
-    }
     case "Play": {
       return (
         <GameEventLayout {...props}>
