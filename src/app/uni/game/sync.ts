@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "~/lib/deepEqual";
 import { log } from "~/lib/logger";
-import { GameConfig, GameSnapshot, updateGameState } from "../game";
+import { GameConfig, GameState, updateGameState } from "../game";
 
 export type SyncedGameSnapshot =
   | {
@@ -12,7 +12,7 @@ export type SyncedGameSnapshot =
   | {
       readonly status: "valid";
       readonly config: GameConfig;
-      readonly snapshot: GameSnapshot;
+      readonly state: GameState;
       /** This becomes false when the state is updated locally but not yet in the backend. */
       readonly syncFinished: boolean;
     }
@@ -24,14 +24,14 @@ export type SyncedGameSnapshot =
 export const syncGame = (
   config: GameConfig,
   lastSynced: SyncedGameSnapshot,
-  remote: GameSnapshot,
+  remoteState: GameState,
   syncFinished: boolean,
 ): SyncedGameSnapshot => {
   switch (lastSynced.status) {
     case "unsynced":
     case "nogame": {
-      log.debug("no last synced snapshot so use remote data without verification");
-      return { status: "valid", config, snapshot: remote, syncFinished };
+      log.debug("no last synced game state so use remote data without verification");
+      return { status: "valid", config, state: remoteState, syncFinished };
     }
 
     case "invalid": {
@@ -39,27 +39,23 @@ export const syncGame = (
     }
 
     case "valid": {
-      if (lastSynced.snapshot.state.turn === remote.state.turn) {
+      if (lastSynced.state.turn === remoteState.turn) {
         return { ...lastSynced, syncFinished };
       }
-      if (remote.state.lastUpdate == null) {
+      if (remoteState.lastUpdate == null) {
         return unexpectedGameStateResult();
       }
 
-      const result = updateGameState(
-        config,
-        lastSynced.snapshot.state,
-        remote.state.lastUpdate.action,
-      );
+      const result = updateGameState(config, lastSynced.state, remoteState.lastUpdate.action);
       if (!result.ok) {
         return { status: "invalid", error: result.error };
       }
-      if (!deepStrictEqual(result.value, remote.state)) {
-        log.debug("local and remote state mismatch", lastSynced.snapshot, remote, result.value);
+      if (!deepStrictEqual(result.value, remoteState)) {
+        log.debug("local and remote state mismatch", lastSynced.state, remoteState, result.value);
         return unexpectedGameStateResult();
       }
 
-      return { status: "valid", config, snapshot: remote, syncFinished };
+      return { status: "valid", config, state: remoteState, syncFinished };
     }
   }
 };

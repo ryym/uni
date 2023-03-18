@@ -33,7 +33,7 @@ export function GameView(props: GameViewProps): ReactElement {
           user={user}
           memberMap={props.room.members}
           gameConfig={game.config}
-          gameState={game.snapshot.state}
+          gameState={game.state}
           handCardMap={handCardMap}
           runAction={(action) => ops.updateAndSync(user.uid, game, action)}
         />

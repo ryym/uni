@@ -20,7 +20,7 @@ export const useHandCardMap = (userUid: string, game: SyncedGameSnapshot): HandC
       return;
     }
 
-    const handCardHashes = game.snapshot.state.playerMap[userUid].hand;
+    const handCardHashes = game.state.playerMap[userUid].hand;
     const newCardHashes = handCardHashes.filter((h) => handCardMap[h] == null);
     if (newCardHashes.length === 0) {
       return;

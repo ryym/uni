@@ -7,7 +7,7 @@ import {
   doc,
   updateDoc as originalUpdateDoc,
 } from "firebase/firestore";
-import { GameConfig, GameSnapshot } from "~shared/game";
+import { GameConfig, GameState } from "~shared/game";
 import { RoomState } from "~shared/room";
 
 export const updateDoc = async <T>(
@@ -46,8 +46,8 @@ export const roomDocRef = (db: Firestore, roomId: string): DocumentReference<Roo
   return doc(db, `rooms/${roomId}`) as DocumentReference<RoomState>;
 };
 
-export const gameSnapDocRef = (db: Firestore, roomId: string): DocumentReference<GameSnapshot> => {
-  return doc(db, `games/${roomId}/snapshots/current`) as DocumentReference<GameSnapshot>;
+export const gameStateDocRef = (db: Firestore, roomId: string): DocumentReference<GameState> => {
+  return doc(db, `games/${roomId}/states/current`) as DocumentReference<GameState>;
 };
 
 export const gameConfigDocRef = (db: Firestore, roomId: string): DocumentReference<GameConfig> => {

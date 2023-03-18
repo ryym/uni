@@ -29,19 +29,19 @@ service cloud.firestore {
     match /games/{roomId} {
       allow get: if request.auth != null && request.auth.uid in resource.data.playerUids;
 
-      match /snapshots/current {
-        allow get: if request.auth != null && (resource == null || request.auth.uid in resource.data.state.playerMap);
+      match /states/current {
+        allow get: if request.auth != null && (resource == null || request.auth.uid in resource.data.playerMap);
         allow update: if (
           request.auth != null
-          && request.auth.uid == resource.data.state.currentPlayerUid
-          && request.resource.data.state.turn == resource.data.state.turn + 1
+          && request.auth.uid == resource.data.currentPlayerUid
+          && request.resource.data.turn == resource.data.turn + 1
         );
       }
 
       match /cards/{hash} {
         allow read: if (
           request.auth != null
-          && hash in get(/databases/$(database)/documents/games/$(roomId)/snapshots/current).data.state.playerMap[request.auth.uid].hand
+          && hash in get(/databases/$(database)/documents/games/$(roomId)/states/current).data.playerMap[request.auth.uid].hand
         )
       }
     }

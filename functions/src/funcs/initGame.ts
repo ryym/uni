@@ -1,7 +1,7 @@
 import { app } from "firebase-admin";
 import { Card, buildDeck } from "../../../shared/cards";
 import { InitGameParams, InitGameResult } from "../../../shared/functions";
-import { GameSnapshot, initializeGame } from "../../../shared/game";
+import { initializeGame } from "../../../shared/game";
 import { randomInt } from "../../../shared/random";
 import { RoomState } from "../../../shared/room";
 import { CallHandler } from "../lib/firebaseFunctions";
@@ -35,11 +35,10 @@ export const initGameHandler = (
       playerUids,
       handCardsNum: 7,
     });
-    const gameSnapshot: GameSnapshot = { state: gameState };
 
     const batch = firestore.batch();
     batch.set(firestore.doc(`games/${params.roomId}`), gameConfig);
-    batch.set(firestore.doc(`games/${params.roomId}/snapshots/current`), gameSnapshot);
+    batch.set(firestore.doc(`games/${params.roomId}/states/current`), gameState);
 
     cards.forEach((c) => {
       batch.set(firestore.doc(`games/${params.roomId}/cards/${idHashMap[c.id]}`), { cardId: c.id });

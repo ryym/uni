@@ -3,7 +3,7 @@ import { GameAction, GameConfig, GameState } from "~shared/game";
 import { Card } from "./cards";
 import { applyGameStatePatch, buildGameStatePatch } from "./game/patch";
 
-export type { GameAction, GameConfig, GameSnapshot, GameState } from "~shared/game";
+export type { GameAction, GameConfig, GameState } from "~shared/game";
 
 export const updateGameState = (
   config: GameConfig,

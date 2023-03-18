@@ -12,10 +12,6 @@ export type GameConfig = {
   };
 };
 
-export type GameSnapshot = {
-  readonly state: GameState;
-};
-
 export type GameState = {
   readonly turn: number;
   readonly currentPlayerUid: string;
