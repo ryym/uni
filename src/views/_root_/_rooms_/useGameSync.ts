@@ -7,7 +7,7 @@ import { gameConfigDocRef, gameStateDocRef, updateDoc } from "~/backend/db";
 import { callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
-import { roomAtom } from "./store/room";
+import { roomConfigAtom } from "./store/room";
 
 export type GameSyncOperations = {
   readonly startGame: () => Promise<void>;
@@ -23,12 +23,13 @@ export type UpdateAndSyncGame = (
 export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
   const { db, functions } = useAtomValue(firebaseAtom);
 
-  const room = useAtomValue(roomAtom);
+  const roomConfig = useAtomValue(roomConfigAtom);
   const gameConfigRef = useRef<GameConfig | null>(null);
   const [game, setGame] = useState<GameSync>({ status: "unsynced" });
 
   useEffect(() => {
-    return onSnapshot(gameStateDocRef(db, room.id), { includeMetadataChanges: true }, async (d) => {
+    const roomConfigRef = gameStateDocRef(db, roomConfig.id);
+    return onSnapshot(roomConfigRef, { includeMetadataChanges: true }, async (d) => {
       const remoteState = d.data();
       if (remoteState == null) {
         gameConfigRef.current = null;
@@ -39,7 +40,7 @@ export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
 
       if (gameConfigRef.current == null) {
         log.debug("fetching game config");
-        const remoteConfig = (await getDoc(gameConfigDocRef(db, room.id))).data();
+        const remoteConfig = (await getDoc(gameConfigDocRef(db, roomConfig.id))).data();
         if (remoteConfig == null) {
           throw new Error("[uni] game state exists without game config");
         }
@@ -51,12 +52,12 @@ export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
         return syncGame(config, game, remoteState, !d.metadata.hasPendingWrites);
       });
     });
-  }, [db, room]);
+  }, [db, roomConfig]);
 
   const ops: GameSyncOperations = useMemo(() => {
     return {
       startGame: async () => {
-        const result = await callInitGameFunction(functions, { roomId: room.id });
+        const result = await callInitGameFunction(functions, { roomId: roomConfig.id });
         if (result.error != null) {
           setGame({ status: "invalid", error: result.error });
         }
@@ -69,13 +70,13 @@ export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
         const result = updateGameState(game.config, game.state, action);
         log.debug("local game state update result", result);
         if (result.ok) {
-          await updateDoc(null, gameStateDocRef(db, room.id), result.value);
+          await updateDoc(null, gameStateDocRef(db, roomConfig.id), result.value);
         } else {
           setGame({ status: "invalid", error: result.error });
         }
       },
     };
-  }, [db, functions, room]);
+  }, [db, functions, roomConfig]);
 
   return [game, ops];
 };

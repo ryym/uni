@@ -2,9 +2,9 @@ import { ReactElement } from "react";
 import { InitAtoms } from "~/views/lib/InitAtoms";
 import { Entrance } from "./Entrance";
 import { GameView } from "./GameView";
-import { roomAtomInitializers } from "./store/room";
+import { roomConfigAtomInitializers } from "./store/room";
 import styles from "./styles/RoomPage.module.css";
-import { useSyncedRoom } from "./useSyncedRoom";
+import { useRoomSync } from "./useRoomSync";
 
 export type RoomPageProps = {
   readonly params: {
@@ -21,15 +21,15 @@ export function RoomPage(props: RoomPageProps): ReactElement {
 }
 
 function RoomPageBody(props: RoomPageProps): ReactElement {
-  const [sync, joinRoom] = useSyncedRoom(props.params.roomId);
-  switch (sync.status) {
+  const [room, joinRoom] = useRoomSync(props.params.roomId);
+  switch (room.status) {
     case "unsynced": {
-      return <Entrance joinRoom={joinRoom} joining={sync.syncing} />;
+      return <Entrance joinRoom={joinRoom} joining={room.syncing} />;
     }
     case "synced": {
       return (
-        <InitAtoms initialValues={roomAtomInitializers(sync.room)}>
-          <GameView room={sync.state} />
+        <InitAtoms initialValues={roomConfigAtomInitializers(room.config)}>
+          <GameView room={room.state} />
         </InitAtoms>
       );
     }

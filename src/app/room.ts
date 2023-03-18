@@ -1,16 +1,16 @@
 import { RoomState } from "~shared/room";
 
-export type Room = {
+export type RoomConfig = {
   readonly id: string;
 };
 
-export type SyncedRoom =
+export type RoomSync =
   | {
       readonly status: "unsynced";
       readonly syncing: boolean;
     }
   | {
       readonly status: "synced";
-      readonly room: Room;
+      readonly config: RoomConfig;
       readonly state: RoomState;
     };

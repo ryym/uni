@@ -7,11 +7,11 @@ import { GameSync } from "~/app/uni/game/sync";
 import { cardCollectionRef } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
-import { roomAtom } from "./store/room";
+import { roomConfigAtom } from "./store/room";
 
 export const useHandCardMap = (userUid: string, game: GameSync): HandCardMap => {
   const { db } = useAtomValue(firebaseAtom);
-  const room = useAtomValue(roomAtom);
+  const roomConfig = useAtomValue(roomConfigAtom);
 
   const [handCardMap, setHandCardMap] = useState<HandCardMap>({});
 
@@ -35,7 +35,7 @@ export const useHandCardMap = (userUid: string, game: GameSync): HandCardMap => 
       return m;
     });
 
-    openCards(db, room.id, newCardHashes).then((hashAndIds) => {
+    openCards(db, roomConfig.id, newCardHashes).then((hashAndIds) => {
       log.debug("new cards got", hashAndIds);
       setHandCardMap((cur) => {
         const m = { ...cur };
@@ -45,7 +45,7 @@ export const useHandCardMap = (userUid: string, game: GameSync): HandCardMap => 
         return m;
       });
     });
-  }, [userUid, db, room, game, handCardMap]);
+  }, [userUid, db, roomConfig, game, handCardMap]);
 
   return handCardMap;
 };

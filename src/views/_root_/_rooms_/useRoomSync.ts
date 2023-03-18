@@ -2,7 +2,7 @@ import { Firestore, onSnapshot, runTransaction } from "firebase/firestore";
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { User } from "~/app/models";
-import { Room, SyncedRoom } from "~/app/room";
+import { RoomConfig, RoomSync } from "~/app/room";
 import { roomDocRef, updateDoc } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
@@ -23,7 +23,7 @@ type JoinState =
       readonly user: User;
     };
 
-export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubscribeRoom] => {
+export const useRoomSync = (roomId: string): readonly [RoomSync, JoinAndSubscribeRoom] => {
   const { db } = useAtomValue(firebaseAtom);
   const signIn = useSignIn();
   const session = useAtomValue(sessionAtom);
@@ -36,12 +36,12 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
     return { joined: false };
   });
 
-  const [sync, setSync] = useState<SyncedRoom>({ status: "unsynced", syncing: joinState.joined });
-  const [room] = useState<Room>({ id: roomId });
+  const [room, setRoom] = useState<RoomSync>({ status: "unsynced", syncing: joinState.joined });
+  const [roomConfig] = useState<RoomConfig>({ id: roomId });
 
   const joinRoom: JoinAndSubscribeRoom = useCallback(
     async (userName) => {
-      setSync({ status: "unsynced", syncing: true });
+      setRoom({ status: "unsynced", syncing: true });
       const user = await signIn();
       log.debug("joining room", user.uid, userName);
       await registerAsRoomMember(db, roomId, user, userName);
@@ -55,7 +55,7 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
     if (!joinState.joined) {
       return;
     }
-    return onSnapshot(roomDocRef(db, room.id), (d) => {
+    return onSnapshot(roomDocRef(db, roomConfig.id), (d) => {
       const state = d.data();
       if (state == null) {
         throw new Error("room not found (in subscription)");
@@ -63,11 +63,11 @@ export const useSyncedRoom = (roomId: string): readonly [SyncedRoom, JoinAndSubs
       if (state.members[joinState.user.uid] == null) {
         throw new Error("user not in room members");
       }
-      setSync({ status: "synced", room, state });
+      setRoom({ status: "synced", config: roomConfig, state });
     });
-  }, [db, room, joinState]);
+  }, [db, roomConfig, joinState]);
 
-  return [sync, joinRoom];
+  return [room, joinRoom];
 };
 
 const registerAsRoomMember = (db: Firestore, roomId: string, user: User, userName: string) => {

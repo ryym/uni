@@ -1,15 +1,17 @@
 import { atom } from "jotai";
-import { Room } from "~/app/room";
+import { RoomConfig } from "~/app/room";
 import { AtomInitializer, pair } from "~/views/lib/jotai";
 
-const mutRoomAtom = atom<Room | null>(null);
+const mutRoomConfigAtom = atom<RoomConfig | null>(null);
 
-export const roomAtomInitializers = (room: Room): Array<AtomInitializer<unknown>> => {
-  return [pair(mutRoomAtom, room)];
+export const roomConfigAtomInitializers = (
+  roomConfig: RoomConfig,
+): Array<AtomInitializer<unknown>> => {
+  return [pair(mutRoomConfigAtom, roomConfig)];
 };
 
-export const roomAtom = atom((get) => {
-  const room = get(mutRoomAtom);
+export const roomConfigAtom = atom((get) => {
+  const room = get(mutRoomConfigAtom);
   if (room == null) {
     throw new Error("Room atom not set");
   }
