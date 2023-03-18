@@ -36,27 +36,22 @@ type PlayerRowProps = {
   readonly isCurrent: boolean;
 };
 
-type CardsInOutEvent = {
-  readonly key: number;
-  readonly lastCardCount: number;
-  readonly cardDiff: number;
-};
-
 function PlayerRow(props: PlayerRowProps): ReactElement {
   const cardCount = props.player.hand.length;
   const headCards = props.player.hand.slice(0, 20);
   const omittedCount = props.player.hand.length - headCards.length;
 
-  const [inOutEvent, setInOutEvent] = useState<CardsInOutEvent>({
-    key: 0,
+  const [handDiff, setHandDiff] = useState({
     lastCardCount: cardCount,
-    cardDiff: 0,
+    lastDraw: { key: 0, count: 0 },
+    lastPlay: { key: 0, count: 0 },
   });
-  if (inOutEvent.lastCardCount !== cardCount) {
-    setInOutEvent({
-      key: inOutEvent.key + 1,
+  if (cardCount !== handDiff.lastCardCount) {
+    const added = cardCount - handDiff.lastCardCount;
+    setHandDiff({
       lastCardCount: cardCount,
-      cardDiff: cardCount - inOutEvent.lastCardCount,
+      lastDraw: added > 0 ? { key: handDiff.lastDraw.key + 1, count: added } : handDiff.lastDraw,
+      lastPlay: added < 0 ? { key: handDiff.lastPlay.key + 1, count: -added } : handDiff.lastPlay,
     });
   }
 
@@ -68,23 +63,19 @@ function PlayerRow(props: PlayerRowProps): ReactElement {
       </div>
       <div className={styles.hand}>
         {headCards.map((v) => (
-          <CardView key={v} card="hidden" size="sm" />
+          <div key={v} className={styles.drawnCard}>
+            <CardView card="hidden" size="sm" />
+          </div>
         ))}
         {omittedCount > 0 && (
-          <div className={styles.omitted}>
+          <div key={handDiff.lastDraw.key} className={[styles.omitted, styles.drawnCard].join(" ")}>
             <CardView card="hidden" size="sm" />
             <span className={styles.omittedCount}>+{omittedCount}</span>
           </div>
         )}
-        {inOutEvent.key > 0 && (
-          <div
-            key={inOutEvent.key}
-            className={[
-              styles.cardsInOut,
-              inOutEvent.cardDiff > 0 ? styles.cardsIn : styles.cardsOut,
-            ].join(" ")}
-          >
-            {range(0, Math.abs(inOutEvent.cardDiff)).map((i) => (
+        {handDiff.lastPlay.count > 0 && (
+          <div key={handDiff.lastPlay.key} className={styles.playedCards}>
+            {range(0, handDiff.lastPlay.count).map((i) => (
               <CardView key={i} card="hidden" size="sm" />
             ))}
           </div>
