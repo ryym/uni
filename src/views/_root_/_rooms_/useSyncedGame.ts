@@ -31,6 +31,7 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
     return onSnapshot(gameSnapDocRef(db, room.id), { includeMetadataChanges: true }, async (d) => {
       const snapshot = d.data();
       if (snapshot == null) {
+        gameConfigRef.current = null;
         setGame({ status: "nogame" });
         return;
       }
