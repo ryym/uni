@@ -14,7 +14,6 @@ export type GameConfig = {
 
 export type GameSnapshot = {
   readonly state: GameState;
-  readonly lastAction: null | GameAction;
 };
 
 export type GameState = {

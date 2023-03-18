@@ -71,7 +71,6 @@ export const useSyncedGame = (): readonly [SyncedGameSnapshot, SyncedGameOperati
         if (result.ok) {
           await updateDoc(null, gameSnapDocRef(db, room.id), {
             state: result.value,
-            lastAction: action,
           });
         } else {
           setGame({ status: "invalid", error: result.error });

@@ -35,7 +35,7 @@ export const initGameHandler = (
       playerUids,
       handCardsNum: 7,
     });
-    const gameSnapshot: GameSnapshot = { state: gameState, lastAction: null };
+    const gameSnapshot: GameSnapshot = { state: gameState };
 
     const batch = firestore.batch();
     batch.set(firestore.doc(`games/${params.roomId}`), gameConfig);

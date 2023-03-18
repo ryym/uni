@@ -42,11 +42,15 @@ export const syncGame = (
       if (lastSynced.snapshot.state.turn === remote.state.turn) {
         return { ...lastSynced, syncFinished };
       }
-      if (remote.lastAction == null) {
+      if (remote.state.lastUpdate == null) {
         return unexpectedGameStateResult();
       }
 
-      const result = updateGameState(config, lastSynced.snapshot.state, remote.lastAction);
+      const result = updateGameState(
+        config,
+        lastSynced.snapshot.state,
+        remote.state.lastUpdate.action,
+      );
       if (!result.ok) {
         return { status: "invalid", error: result.error };
       }
