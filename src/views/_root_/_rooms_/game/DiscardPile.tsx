@@ -31,7 +31,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
   //   topCards: [3,4,5,6,7] -> placements: [6,7,3,4,5]
   //   ...
 
-  const [initialTopCards] = useState(() => new Set(props.topCards));
+  const [backgroundCards] = useState(() => new Set(props.topCards.slice(1)));
 
   const oldToNew = [...props.topCards].reverse();
   const lowestTopCardIdx = props.cardCount % oldToNew.length;
@@ -77,7 +77,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
       {placements.map((p, i) => (
         <div
           key={p.card.id}
-          className={initialTopCards.has(p.card) ? "" : styles.newCard}
+          className={backgroundCards.has(p.card) ? "" : styles.newCard}
           data-hoge={p.index}
           style={{
             position: "absolute",
