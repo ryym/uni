@@ -27,7 +27,8 @@ type GameEvent = {
 
 export function OngoingGame(props: OngoingGameProps): ReactElement {
   const [gameEvent, setGameEvent] = useState<GameEvent>({
-    key: 0,
+    // Show the notice on initial render only if the game is initial state.
+    key: props.gameState.lastUpdate != null ? 0 : 1,
     lastUpdate: props.gameState.lastUpdate,
   });
   if (gameEvent.lastUpdate !== props.gameState.lastUpdate) {
@@ -69,10 +70,10 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
         />
       </div>
       <div className={styles.table}>
-        {gameEvent.key > 0 && gameEvent.lastUpdate != null && (
+        {gameEvent.key > 0 && (
           <div key={gameEvent.key} className={styles.event}>
             <GameEventNotice
-              event={gameEvent.lastUpdate}
+              lastUpdate={gameEvent.lastUpdate}
               playerName={(uid) => props.memberMap[uid].name}
             />
           </div>
