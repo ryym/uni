@@ -98,3 +98,33 @@ export const Interactive: Story = (() => {
     memberMap: { p1: { name: "プレイヤー1" }, p2: { name: "プレイヤー2" } },
   });
 })();
+
+export const ConecutiveAttacks: Story = (() => {
+  const initialGame = initializeGame({
+    cards: [
+      cardById("draw2-r-0"),
+      cardById("draw2-b-0"),
+      cardById("draw2-g-0"),
+      cardById("draw2-y-0"),
+      cardById("draw4-0"),
+      cardById("num-r-0-0"),
+      cardById("num-b-0-0"),
+      cardById("num-g-0-0"),
+      cardById("num-y-0-0"),
+      cardById("num-r-1-0"),
+      cardById("num-b-1-0"),
+      cardById("num-g-1-0"),
+      cardById("num-y-1-0"),
+      cardById("num-r-2-0"),
+      cardById("num-b-2-0"),
+      cardById("num-g-2-0"),
+      cardById("num-y-2-0"),
+      cardById("wild-0"),
+    ],
+    playerUids: ["p1"],
+    handCardsNum: 5,
+  });
+  return interactiveStory(initialGame, {
+    memberMap: { p1: { name: "プレイヤー1" } },
+  });
+})();

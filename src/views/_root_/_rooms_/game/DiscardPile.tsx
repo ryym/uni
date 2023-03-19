@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Card, Color } from "~shared/cards";
 import { CardView } from "./CardView";
 import styles from "./styles/DiscardPile.module.css";
@@ -8,6 +8,7 @@ export type DiscardPileProps = {
   /** Top N cards in the discard pile in newest to oldest order. */
   readonly topCards: readonly Card[];
   readonly color: Color;
+  readonly attackTotal: number | null;
 };
 
 type CardPlacement = {
@@ -54,6 +55,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
 
   const [backgroundCards] = useState(() => new Set(props.topCards.slice(1)));
   const [placements, newestCard] = useCardPlacements(props.topCards, props.cardCount);
+  const attackState = useAttackState(props.attackTotal || 0);
 
   return (
     <div className={[styles.root, colorClasses[props.color]].join(" ")}>
@@ -71,6 +73,17 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
           <CardView card={p.card} floating={p.card === newestCard} />
         </div>
       ))}
+      {attackState.cardsToDraw > 0 && (
+        <div
+          className={[
+            styles.nextDraw,
+            attackState.attackFinished ? styles.attackFinished : "",
+          ].join(" ")}
+        >
+          <div>Next draw</div>
+          <div className={styles.nextDrawValue}>+{attackState.cardsToDraw}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -94,4 +107,31 @@ const useCardPlacements = (topCards: readonly Card[], cardCount: number) => {
   });
 
   return [placements, newest] as const;
+};
+
+// Manage attack state (Draw2/Draw4 pile) just for animating the attack finish.
+const useAttackState = (attackTotal: number) => {
+  const [attackState, setAttackState] = useState({
+    cardsToDraw: 0,
+    attackFinished: false,
+  });
+  if (attackTotal !== attackState.cardsToDraw) {
+    if (attackTotal > 0) {
+      setAttackState({ cardsToDraw: attackTotal, attackFinished: false });
+    } else if (!attackState.attackFinished) {
+      setAttackState((s) => ({ ...s, attackFinished: true }));
+    }
+  }
+
+  useEffect(() => {
+    if (!attackState.attackFinished) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAttackState({ cardsToDraw: 0, attackFinished: false });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [attackState]);
+
+  return attackState;
 };

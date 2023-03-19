@@ -39,3 +39,43 @@
     scale: 1;
   }
 }
+
+.nextDraw {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  color: var(--color-accent);
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.nextDrawValue {
+  font-size: 2rem;
+  animation-name: next-draw-palse;
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes next-draw-palse {
+  50% {
+    scale: 1.2;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+.attackFinished {
+  animation-name: attack-applied;
+  animation-duration: 0.6s;
+  animation-fill-mode: forwards;
+  transform-origin: left;
+}
+
+@keyframes attack-applied {
+  100% {
+    opacity: 0;
+    scale: 2;
+  }
+}
