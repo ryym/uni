@@ -72,7 +72,10 @@ export function MyHand(props: MyHandProps): ReactElement {
 
   const renderCard = (cardHash: string) => {
     const cardState = props.handCardMap[cardHash];
-    if (cardState?.type !== "got") {
+    if (cardState == null) {
+      return null;
+    }
+    if (cardState.type !== "got") {
       return <CardView key={cardHash} card="hidden" />;
     }
     const { card } = cardState;
