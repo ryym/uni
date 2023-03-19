@@ -24,26 +24,7 @@ const colorClasses = {
 } satisfies Record<Color, string>;
 
 export function DiscardPile(props: DiscardPileProps): ReactElement {
-  // This component represents a discard pile by displaying most recently played N cards (= props.topCards).
-  // Card placements are fixed so put cards in correct order there.
-  //   topCards: [1,2,3,4,5] -> placements: [1,2,3,4,5]
-  //   topCards: [2,3,4,5,6] -> placements: [6,2,3,4,5]
-  //   topCards: [3,4,5,6,7] -> placements: [6,7,3,4,5]
-  //   ...
-
-  const [backgroundCards] = useState(() => new Set(props.topCards.slice(1)));
-
-  const oldToNew = [...props.topCards].reverse();
-  const lowestTopCardIdx = props.cardCount % oldToNew.length;
-  const hiddenCardCount = props.cardCount - props.topCards.length;
-
-  const placements: CardPlacement[] = new Array(oldToNew.length);
-  oldToNew.forEach((card, idx) => {
-    const pos = (idx + lowestTopCardIdx) % oldToNew.length;
-    placements[pos] = { card, index: idx, indexInPile: hiddenCardCount + idx + 1 };
-  });
-
-  const cardPlacements = [
+  const cardPositions = [
     {
       top: "105px",
       left: "130px",
@@ -71,7 +52,9 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
     },
   ];
 
-  const newest = oldToNew[oldToNew.length - 1];
+  const [backgroundCards] = useState(() => new Set(props.topCards.slice(1)));
+  const [placements, newestCard] = useCardPlacements(props.topCards, props.cardCount);
+
   return (
     <div className={[styles.root, colorClasses[props.color]].join(" ")}>
       {placements.map((p, i) => (
@@ -81,13 +64,34 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
           data-hoge={p.index}
           style={{
             position: "absolute",
-            ...cardPlacements[i],
+            ...cardPositions[i],
             zIndex: p.indexInPile,
           }}
         >
-          <CardView card={p.card} floating={p.card === newest} />
+          <CardView card={p.card} floating={p.card === newestCard} />
         </div>
       ))}
     </div>
   );
 }
+
+// DiscardPile component represents a discard pile by displaying most recently played N cards (= topCards).
+// Card positions are fixed so put cards in correct order there.
+//   topCards: [1,2,3,4,5] -> placements: [1,2,3,4,5]
+//   topCards: [2,3,4,5,6] -> placements: [6,2,3,4,5]
+//   topCards: [3,4,5,6,7] -> placements: [6,7,3,4,5]
+//   ...
+const useCardPlacements = (topCards: readonly Card[], cardCount: number) => {
+  const oldToNew = [...topCards].reverse();
+  const lowestTopCardIdx = cardCount % oldToNew.length;
+  const hiddenCardCount = cardCount - topCards.length;
+  const newest = oldToNew[oldToNew.length - 1];
+
+  const placements: CardPlacement[] = new Array(oldToNew.length);
+  oldToNew.forEach((card, idx) => {
+    const pos = (idx + lowestTopCardIdx) % oldToNew.length;
+    placements[pos] = { card, index: idx, indexInPile: hiddenCardCount + idx + 1 };
+  });
+
+  return [placements, newest] as const;
+};
