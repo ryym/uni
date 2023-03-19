@@ -5,6 +5,7 @@
 }
 
 .player {
+  min-width: max-content;
   padding: 8px;
 }
 
