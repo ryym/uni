@@ -64,9 +64,9 @@ export type CardIdHashMap = {
   readonly [cardId: string]: string;
 };
 
-export const initializeGame = (
-  params: InitializeGameParams,
-): [GameConfig, GameState, CardIdHashMap] => {
+export type InitializeGameResult = readonly [GameConfig, GameState, CardIdHashMap];
+
+export const initializeGame = (params: InitializeGameParams): InitializeGameResult => {
   const salt = `${Date.now()}${randomInt(100)}`;
 
   const idHashMap = params.cards.reduce((m, c) => {
