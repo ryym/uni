@@ -17,6 +17,7 @@
   left: 0;
   z-index: 2;
   animation-name: drawn;
+  animation-delay: calc((var(--total) - var(--order)) * 0.05s);
   animation-duration: 0.6s;
   animation-fill-mode: forwards;
 }
@@ -27,9 +28,13 @@
     transform: translateX(0);
   }
 
+  60% {
+    opacity: 0;
+  }
+
   100% {
     opacity: 0;
-    transform: translateX(-150%);
+    transform: translateX(calc(var(--order) * -40px + -250%));
   }
 }
 
