@@ -26,7 +26,9 @@ export const initGameHandler = (
       return { error: "non-owner call not allowed" };
     }
 
-    const playerUids = Object.keys(room.members);
+    const playerUids = Object.keys(room.members).sort((uid1, uid2) => {
+      return room.members[uid1].joinedAt - room.members[uid2].joinedAt;
+    });
     const cards = buildDeck();
     shuffleCards(cards);
 
