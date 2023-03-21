@@ -5,13 +5,17 @@
 }
 
 .player {
-  min-width: max-content;
   padding: 8px;
 }
 
 .playerHead {
+  min-width: 160px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--color-gray);
+}
+
+.playerName {
+  word-break: break-all;
 }
 
 .isCurrent {

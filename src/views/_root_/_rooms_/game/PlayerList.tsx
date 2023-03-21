@@ -58,7 +58,7 @@ function PlayerRow(props: PlayerRowProps): ReactElement {
   return (
     <div className={styles.player}>
       <div className={[styles.playerHead, props.isCurrent ? styles.isCurrent : ""].join(" ")}>
-        {props.player.name}
+        <span className={styles.playerName}>{props.player.name}</span>
         {props.isYou ? <span className={styles.isYou}>(You)</span> : ""}
       </div>
       <div className={styles.hand}>
