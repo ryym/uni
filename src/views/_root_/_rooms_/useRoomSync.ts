@@ -7,6 +7,7 @@ import { roomDocRef, updateDoc } from "~/backend/db";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
 import { sessionAtom, useSignIn } from "~/views/store/session";
+import { RoomMemberMap } from "~shared/room";
 
 export type JoinAndSubscribeRoom = (userName: string) => Promise<void>;
 
@@ -77,9 +78,12 @@ const registerAsRoomMember = (db: Firestore, roomId: string, user: User, userNam
     if (room == null) {
       throw new Error("'room not found (on join)'");
     }
-    const members = {
+    const members: RoomMemberMap = {
       ...room.members,
-      [user.uid]: { name: userName },
+      [user.uid]: {
+        name: userName,
+        joinedAt: Date.now(),
+      },
     };
     await updateDoc(tx, roomDocRef(db, roomId), { members });
   });

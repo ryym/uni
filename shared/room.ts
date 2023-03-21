@@ -10,4 +10,5 @@ export type RoomMemberMap = {
 
 export type RoomMember = {
   readonly name: string;
+  readonly joinedAt: number;
 };

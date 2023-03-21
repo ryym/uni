@@ -76,7 +76,10 @@ export const Base: Story = (() => {
   return {
     args: {
       user: { uid: "p1" },
-      memberMap: { p1: { name: "プレイヤー1" }, p2: { name: "プレイヤー2" } },
+      memberMap: {
+        p1: { name: "プレイヤー1", joinedAt: 1 },
+        p2: { name: "プレイヤー2", joinedAt: 2 },
+      },
       gameConfig,
       gameState,
       handCardMap: {
@@ -95,7 +98,10 @@ export const Interactive: Story = (() => {
     handCardsNum: 3,
   });
   return interactiveStory(initialGame, {
-    memberMap: { p1: { name: "プレイヤー1" }, p2: { name: "プレイヤー2" } },
+    memberMap: {
+      p1: { name: "プレイヤー1", joinedAt: 1 },
+      p2: { name: "プレイヤー2", joinedAt: 2 },
+    },
   });
 })();
 
@@ -125,6 +131,6 @@ export const ConecutiveAttacks: Story = (() => {
     handCardsNum: 5,
   });
   return interactiveStory(initialGame, {
-    memberMap: { p1: { name: "プレイヤー1" } },
+    memberMap: { p1: { name: "プレイヤー1", joinedAt: 1 } },
   });
 })();
