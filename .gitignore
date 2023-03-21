@@ -3,5 +3,7 @@ dist/
 node_modules/
 *-debug.log
 
+.env.*
+
 *.css.d.ts
 *.css.d.ts.map
