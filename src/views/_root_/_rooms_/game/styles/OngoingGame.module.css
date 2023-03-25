@@ -3,7 +3,7 @@
   grid-template-areas:
     ". players table ."
     ". players myhand .";
-  grid-template-columns: auto minmax(min-content, 320px) minmax(800px, 1240px) auto;
+  grid-template-columns: 1fr minmax(min-content, 320px) minmax(800px, 1240px) 1.5fr;
   grid-template-rows: max-content auto;
   gap: 20px;
   height: 100vh;
