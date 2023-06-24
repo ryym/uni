@@ -105,7 +105,7 @@ export const Interactive: Story = (() => {
   });
 })();
 
-export const ConecutiveAttacks: Story = (() => {
+export const ConsecutiveAttacks: Story = (() => {
   const initialGame = initializeGame({
     cards: [
       cardById("draw2-r-0"),
