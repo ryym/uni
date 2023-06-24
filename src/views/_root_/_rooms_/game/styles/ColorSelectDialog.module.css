@@ -1,0 +1,48 @@
+.colorSelectForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+}
+
+.colorChoiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.colorChoice {
+  --border-width: 1px;
+
+  display: flex;
+  align-items: center;
+}
+
+.colorChoice:hover {
+  --border-width: 2px;
+
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.colorChoice > input {
+  display: none;
+}
+
+.colorChoice > span {
+  position: relative;
+  display: flex;
+  flex: auto;
+  align-items: flex-end;
+  height: 24px;
+  border-bottom: var(--border-width) solid var(--card-color);
+}
+
+.colorChoice > span::before {
+  content: "";
+  width: 16px;
+  height: 100%;
+  margin-right: 4px;
+  background-color: var(--card-color);
+}
