@@ -62,3 +62,21 @@ button:disabled::before {
   background-color: var(--color-white);
   opacity: 0.6;
 }
+
+/* Global classes */
+
+.cardRed {
+  --card-color: var(--color-card-red);
+}
+
+.cardBlue {
+  --card-color: var(--color-card-blue);
+}
+
+.cardGreen {
+  --card-color: var(--color-card-green);
+}
+
+.cardYellow {
+  --card-color: var(--color-card-yellow);
+}

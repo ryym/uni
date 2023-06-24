@@ -1,4 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
+import { cardColorClasses } from "~/globalStyles";
 import { Card, Color } from "~shared/cards";
 import { CardView } from "./CardView";
 import styles from "./styles/DiscardPile.module.css";
@@ -16,13 +17,6 @@ type CardPlacement = {
   readonly index: number;
   readonly indexInPile: number;
 };
-
-const colorClasses = {
-  Red: styles.pileRed,
-  Blue: styles.pileBlue,
-  Green: styles.pileGreen,
-  Yellow: styles.pileYellow,
-} satisfies Record<Color, string>;
 
 export function DiscardPile(props: DiscardPileProps): ReactElement {
   const cardPositions = [
@@ -58,7 +52,7 @@ export function DiscardPile(props: DiscardPileProps): ReactElement {
   const attackState = useAttackState(props.attackTotal || 0);
 
   return (
-    <div className={[styles.root, colorClasses[props.color]].join(" ")}>
+    <div className={[styles.root, cardColorClasses[props.color]].join(" ")}>
       {placements.map((p, i) => (
         <div
           key={p.card.id}

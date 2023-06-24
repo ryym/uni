@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
-import { Card, Color } from "~shared/cards";
+import { cardColorClasses } from "~/globalStyles";
+import { Card } from "~shared/cards";
 import styles from "./styles/CardView.module.css";
 
 export type CardViewProps = {
@@ -34,33 +35,28 @@ export function CardView(props: CardViewProps): ReactElement {
   );
 }
 
-const colorClasses = {
-  Red: styles.cardRed,
-  Blue: styles.cardBlue,
-  Green: styles.cardGreen,
-  Yellow: styles.cardYellow,
-} satisfies Record<Color, string>;
-
 function CardViewContent({ card }: CardViewProps): ReactElement {
   if (card === "hidden") {
     return <div className={styles.hidden}>uni</div>;
   }
   switch (card.type) {
     case "Number": {
-      return <div className={`${styles.character} ${colorClasses[card.color]}`}>{card.value}</div>;
+      return (
+        <div className={`${styles.character} ${cardColorClasses[card.color]}`}>{card.value}</div>
+      );
     }
 
     case "Reverse": {
-      return <div className={`${styles.character} ${colorClasses[card.color]}`}>R</div>;
+      return <div className={`${styles.character} ${cardColorClasses[card.color]}`}>R</div>;
     }
 
     case "Skip": {
-      return <div className={`${styles.character} ${colorClasses[card.color]}`}>S</div>;
+      return <div className={`${styles.character} ${cardColorClasses[card.color]}`}>S</div>;
     }
 
     case "Draw2": {
       return (
-        <div className={`${styles.draw2} ${colorClasses[card.color]}`}>
+        <div className={`${styles.draw2} ${cardColorClasses[card.color]}`}>
           <div className={styles.draw2Symbol}>
             <div style={{ top: "18%", left: "18%" }} />
             <div style={{ top: "34%", left: "38%" }} />
@@ -74,10 +70,10 @@ function CardViewContent({ card }: CardViewProps): ReactElement {
       return (
         <div className={styles.draw4}>
           <div className={styles.draw4Symbol}>
-            <div className={colorClasses.Green} style={{ top: "16%", left: "12%" }} />
-            <div className={colorClasses.Yellow} style={{ top: "24%", left: "24%" }} />
-            <div className={colorClasses.Blue} style={{ top: "32%", left: "36%" }} />
-            <div className={colorClasses.Red} style={{ top: "40%", left: "48%" }} />
+            <div className={cardColorClasses.Green} style={{ top: "16%", left: "12%" }} />
+            <div className={cardColorClasses.Yellow} style={{ top: "24%", left: "24%" }} />
+            <div className={cardColorClasses.Blue} style={{ top: "32%", left: "36%" }} />
+            <div className={cardColorClasses.Red} style={{ top: "40%", left: "48%" }} />
           </div>
           +4
         </div>
@@ -88,10 +84,10 @@ function CardViewContent({ card }: CardViewProps): ReactElement {
       return (
         <div className={styles.wild}>
           <div className={styles.wildSymbol}>
-            <div className={colorClasses.Red} />
-            <div className={colorClasses.Blue} />
-            <div className={colorClasses.Green} />
-            <div className={colorClasses.Yellow} />
+            <div className={cardColorClasses.Red} />
+            <div className={cardColorClasses.Blue} />
+            <div className={cardColorClasses.Green} />
+            <div className={cardColorClasses.Yellow} />
           </div>
         </div>
       );
