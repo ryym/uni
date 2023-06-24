@@ -9,8 +9,10 @@ import {
   canPlayOn,
   canPlayWith,
 } from "~/app/uni/game/readers";
-import { Card } from "~shared/cards";
+import { useDialog } from "~/views/lib/ModalDialog";
+import { Card, Color } from "~shared/cards";
 import { CardView } from "./CardView";
+import { ColorSelectDialog } from "./ColorSelectDialog";
 import styles from "./styles/MyHand.module.css";
 
 export type MyHandProps = {
@@ -100,18 +102,24 @@ export function MyHand(props: MyHandProps): ReactElement {
     );
   };
 
+  const colorSelectDialogHandle = useDialog();
+
+  const playCards = (color: string | null) => {
+    setSelectedCards([]);
+    const cardIds = selectedCards.map((c) => c.id);
+    props.runAction({ type: "Play", cardIds, color });
+  };
+
   const onPlay = () => {
     if (selectedCards.length === 0) {
       return;
     }
-    const cardIds = selectedCards.map((c) => c.id);
     const cardType = selectedCards[0].type;
-    let color: string | null = null;
     if (cardType === "Wild" || cardType === "Draw4") {
-      color = window.prompt("color (Red | Blue | Green | Yellow)");
+      colorSelectDialogHandle.showModal();
+    } else {
+      playCards(null);
     }
-    setSelectedCards([]);
-    props.runAction({ type: "Play", cardIds, color });
   };
 
   const onDraw = () => {
@@ -124,8 +132,18 @@ export function MyHand(props: MyHandProps): ReactElement {
     props.runAction({ type: "Pass" });
   };
 
+  const onColorSelect = (color: Color) => {
+    colorSelectDialogHandle.close();
+    playCards(color);
+  };
+
   return (
     <div className={styles.root}>
+      <ColorSelectDialog
+        key={myCardHashes.join("-")}
+        handle={colorSelectDialogHandle}
+        onColorSelect={onColorSelect}
+      />
       <div className={`${styles.handHead} ${isMyTurn ? styles.isMyTurn : ""}`}>
         <span>手札</span>
         {selectedCards.length > 0 && (
