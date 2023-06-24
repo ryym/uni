@@ -5,10 +5,10 @@
   "author": "ryym <ryym.64@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "concurrently npm:vite npm:hcm",
+    "dev": "concurrently npm:vite npm:hcm npm:emulator",
+    "dev-connect": "CONNECT_FIREBASE=true npm:vite npm:hcm",
     "vite": "vite",
-    "emulator": "firebase emulators:start",
-    "dev-connect": "CONNECT_FIREBASE=true vite",
+    "emulator": "node scripts/firebaseEmulator.mjs",
     "build:dev": "tsc && CONNECT_FIREBASE=true vite build --mode development",
     "build:PROD": "tsc && vite build",
     "deploy:dev": "firebase --project default deploy",
