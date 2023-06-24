@@ -134,3 +134,21 @@ export const ConecutiveAttacks: Story = (() => {
     memberMap: { p1: { name: "プレイヤー1", joinedAt: 1 } },
   });
 })();
+
+export const ColorSelection: Story = (() => {
+  const initialGame = initializeGame({
+    cards: [
+      cardById("draw4-0"),
+      cardById("wild-0"),
+      cardById("num-r-0-0"),
+      cardById("num-b-0-0"),
+      cardById("num-g-0-0"),
+      cardById("num-y-0-0"),
+    ],
+    playerUids: ["p1"],
+    handCardsNum: 2,
+  });
+  return interactiveStory(initialGame, {
+    memberMap: { p1: { name: "プレイヤー1", joinedAt: 1 } },
+  });
+})();
