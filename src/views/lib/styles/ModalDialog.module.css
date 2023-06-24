@@ -6,3 +6,7 @@
   border-radius: 4px;
   box-shadow: 0 0 6px var(--color-black);
 }
+
+.root::backdrop {
+  background: rgb(0 0 0 / 40%);
+}
