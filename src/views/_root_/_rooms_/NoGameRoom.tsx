@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Fragment, ReactElement } from "react";
+import { Fragment, ReactElement, useState } from "react";
 import { userAtom } from "~/views/store/session";
 import { RoomState } from "~shared/room";
 import styles from "./styles/NoGameRoom.module.css";
@@ -11,11 +11,18 @@ export type NoGameRoomProps = {
 
 export function NoGameRoom(props: NoGameRoomProps): ReactElement {
   const user = useAtomValue(userAtom);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const onStartGame = () => {
+    setIsGameStarted(true);
+    props.onStartGame();
+  };
   return (
     <div className={styles.root}>
       <div>
         <p>ゲームはまだ始まっていません。</p>
-        <button onClick={props.onStartGame}>ゲームを始める</button>
+        <button onClick={onStartGame} disabled={isGameStarted}>
+          ゲームを始める
+        </button>
       </div>
       <div>
         <div className={styles.head}>メンバー</div>
