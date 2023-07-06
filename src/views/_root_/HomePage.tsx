@@ -7,10 +7,12 @@ export function HomePage(): ReactElement {
   const [, navigate] = useLocation();
   const createRoom = useCreateRoom();
 
+  const [submitted, setSubmitted] = useState(false);
   const [masterPassword, setMasterPassword] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitted(true);
     const newRoom = await createRoom(masterPassword);
     navigate(`/rooms/${newRoom.id}`);
   };
@@ -32,7 +34,9 @@ export function HomePage(): ReactElement {
             value={masterPassword}
             onChange={(e) => setMasterPassword(e.target.value)}
           />
-          <button type="submit">作成</button>
+          <button type="submit" disabled={submitted}>
+            作成
+          </button>
         </form>
         <p className={styles.limitNote}>
           ※ この Web アプリは限定されたユーザーにのみ公開されています。
