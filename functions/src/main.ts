@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { cancelGameHandler } from "./funcs/cancelGame";
 import { initGameHandler } from "./funcs/initGame";
 import { pingHandler } from "./funcs/ping";
 
@@ -28,3 +29,4 @@ const func = functions.region("asia-northeast1").https;
 
 export const ping = func.onCall(pingHandler(app));
 export const initGame = func.onCall(initGameHandler(app));
+export const cancelGame = func.onCall(cancelGameHandler(app));
