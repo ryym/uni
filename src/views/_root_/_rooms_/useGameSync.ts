@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GameAction, GameConfig, updateGameState } from "~/app/uni/game";
 import { GameSync, syncGame } from "~/app/uni/game/sync";
 import { gameConfigDocRef, gameStateDocRef, updateDoc } from "~/backend/db";
-import { callInitGameFunction } from "~/backend/functions";
+import { callCancelGameFunction, callInitGameFunction } from "~/backend/functions";
 import { log } from "~/lib/logger";
 import { firebaseAtom } from "~/views/store/firebase";
 import { roomConfigAtom } from "./store/room";
@@ -12,6 +12,7 @@ import { roomConfigAtom } from "./store/room";
 export type GameSyncOperations = {
   readonly startGame: () => Promise<void>;
   readonly updateAndSync: UpdateAndSyncGame;
+  readonly cancelGame: () => Promise<void>;
 };
 
 export type UpdateAndSyncGame = (
@@ -72,6 +73,12 @@ export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
         if (result.ok) {
           await updateDoc(null, gameStateDocRef(db, roomConfig.id), result.value);
         } else {
+          setGame({ status: "invalid", error: result.error });
+        }
+      },
+      cancelGame: async () => {
+        const result = await callCancelGameFunction(functions, { roomId: roomConfig.id });
+        if (result.error != null) {
           setGame({ status: "invalid", error: result.error });
         }
       },
