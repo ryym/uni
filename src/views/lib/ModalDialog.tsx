@@ -28,13 +28,18 @@ export type DialogHandle = {
 export const useDialog = (): DialogHandle => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  const getDialogElement = (ref: typeof dialogRef) => {
+    if (ref.current == null) {
+      throw new Error("[uni][useDialog] dialog ref must be set");
+    }
+    return ref.current;
+  };
+
   const handle: DialogHandle = useMemo(() => {
     return Object.freeze({
       ref: dialogRef,
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
-      showModal: () => dialogRef.current!.showModal(),
-      close: () => dialogRef.current!.close(),
-      /* eslint-enable @typescript-eslint/no-non-null-assertion */
+      showModal: () => getDialogElement(dialogRef).showModal(),
+      close: () => getDialogElement(dialogRef).close(),
     });
   }, [dialogRef]);
 
