@@ -1,4 +1,5 @@
 import { ReactElement, useState } from "react";
+import { globalStyles } from "~/globalStyles";
 import styles from "./styles/Entrance.module.css";
 
 export type EntranceProps = {
@@ -25,7 +26,7 @@ export function Entrance(props: EntranceProps): ReactElement {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
         />
-        <button type="submit" disabled={props.joining}>
+        <button type="submit" className={globalStyles.btn} disabled={props.joining}>
           {props.joining ? "入室中..." : "入室"}
         </button>
       </form>

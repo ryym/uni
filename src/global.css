@@ -40,29 +40,6 @@ input:where([type="text"], [type="password"]) {
   font-size: inherit;
 }
 
-button {
-  position: relative;
-  display: block;
-  appearance: none;
-  padding: 0.25em 0.7em;
-  border: 0;
-  border-radius: 0.25em;
-  font-size: inherit;
-  color: var(--color-white);
-  background-color: var(--color-black);
-}
-
-button:disabled::before {
-  content: " ";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: var(--color-white);
-  opacity: 0.6;
-}
-
 /* Global classes */
 
 .cardRed {
@@ -79,4 +56,27 @@ button:disabled::before {
 
 .cardYellow {
   --card-color: var(--color-card-yellow);
+}
+
+.btn {
+  position: relative;
+  display: block;
+  appearance: none;
+  padding: 0.25em 0.7em;
+  border: 0;
+  border-radius: 0.25em;
+  font-size: inherit;
+  color: var(--color-white);
+  background-color: var(--color-black);
+}
+
+.btn:disabled::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-white);
+  opacity: 0.6;
 }

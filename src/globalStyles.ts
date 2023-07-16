@@ -6,3 +6,7 @@ export const cardColorClasses = Object.freeze({
   Green: "cardGreen",
   Yellow: "cardYellow",
 }) satisfies Record<Color, string>;
+
+export const globalStyles = Object.freeze({
+  btn: "btn",
+});

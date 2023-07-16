@@ -9,6 +9,7 @@ import {
   canPlayOn,
   canPlayWith,
 } from "~/app/uni/game/readers";
+import { globalStyles } from "~/globalStyles";
 import { useDialog } from "~/views/lib/ModalDialog";
 import { Card, Color } from "~shared/cards";
 import { CardView } from "./CardView";
@@ -156,13 +157,25 @@ export function MyHand(props: MyHandProps): ReactElement {
       </div>
       <div className={styles.cards}>{myCardHashes.map((cardHash) => renderCard(cardHash))}</div>
       <div className={styles.actions}>
-        <button className={styles.actionButton} disabled={!playEnabled} onClick={onPlay}>
+        <button
+          className={`${globalStyles.btn} ${styles.actionButton}`}
+          disabled={!playEnabled}
+          onClick={onPlay}
+        >
           出す
         </button>
-        <button className={styles.actionButton} disabled={!drawEnabled} onClick={onDraw}>
+        <button
+          className={`${globalStyles.btn} ${styles.actionButton}`}
+          disabled={!drawEnabled}
+          onClick={onDraw}
+        >
           引く
         </button>
-        <button className={styles.actionButton} disabled={!passEnabled} onClick={onPass}>
+        <button
+          className={`${globalStyles.btn} ${styles.actionButton}`}
+          disabled={!passEnabled}
+          onClick={onPass}
+        >
           パス
         </button>
       </div>

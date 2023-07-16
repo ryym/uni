@@ -1,5 +1,6 @@
 import { FormEvent, ReactElement, useState } from "react";
 import { useLocation } from "wouter";
+import { globalStyles } from "~/globalStyles";
 import styles from "./styles/HomePage.module.css";
 import { useCreateRoom } from "./useCreateRoom";
 
@@ -34,7 +35,7 @@ export function HomePage(): ReactElement {
             value={masterPassword}
             onChange={(e) => setMasterPassword(e.target.value)}
           />
-          <button type="submit" disabled={submitted}>
+          <button type="submit" className={globalStyles.btn} disabled={submitted}>
             作成
           </button>
         </form>
