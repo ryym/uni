@@ -25,7 +25,7 @@ export function GameView(props: GameViewProps): ReactElement {
       return <NoGameRoom room={props.room} onStartGame={ops.startGame} />;
     }
     case "invalid": {
-      return <InvalidGame message={game.error} />;
+      return <InvalidGame message={game.error} cancelGame={ops.cancelGame} />;
     }
     case "valid": {
       return (

@@ -4,3 +4,7 @@
   gap: 8px;
   color: var(--color-card-red);
 }
+
+.cancelBtn {
+  max-width: 200px;
+}
