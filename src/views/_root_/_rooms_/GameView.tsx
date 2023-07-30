@@ -36,6 +36,7 @@ export function GameView(props: GameViewProps): ReactElement {
           gameState={game.state}
           handCardMap={handCardMap}
           runAction={(action) => ops.updateAndSync(user.uid, game, action)}
+          cancelGame={ops.cancelGame}
         />
       );
     }

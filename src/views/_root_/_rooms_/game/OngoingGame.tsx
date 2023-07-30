@@ -3,6 +3,8 @@ import { User } from "~/app/models";
 import { cardById } from "~/app/uni/cards";
 import { GameAction, GameConfig, GameState, HandCardMap } from "~/app/uni/game";
 import { countCardsInDeck, countCardsInHands } from "~/app/uni/game/readers";
+import { globalStyles } from "~/globalStyles";
+import { ModalDialog, useDialog } from "~/views/lib/ModalDialog";
 import { RoomMemberMap } from "~shared/room";
 import { Deck } from "./Deck";
 import { DiscardPile } from "./DiscardPile";
@@ -18,6 +20,7 @@ export type OngoingGameProps = {
   readonly gameState: GameState;
   readonly handCardMap: HandCardMap;
   readonly runAction: (action: GameAction) => void;
+  readonly cancelGame: () => unknown;
 };
 
 type GameEvent = {
@@ -60,6 +63,17 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
     return gameState.discardPile.topCardIds.map((id) => cardById(id));
   }, [gameState.discardPile.topCardIds]);
 
+  const menuDialogHandle = useDialog();
+  const [gameCancelled, setGameCancelled] = useState(false);
+  const onCancelGame = () => {
+    setGameCancelled(true);
+    props.cancelGame();
+  };
+
+  const onMenuOpen = () => {
+    menuDialogHandle.showModal();
+  };
+
   return (
     <div className={styles.root}>
       <div className={styles.players}>
@@ -79,6 +93,20 @@ export function OngoingGame(props: OngoingGameProps): ReactElement {
           </div>
         )}
 
+        <div className={styles.gameMenu}>
+          <button type="button" className={styles.menuButton} onClick={onMenuOpen} title="menu">
+            <span />
+            <span />
+            <span />
+          </button>
+          <ModalDialog handle={menuDialogHandle}>
+            <div className={styles.menuDialog}>
+              <button className={globalStyles.btn} disabled={gameCancelled} onClick={onCancelGame}>
+                Cancel Game
+              </button>
+            </div>
+          </ModalDialog>
+        </div>
         <div className={styles.discardPile}>
           <DiscardPile
             cardCount={pileCardCount}

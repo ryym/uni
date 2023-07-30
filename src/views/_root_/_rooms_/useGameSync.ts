@@ -77,6 +77,7 @@ export const useGameSync = (): readonly [GameSync, GameSyncOperations] => {
         }
       },
       cancelGame: async () => {
+        log.debug("cancelling game");
         const result = await callCancelGameFunction(functions, { roomId: roomConfig.id });
         if (result.error != null) {
           setGame({ status: "invalid", error: result.error });

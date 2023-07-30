@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { User } from "~/app/models";
@@ -61,6 +62,7 @@ const interactiveStory = (
           gameState={state}
           handCardMap={handCardMap}
           runAction={runAction}
+          cancelGame={action("cancelGame")}
         />
       );
     },
